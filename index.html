@@ -91,8 +91,14 @@ wherever our markers occur.</p>             </td>             <td class="code"> 
   <span class="nv">language = </span><span class="nx">get_language</span> <span class="nx">source</span>
   <span class="nv">pygments = </span><span class="nx">spawn</span> <span class="s1">&#39;pygmentize&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;-l&#39;</span><span class="p">,</span> <span class="nx">language</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;html&#39;</span><span class="p">,</span> <span class="s1">&#39;-O&#39;</span><span class="p">,</span> <span class="s1">&#39;encoding=utf-8&#39;</span><span class="p">]</span>
   <span class="nv">output   = </span><span class="s1">&#39;&#39;</span>
+  
   <span class="nx">pygments</span><span class="p">.</span><span class="nx">stderr</span><span class="p">.</span><span class="nx">addListener</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span>  <span class="nf">(error)  -&gt;</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span> <span class="nx">error</span> <span class="k">if</span> <span class="nx">error</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span> <span class="nx">error</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="k">if</span> <span class="nx">error</span>
+    
+  <span class="nx">pygments</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">addListener</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span>  <span class="nf">(error)  -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span> <span class="s2">&quot;Could not use Pygments to highlight the source.&quot;</span>
+    <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span> <span class="mi">1</span>
+    
   <span class="nx">pygments</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">addListener</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nf">(result) -&gt;</span>
     <span class="nx">output</span> <span class="o">+=</span> <span class="nx">result</span> <span class="k">if</span> <span class="nx">result</span>
     
@@ -105,7 +111,7 @@ wherever our markers occur.</p>             </td>             <td class="code"> 
     <span class="nx">callback</span><span class="p">()</span>
     
   <span class="k">if</span> <span class="nx">pygments</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">writable</span>
-  <span class="nx">pygments</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">((</span><span class="nx">section</span><span class="p">.</span><span class="nx">code_text</span> <span class="k">for</span> <span class="nx">section</span> <span class="k">in</span> <span class="nx">sections</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="nx">language</span><span class="p">.</span><span class="nx">divider_text</span><span class="p">))</span>
+    <span class="nx">pygments</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">((</span><span class="nx">section</span><span class="p">.</span><span class="nx">code_text</span> <span class="k">for</span> <span class="nx">section</span> <span class="k">in</span> <span class="nx">sections</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="nx">language</span><span class="p">.</span><span class="nx">divider_text</span><span class="p">))</span>
     <span class="nx">pygments</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">end</span><span class="p">()</span>
   </pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>Once all of the code is finished highlighting, we can generate the HTML file
 and write out the documentation. Pass the completed sections into the template
@@ -188,4 +194,4 @@ For each source file passed in as an argument, generate the documentation.</p>  
     <span class="nv">next_file = </span><span class="o">-&gt;</span> <span class="nx">generate_documentation</span> <span class="nx">files</span><span class="p">.</span><span class="nx">shift</span><span class="p">(),</span> <span class="nx">next_file</span> <span class="k">if</span> <span class="nx">files</span><span class="p">.</span><span class="nx">length</span>
     <span class="nx">next_file</span><span class="p">()</span>
 
-</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div>    </body> </html> 
