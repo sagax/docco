@@ -65,7 +65,13 @@
     </table>
   </div>
   <% if (sources.length > 1) { %>
-    <script type="text/javascript" src="docco.js"></script>
+    <% if (scripts) { %>
+      <script type="text/javascript">
+        <%= scripts %>
+      </script>
+    <% } else { %>
+      <script type="text/javascript" src="docco.js"></script>
+    <% } %>
   <% } %>
 </body>
 </html>

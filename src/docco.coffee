@@ -146,7 +146,7 @@ generate_html = (source, sections) ->
   
   # If using `--structured-output`: we can pass in the sources array *as-is*.
   # Otherwise: we map the sources to just the filenames.
-  html        = docco_template
+  html = docco_template
     title: title
     styles: if inline then docco_styles else ''
     scripts: if inline then docco_scripts else ''
@@ -238,8 +238,8 @@ while args.length
     # `--structured-output` will match the docs directory structure to your source
     # directory structure. This will also trigger css and scripts to render inline.
     when '--structured-output' then inline = structured_output = true
-    # `--inline` will add the styles into a `<style>` tag inline vs externally
-    # linking to the styles.
+    # `--inline` will add the styles and scripts _inline_ intead of using external
+    # resources.
     when '--inline' then inline = true
     # `--css myStyles.css` or `-c myStyles.css` will trigger using a custom
     # stylesheet; otherwise the default docco styles will be used.
