@@ -134,24 +134,24 @@ generate_html = (source, sections) ->
   title       = path.basename source
   dest        = destination source
   
-  # If using `--structured-output`: create a relative destination function
+  # If using `--structured`: create a relative destination function
   # to fix paths used in the "Jump to..." menu. The new function creates
   # a string with a `../` for each level of depth in the current source file's
   # path and prefixes it to the linked source file's path. Otherwise:
   # the relative destination should simply be the filename.
-  relative_destination = if structured_output then (source)->
+  relative_destination = if structured then (source)->
     (path.dirname(dest) + '/').replace(/[^\/]*\//g, '../') + destination source
   else (source) ->
     path.basename destination source
   
-  # If using `--structured-output`: we can pass in the sources array *as-is*.
+  # If using `--structured`: we can pass in the sources array *as-is*.
   # Otherwise: we map the sources to just the filenames.
-  html = docco_template
+  html        = docco_template
     title: title
     styles: if inline then docco_styles else ''
     scripts: if inline then docco_scripts else ''
     sections: sections
-    sources: if structured_output then sources else sources.map (source)-> path.basename source
+    sources: if structured then sources else sources.map (source)-> path.basename source
     relative_destination: relative_destination
   console.log "docco: #{source} -> #{dest}"
   ensure_directory path.dirname(dest), ->
@@ -203,9 +203,9 @@ get_language = (source) -> languages[path.extname(source)]
 
 # Compute the destination HTML path for an input source file path. If the source
 # is `lib/example.coffee`, the HTML will be at `docs/example.html`; unless the
-# `--structured-output` flag is set, in which case it will be `docs/lib/example.html`
+# `--structured` flag is set, in which case it will be `docs/lib/example.html`
 destination = (filepath) ->
-  'docs/' + (if structured_output then path.dirname(filepath) + '/' else '') + path.basename(filepath, path.extname(filepath)) + '.html'
+  'docs/' + (if structured then path.dirname(filepath) + '/' else '') + path.basename(filepath, path.extname(filepath)) + '.html'
 
 # Ensure that the destination directory exists.
 ensure_directory = (dir, callback) ->
@@ -235,9 +235,9 @@ while args.length
     when '--version'
       console.log 'Docco v' + version
       return
-    # `--structured-output` will match the docs directory structure to your source
+    # `--structured` will match the docs directory structure to your source
     # directory structure. This will also trigger css and scripts to render inline.
-    when '--structured-output' then inline = structured_output = true
+    when '--structured', '-s' then inline = structured = true
     # `--inline` will add the styles and scripts _inline_ intead of using external
     # resources.
     when '--inline' then inline = true
