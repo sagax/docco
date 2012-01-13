@@ -97,7 +97,7 @@ parse = (source, code) ->
       line = line.replace(language.comment_exit, '')
       line = line.replace(language.comment_enter, '')
       line = line.replace(language.comment_matcher, '')
-      line = line.replace(/^ +/, '');
+      line = line.replace(/^ *[\*] */, '');
       param = line.match(language.param);
       if param
         line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
@@ -170,7 +170,7 @@ languages =
   '.coffee':
     name: 'coffee-script', symbol: '#'
   '.js':
-    name: 'javascript', symbol: '//', enter: '/\\*\+', exit: '\\*\+/', param: /\* *@([a-zA-Z]+)/
+    name: 'javascript', symbol: '//', enter: '/\\*\+', exit: '\\*\+/', param: /@([a-zA-Z]+)/
   '.rb':
     name: 'ruby', symbol: '#'
   '.py':
