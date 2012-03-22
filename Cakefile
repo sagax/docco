@@ -9,11 +9,12 @@ task 'build', 'build the docco library', (options) ->
 
 task 'install', 'install the `docco` command into /usr/local (or --prefix)', (options) ->
   base = options.prefix or '/usr/local'
-  lib  = base + '/lib/docco'
+  lib  = base + '/lib/docas'
   exec([
     'mkdir -p ' + lib
     'cp -rf bin README resources vendor lib ' + lib
     'ln -sf ' + lib + '/bin/docco ' + base + '/bin/docco'
+    'ln -sf ' + lib + '/bin/docas ' + base + '/bin/docas'
   ].join(' && '), (err, stdout, stderr) ->
    if err then console.error stderr
   )
