@@ -61,9 +61,21 @@ generate_documentation = (source, callback) ->
     sections = parse source, code
     highlight source, sections, ->
       if /[^_]_$/.exec path.extname source
-        code_html = sections[0].code_text.split(' ') \
-          .map((x) -> "<span>#{x}</span>").join(' ')
-        sections[0].code_html = "<div class=\"highlight shebang\"><pre>#{code_html}</pre></div>"
+        if sections.length > 0
+          code_html = sections[0].code_text.split(' ') \
+            .map((x) -> "<span>#{x}</span>").join(' ')
+          sections[0].code_html = "<div class=\"highlight shebang\"><pre>#{code_html}</pre></div>"
+          if sections[0].code_text.trim().length and sections.length > 1
+            tmp = sections[0]
+            sections[0] = sections[1]
+            sections[1] = tmp
+          # if sections[0].code_text.trim().length > 0
+          #   idx = 1
+          #   while idx < sections.length and not sections[idx].code_text.trim().length
+          #     idx += 1
+          #   if idx < sections.length
+          #     sections.splice idx, 0, sections[0]
+          #     sections.splice 0, 1
       generate_html source, sections
       callback()
 

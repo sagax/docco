@@ -32,14 +32,14 @@
 # collaborator.
 #
 # ### Command-line usage: ###
-# docas <username>/<repository>
+# docas username/repository
 
 
 
 # ## Script Procedure ##
-
+#
 # ### Setup Phase ###
-
+#
 # Halt the execution immediately when encountering any non-zero return value.
 set -e
 
