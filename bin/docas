@@ -1,61 +1,94 @@
 #!/usr/bin/env bash
 
-# Command-line usage:
-# docas <username> <repository>
+# Docas help you document your git repository automatically. It relies on:
+#
+#   *  [Docco][Docco], a quick and dirty, hundred-line-long, 
+#      literate-programming style documentation generator, original by
+#      Jeremy Ashkenas.
+#
+#   *  Docci, generate an index.html cover page for your git repository. The
+#      cover page contains the repository's recent commit history, a
+#      statistics of languages and slocs, and a file browser for navigation.
+#
+# Docas can be used stand alone on the developer's machine, which will:
+#
+#   1. Clone the git (current on GitHub only) repository into a temporary
+#      directory.
+#
+#   2. (Optional) Create the gh-pages branch on GitHub if not exists.
+#
+#   3. Generate the cover page using docci.
+#
+#   4. Documente (documentable) sources for each directory.
+#
+#   5. Push to the remote gh-pages branch.
+#
+# ## Hosted Version ##
+#
+# Actually, for most of developers who want a quick and dirty mechanism for
+# documentation synchronization, please goto [Docas.io](http://docas.io), an
+# documentation service which synchronize the documents on gh-pages branch in
+# real time when you make any commit. As simple as adding docas as your
+# collaborator.
+#
+# ### Command-line usage: ###
+# docas <username>/<repository>
 
-# Exit when encounters a non-zero return value.
+
+
+# ## Script Procedure ##
+
+# ### Setup Phase ###
+
+# Halt the execution immediately when encountering any non-zero return value.
 set -e
 
 # Ensure enough arguments are given.
-if [ $# -lt 2 ]; then
-
-  echo -e "\nUsage: docas <username> <repository>\n"
+if [ $# -lt 1 ]; then
+  echo -e "\nUsage: docas <username>/<repository>\n"
   exit
-
 fi
 
+# Separate input arguments by slash into user name and repository name.
+username=$(echo $1 | cut -d'/' -f1)
+repository=$(echo $1 | cut -d'/' -f2)
 
-# Prepare working directory.
-# --------------------------
-
-# Create temp directory to hold repository.
+# Prepare working directory, create a temporary directory to store the
+# repository's master branch and also the generated gh-pages branch.
 tempdir=$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)
 
 # Remove the temp directory on exit, interruption, and termination.
 trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
 
-# Change directory to temp directory.
+# Resolve link to actual directory. This will keep the shell script's directory
+# and node.js' path.resolve (which will provide the actual referenced path) in
+# consistency.
 cd $tempdir
+tempdir=$(pwd -P)
 
+# ### Fetch the Repository ###
 
-# Fetch the repository.
-# ---------------------
-
-echo "Fetching git@github.com:$1/$2.git..."
+echo "Cloning git@github.com:$username/$repository.git..."
 
 # Shallow clone the GitHub repository to master directory.
-git clone -q --depth=1 git@github.com:$1/$2.git master
+git clone -q --depth=1 git@github.com:$username/$repository.git "$tempdir/master"
 
+# Keep the current commit hash.
+cd $tempdir/master
+commithash=$(git rev-parse HEAD | cut -c1-10)
 
-# Ensure gh-pages branch exists.
-# ------------------------------
-
-# Change directory to master directory.
-cd master
+# ### Ensure gh-pages Branch Exists. ###
 
 # Test if gh-pages branch exists.
-if [ `git branch -a | grep origin\/gh-pages | wc -l` = 0 ]; then
+if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
 
-  echo "Branch gh-pages not found, creating..."
-
-  # Change to temp directory.
-  cd ..
+  echo "Creating gh-pages branch..."
 
   # Duplicate master directory to gh-pages directory.
-  cp -R master gh-pages
+  cd -R $tempdir/master $tempdir/gh-pages
 
   # Change to gh-pages directory.
-  cd gh-pages
+  cd $tempdir/gh-pages
 
   # Create gh-pages branch. 
   git symbolic-ref HEAD refs/heads/gh-pages > /dev/null
@@ -71,93 +104,127 @@ if [ `git branch -a | grep origin\/gh-pages | wc -l` = 0 ]; then
 
 else
 
-  # Change to temp directory. 
-  cd ..
-
   # Duplicate master directory to gh-pages directory.
-  cp -R master gh-pages
+  cp -R $tempdir/master $tempdir/gh-pages
 
   # Change directory to gh-pages.
-  cd gh-pages
+  cd $tempdir/gh-pages
 
   # Setup gh-pages branch to track remote branch gh-pages from origin.
   git checkout -q -b gh-pages origin/gh-pages > /dev/null
 
 fi
 
+# ### Generate Cover Page using Docci ###
 
-# Make sure default stylesheet exists. User modification will be kept.
-# --------------------------------------------------------------------
+# Used on stand-alone version.
+cd /usr/local/lib/docas/vendor/linguist
+bundle exec linguist $tempdir/master                         > $tempdir/stat
+find $tempdir/master -type f | xargs bundle exec source_only > $tempdir/list
+cd $tempdir
 
-# Change directory to temporary directory.
-cd ..
+# Used on SaaS version, by leveraging
+# [linguist_http](http://github.com/baoshan/linguist_http).
+# wget -O "$tempdir/stat" "http://127.0.0.1:4567/stat$tempdir"
+# wget -O "$tempdir/list" "http://127.0.0.1:4567/list$tempdir"
+
+# Make sure a stylesheet for index.html exists. User modification will be kept.
 
 # In case of the stylesheet doesn't exists.
-if ! [ -f gh-pages/stylesheets/docco.css ]; then
+if ! [ -f $tempdir/gh-pages/stylesheets/index.css ]; then
 
   # Create the stylesheets folder if not exists.
-  mkdir -p gh-pages/stylesheets
+  mkdir -p $tempdir/gh-pages/stylesheets
 
-  # Copy the default stylesheet by Jeremy to the folder.
-  cp /usr/local/lib/docas/resources/docco.css gh-pages/stylesheets/docco.css
+  # Copy the default stylesheet to the folder.
+  cp /usr/local/lib/docas/resources/index.css \
+    $tempdir/gh-pages/stylesheets/index.css
 
 fi
 
+# Invoke the docci command-line to generate index.html for master directory.
+docci -c "/$repository/stylesheets/index.css" -o $tempdir/gh-pages $tempdir/master
 
-# Synchronize gh-pages Branch
-# ---------------------------
 
-echo "Synchronizing locally..."
 
-# Change directory to gh-pages.
-cd gh-pages
+# ### Generate Documents using Docco ###
 
-# Remove all the files in the gh-pages directory which is generated by docco.
-find . -type f -exec grep -l -i '<meta name="generator" content="docco.*">' '{}' ';' | xargs rm
+echo "Generating documents..."
 
-# Change directory to master.
-cd ../master
+# Make sure a stylesheet for documents exists. User modification will be kept.
+
+
+# In case of the stylesheet doesn't exists.
+if ! [ -f $tempdir/gh-pages/stylesheets/docco.css ]; then
+
+  # Create the stylesheets folder if not exists.
+  mkdir -p $tempdir/gh-pages/stylesheets
+
+  # Copy the default stylesheet to the folder.
+  cp /usr/local/lib/docas/resources/docco.css \
+    $tempdir/gh-pages/stylesheets/docco.css
+
+fi
+
+# Remove all the files generated by docco previously.
+find $tempdir/gh-pages -type f \
+  -exec grep -l -i '<meta name="generator" content="docco.*">' '{}' + \
+  | xargs rm
+
+# Keep the path name of the master directory into a local variable, which will
+# be used to remove the prefix from the source list.
+masterdir=$tempdir/master
+masterdirlength=${#masterdir}
+
+cat $tempdir/list
 
 # Process the sources for each directory (exclude hidden directory).
-find . -type d -not -path '*/.*/*' -not -name '.*' | while read dir; do
+find $tempdir/master -type d -not -path '*/.*/*' -not -name '.*' | while read dir; do
+
+
+  echo $dir
 
   # Files directly belong to that directory will be processed together.
   # The link of the stylesheet will be '/<repository>/stylesheets/docco.css'.
-  find $dir -maxdepth 1 -type f -exec docco -c "/$2/stylesheets/docco.css" -o ../gh-pages/$dir '{}' + > /dev/null
+  egrep "^$dir/[^\/]+$" $tempdir/list \
+    | xargs docco -c "/$repository/stylesheets/docco.css" -o \
+    $tempdir/gh-pages${dir:$masterdirlength} # > /dev/null
 
 done
 
 
-# Update gh-pages Branch at GitHub
-# --------------------------------
 
-# Change directory to gh-pages.
-cd ../gh-pages
+# ### Synchronize gh-pages Branch with GitHub
 
-# Add any new or modified files to the index.
+# Add any created or modified files to the index.
+cd $tempdir/gh-pages
 git add .
 
-# Provide general statistics.
+# Find out the status of gh-pages branch using git porcelain layer.
+gitstatus=$(git status --porcelain)
+
+# Print modification log.
 echo "Created:$(git status --porcelain | egrep "^(A| A)" | wc -l)"
 echo "Altered:$(git status --porcelain | egrep "^(M| M)" | wc -l)"
 echo "Deleted:$(git status --porcelain | egrep "^(D| D)" | wc -l)"
 
-# If any file is new, modified, or deleted.
+# Is there any file created, modified, or deleted?
 if [ $(git status --porcelain | wc -l) -gt 0 ]; then
 
-  echo "Pushing to gh-pages branch at GitHub."
+  echo "Synchronizing GitHub pages remotely..."
 
-  # Commit the gh-pages branch.
-  # Auto include deleted files.
-  git commit -q -a -m "Synced at $(date)."
+  # Commit the gh-pages branch. Remove deleted files from the index
+  # automatically.
+  git commit -q -a -m "Docas dropped in. Synced with $commithash."
 
-  # Push to origin/gh-pages branch at GitHub.
+  # Push to gh-pages branch at GitHub.
   git push -q origin gh-pages
 
-  echo "Successed!"
+  echo http://$username.github.com/$repository is now up-to-date. \
+    \(crowd applauds\)
 
 else
-
-  echo "No changes made to documentable sources."
-
+  # gh-pages branch is synchronized already.
+  echo Nothing happened to http://$username.github.com/$repository. \
+    Keep working hard...
 fi

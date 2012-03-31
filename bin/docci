@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
-// The node shell script is used to prepare require parameters for docci.js to
-// generate index.html for a git repository.
+// This node shell script is used to prepare required parameters for docci.js
+// to generate index.html for a git repository.
+
+// This script is invoked by the docas command-line internally.
 
 var path = require('path');
 var fs = require('fs');
@@ -12,8 +14,8 @@ process.ARGV = process.argv = process.argv.slice(2, process.argv.length);
 process.OPTS = {};
 
 // -c, --css   specify stylesheet link, default to 'index.css'
-// User should be responsible for offering the stylesheet at according location
-// when specifying this option.
+// Invoker should be responsible for offering the stylesheet at the according
+// folder/link location when specifying this option.
 var pos = process.ARGV.indexOf('-c');
 if(pos == -1) pos = process.ARGV.indexOf('--css');
 if(pos != -1) process.OPTS.css = process.ARGV.splice(pos, 2)[1];
@@ -23,4 +25,5 @@ pos = process.ARGV.indexOf('-o');
 if(pos == -1) pos = process.ARGV.indexOf('--out');
 if(pos != -1) process.OPTS.out = process.ARGV.splice(pos, 2)[1];
 
-require(lib + '/docci');
+// Kick start the processing procedure.
+require(lib + '/docci.js');

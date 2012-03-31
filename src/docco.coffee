@@ -56,10 +56,14 @@
 # up into comment/code sections, highlighting them for the appropriate language,
 # and merging them into an HTML template.
 generate_documentation = (source, callback) ->
-  fs.readFile source, "utf-8", (error, code) ->
+  fs.readFile (real_source source), "utf-8", (error, code) ->
     throw error if error
     sections = parse source, code
     highlight source, sections, ->
+      if /[^_]_$/.exec path.extname source
+        code_html = sections[0].code_text.split(' ') \
+          .map((x) -> "<span>#{x}</span>").join(' ')
+        sections[0].code_html = "<div class=\"highlight shebang\"><pre>#{code_html}</pre></div>"
       generate_html source, sections
       callback()
 
@@ -133,7 +137,7 @@ highlight = (source, sections, callback) ->
 # and write out the documentation. Pass the completed sections into the template
 # found in `resources/docco.jst`
 generate_html = (source, sections) ->
-  title = path.basename source
+  title = path.basename real_source source
   dest  = destination source
   html  = docco_template {
     title: title, sections: sections, sources: sources, path: path, destination: destination, opts: process.OPTS
@@ -153,23 +157,7 @@ showdown = require('./../vendor/showdown').Showdown
 # A list of the languages that Docco supports, mapping the file extension to
 # the name of the Pygments lexer and the symbol that indicates a comment. To
 # add another language to Docco's repertoire, add it here.
-languages =
-  '.coffee':
-    name: 'coffee-script', symbol: '#'
-  '.js':
-    name: 'javascript', symbol: '//'
-  '.rb':
-    name: 'ruby', symbol: '#'
-  '.py':
-    name: 'python', symbol: '#'
-  '.tex':
-    name: 'tex', symbol: '%'
-  '.latex':
-    name: 'tex', symbol: '%'
-  '.c':
-    name: 'c', symbol: '//'
-  '.h':
-    name: 'c', symbol: '//'
+languages = require './languages'
 
 # Build out the appropriate matchers and delimiters for each language.
 for ext, l of languages
@@ -191,7 +179,10 @@ for ext, l of languages
   l.divider_html = new RegExp('\\n*<span class="c1?">' + l.symbol + 'DIVIDER<\\/span>\\n*')
 
 # Get the current language we're documenting, based on the extension.
-get_language = (source) -> languages[path.extname(source)]
+get_language = (source) ->
+  extname = path.extname source
+  extname = extname.substr 0, extname.length - 1 if /[^_]_$/.exec extname
+  languages[extname.replace '__', '_']
 
 # Compute the destination HTML path for an input source file path. If the source
 # is `lib/example.coffee`, the HTML will be at `docs/example.html`
@@ -228,6 +219,16 @@ highlight_start = '<div class="highlight"><pre>'
 
 # The end of each Pygments highlight block.
 highlight_end   = '</pre></div>'
+
+# To correctly recognize some shebang script, a pseduo extname should be passed
+# in, such as bin/docco.js_, the last underscore indicates there's no extname
+# actually. Dirty? But works:)
+real_source = (source) ->
+  dirname  = path.dirname  source
+  extname  = path.extname  source
+  basename = path.basename source, extname
+  extname  = if not /[^_]_$/.exec extname then extname.replace '__', '_' else ''
+  "#{dirname}/#{basename}#{extname}"
 
 # Run the script.
 # For each recognized source file passed in as an argument, generate the documentation. Log sources of unknown types.

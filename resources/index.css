@@ -184,7 +184,3 @@ body .vc { color: #19469D }                     /* Name.Variable.Class */
 body .vg { color: #19469D }                     /* Name.Variable.Global */
 body .vi { color: #19469D }                     /* Name.Variable.Instance */
 body .il { color: #666666 }                     /* Literal.Number.Integer.Long */
-
-/*-------------------------- Enhancements --------------------------------*/
-body .shebang pre > span            { opacity: 0.5 }
-body .shebang pre > span:last-child { opacity: 1 }
