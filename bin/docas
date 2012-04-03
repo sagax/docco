@@ -67,20 +67,21 @@ tempdir=$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)
 cd $tempdir
 tempdir=$(pwd -P)
 
-# ### Download the Repository ###
+# ### Download the Repository
+#
+# (Shallow) clone the GitHub repository to master directory.
+# Keep the current commit hash of the master branch, which will be included in
+# the commit subject line of gh-pages branch to indicate a successful
+# synchronization.
 
 echo "Cloning git@github.com:$username/$repository.git..."
-
-# Shallow clone the GitHub repository to master directory.
 git clone -q --depth=1 git@github.com:$username/$repository.git "$tempdir/master"
-
-# Keep the current commit hash.
 cd $tempdir/master
 commithash=$(git rev-parse HEAD | cut -c1-10)
 
 
 
-# ### Ensure gh-pages Branch Exists. ###
+# ### Ensure gh-pages Branch Exists.
 
 # Test if gh-pages branch exists.
 if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
