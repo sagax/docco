@@ -177,8 +177,14 @@ echo 0
     cd $tempdir/master
 
     git ls-tree -r --name-only HEAD \
-      | while read file; do dirname $file; done \
-      | uniq > $tempdir/changed_directories_full_path
+      | while read file; do echo $(dirname $file); done \
+      | sort | uniq > $tempdir/changed_directories_full_path
+
+   echo uniq?
+
+   cat $tempdir/changed_directories_full_path
+ 
+   echo uniq!
       # | sed 's?^?'"$tempdir/master"'/?'
   
   else
@@ -284,14 +290,16 @@ fi
 # find $tempdir/gh-pages -type f \
 #  -exec grep -l -i '<meta name="generator" content="docco.*">' '{}' + \
 #  | xargs rm
-
+echo after css
+cat $tempdir/changed_directories_full_path 
+echo pre-delete
 cat $tempdir/changed_directories_full_path | while read dir; do
 
   echo $tempdir/gh-pages/$dir
   if [ -d $tempdir/gh-pages/$dir ]; then
     find $tempdir/gh-pages/$dir -type f -print0 \
-      | xargs -0 grep -l -i '<meta name="generator" content="docco.*">' \
-      | xargs rm
+      | xargs -0 grep -l -i -Z '<meta name="generator" content="docco.*">' \
+      | xargs -0 rm 
   fi
 done
 
