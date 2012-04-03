@@ -59,7 +59,7 @@ repository=$(echo $1 | cut -d'/' -f2)
 tempdir=$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)
 
 # Remove the temp directory on exit, interruption, and termination.
-trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
+# trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
 
 # Resolve link to actual directory. This will keep the shell script's directory
 # and node.js' path.resolve (which will provide the actual referenced path) in
@@ -135,6 +135,8 @@ else
 
   cd $tempdir/gh-pages
 
+echo 0
+
   synced_ghpages_hash=$(git log --pretty=oneline \
     | egrep -m 1 "Docas .* [0-9a-f]{10}$" \
     | head -c 10)
@@ -144,7 +146,31 @@ else
     | tail -c 11 \
     | head -c 10)
 
-  if [ -z $synced_ghpages_hash ]; then
+  cd $tempdir/master
+
+  echo a
+
+  echo $synced_master_hash
+
+  echo d
+
+  ls
+
+  synced_master_hash=fb67c7e73c
+
+  echo d0
+
+  # git log --pretty=oneline | grep -m 1 $synced_master_hash | echo
+
+  echo c
+
+  synced_master_hash=$(git log --pretty=oneline \
+    | egrep -m 1 "$synced_master_hash" \
+    | echo)
+
+  echo b
+
+  if [ -z $synced_ghpages_hash ] || [ -z $synced_master_hash ]; then
    
     echo x1
 
@@ -159,12 +185,15 @@ else
 
     echo "Found docas comitted gh-pages, synced with $synced_master_hash"
 
+    echo $synced_master_hash $synced_ghpages_hash
+
     git diff --name-only $synced_ghpages_hash..HEAD \
       | while read file; do dirname $file; done \
       | uniq > $tempdir/changed_directories
 
     cd $tempdir/master
 
+    echo WOW
     git diff --name-only $synced_master_hash..HEAD \
       | while read file; do dirname $file; done \
       | uniq >> $tempdir/changed_directories

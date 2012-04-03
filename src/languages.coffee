@@ -25,6 +25,8 @@ module.exports =
     name: 'php',           symbol: '//'
   '.pl':
     name: 'perl',          symbol: '#'
+  '.ps1':
+    name: 'powershell',    symbol: '#'
   '.py':
     name: 'python',        symbol: '#'
   '.rb':
