@@ -1,0 +1,41 @@
+tempdir=$(pwd)
+
+cd $tempdir/gh-pages
+
+echo x
+
+synced_ghpages_hash=$(git log --pretty=oneline \
+  | egrep -m 1 "Docas .* [0-9a-f]{10}" \
+  | head -c 10)
+
+echo $synced_ghpages_hash
+
+synced_master_hash=$(git log --pretty=format:'%s' \
+  | egrep -m 1 "Docas .* [0-9a-f]{10}" \
+  | tail -c 12 \
+  | head -c 10 )
+
+
+echo $synced_master_hash
+
+git diff --name-only $synced_ghpages_hash..HEAD \
+  | while read file; do dirname $file; done \
+  | uniq > $tempdir/changed_directories
+
+echo a
+
+cd $tempdir/master
+
+git diff --name-only $synced_master_hash..HEAD \
+  | while read file; do dirname $file; done \
+  | uniq >> $tempdir/changed_directories
+
+echo b
+
+cat $tempdir/changed_directories
+
+cat $tempdir/changed_directories \
+  | uniq \
+  | sed 's?^?'"$tempdir"'/?' > $tempdir/changed_directories_full_path
+
+

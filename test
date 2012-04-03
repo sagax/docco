@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+abc=wow_this_is_awesome
+synced_master_hash=fb67c7e73c
+echo 1
+git log --pretty=oneline | grep -m 1 $synced_master_hash
+echo $xyz
+echo 2
