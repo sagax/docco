@@ -88,7 +88,7 @@ if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
   echo "Creating gh-pages branch..."
 
   # Duplicate master directory to gh-pages directory.
-  cd -R $tempdir/master $tempdir/gh-pages
+  cp -R $tempdir/master $tempdir/gh-pages
 
   # Change to gh-pages directory.
   cd $tempdir/gh-pages
@@ -103,42 +103,14 @@ if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
   git clean -fdx > /dev/null
   
   # Make index
-  cp /usr/local/lib/docas/resources/docas.html index.html
+  # cp /usr/local/lib/docas/resources/docas.html index.html
 
-# ### Analyze the Directories need be Re-Generated
-
-# The directories of gh-pages needs be re-generated are the aggregation of:
-#
-#   1. Modified directories of the master branch, plus
-#   2. Modified directories of the gh-pages branch.
-#
-# All files in the above directories should be re-generated since some jump
-# links of sibling documents may be broken.
-
-cd $tempdir/gh-pages
-
-synced_ghpages_hash=$(git log --pretty=oneline \
-  | egrep -m 1 "Docas .* [0-9a-f]{10}" \
-  | head -c 10)
-
-synced_master_hash=$(git log --pretty=format:'%s' \
-  | egrep -m 1 "Docas .* [0-9a-f]{10}" \
-  | tail -c 12 \
-  | head -c 10 )
-
-git diff --name-only $synced_ghpages_hash..HEAD \
-  | while read file; do dirname $file; done \
-  | uniq > $tempdir/changed_directories
-
-cd $tempdir/master
-
-git diff --name-only $synced_master_hash..HEAD \
-  | while read file; do dirname $file; done \
-  | uniq >> $tempdir/changed_directories
-
-cat $tempdir/changed_directories \
-  | uniq \
-  | sed 's?^?'"$tempdir"'/?' > $tempdir/changed_directories_full_path
+  # List all versioned files.
+  cd $tempdir/master
+  git ls-tree -r --name-only HEAD \
+    | while read file; do dirname $file; done \
+    | uniq > $tempdir/changed_directories_full_path
+  # | sed 's?^?'"$tempdir/master"'/?' > $tempdir/changed_directories_full_path
 
 else
 
@@ -151,19 +123,90 @@ else
   # Setup gh-pages branch to track remote branch gh-pages from origin.
   git checkout -q -b gh-pages origin/gh-pages > /dev/null
 
+  # ### Analyze the Directories need be Re-Generated
 
+  # The directories of gh-pages needs be re-generated are the aggregation of:
+  #
+  #   1. Modified directories of the master branch, plus
+  #   2. Modified directories of the gh-pages branch.
+  #
+  # All files in the above directories should be re-generated since some jump
+  # links of sibling documents may be broken.
+
+  cd $tempdir/gh-pages
+
+  synced_ghpages_hash=$(git log --pretty=oneline \
+    | egrep -m 1 "Docas .* [0-9a-f]{10}$" \
+    | head -c 10)
+
+  synced_master_hash=$(git log --pretty=format:'%s' \
+    | egrep -m 1 "Docas .* [0-9a-f]{10}$" \
+    | tail -c 11 \
+    | head -c 10)
+
+  if [ -z $synced_ghpages_hash ]; then
+   
+    echo x1
+
+    cd $tempdir/master
+
+    git ls-tree -r --name-only HEAD \
+      | while read file; do dirname $file; done \
+      | uniq > $tempdir/changed_directories_full_path
+      # | sed 's?^?'"$tempdir/master"'/?'
+  
+  else
+
+    echo "Found docas comitted gh-pages, synced with $synced_master_hash"
+
+    git diff --name-only $synced_ghpages_hash..HEAD \
+      | while read file; do dirname $file; done \
+      | uniq > $tempdir/changed_directories
+
+    cd $tempdir/master
+
+    git diff --name-only $synced_master_hash..HEAD \
+      | while read file; do dirname $file; done \
+      | uniq >> $tempdir/changed_directories
+
+    cat $tempdir/changed_directories \
+      | uniq > $tempdir/changed_directories_full_path
+      # | sed 's?^?'"$tempdir/master"'/?' > $tempdir/changed_directories_full_path
+
+  fi
 
 fi
 
+# If no file of the master or the gh-pages branch was changed, exit the
+# program with notification. Nothing needs be done further. Neither the cover
+# page nor any document needs be re-generated.
+if [ $(cat $tempdir/changed_directories_full_path | wc -l) -eq 0 ]; then 
+  echo "No file has been touched. Are you kidding?"
+  exit
+fi
 
+echo Changed directories:
+
+cat $tempdir/changed_directories_full_path
+
+# Keep the path name of the master directory into a local variable, which will
+# be used to remove the prefix from the source list.
+masterdir=$tempdir/master
+masterdirlength=${#masterdir}+1
 
 
 # ### Generate Cover Page using Docci ###
 
 # Used on stand-alone version.
 cd /usr/local/lib/docas/vendor/linguist
-bundle exec linguist $tempdir/master                         > $tempdir/stat
-find $tempdir/master -type f | xargs bundle exec source_only > $tempdir/list
+bundle exec linguist $tempdir/master                        > $tempdir/stat
+find $tempdir/master -type f \
+  | xargs bundle exec source_only \
+  | while read file; do echo ${file:$masterdirlength}; done > $tempdir/list
+
+echo LIST
+cat $tempdir/list
+
 cd $tempdir
 
 # Used on SaaS version, by leveraging
@@ -187,7 +230,6 @@ fi
 
 # Invoke the docci command-line to generate index.html for master directory.
 docci -c "/$repository/stylesheets/index.css" -o $tempdir/gh-pages $tempdir/master
-
 
 
 # ### Generate Documents using Docco ###
@@ -214,24 +256,35 @@ fi
 #  -exec grep -l -i '<meta name="generator" content="docco.*">' '{}' + \
 #  | xargs rm
 
-# Keep the path name of the master directory into a local variable, which will
-# be used to remove the prefix from the source list.
-masterdir=$tempdir/master
-masterdirlength=${#masterdir}
+cat $tempdir/changed_directories_full_path | while read dir; do
 
-cat $tempdir/list
+  echo $tempdir/gh-pages/$dir
+  if [ -d $tempdir/gh-pages/$dir ]; then
+    find $tempdir/gh-pages/$dir -type f -print0 \
+      | xargs -0 grep -l -i '<meta name="generator" content="docco.*">' \
+      | xargs rm
+  fi
+done
+
+
+# cat $tempdir/list
 
 # Process the sources for each directory (exclude hidden directory).
-find $tempdir/master -type d -not -path '*/.*/*' -not -name '.*' | while read dir; do
 
+cd $tempdir/master
 
-  echo $dir
+cat $tempdir/changed_directories_full_path | while read dir; do
+# find $tempdir/master -type d -not -path '*/.*/*' -not -name '.*' | while read dir; do
+
+  # echo $dir
 
   # Files directly belong to that directory will be processed together.
   # The link of the stylesheet will be '/<repository>/stylesheets/docco.css'.
   egrep "^$dir/[^\/]+$" $tempdir/list \
     | xargs docco -c "/$repository/stylesheets/docco.css" -o \
-    $tempdir/gh-pages${dir:$masterdirlength} # > /dev/null
+    $tempdir/gh-pages/$dir # > /dev/null
+
+  # ${dir:$masterdirlength}
 
 done
 
@@ -243,7 +296,7 @@ done
 cd $tempdir/gh-pages
 git add .
 
-# Find out the status of gh-pages branch using git porcelain layer.
+# Find out the status of the gh-pages branch using the porcelain layer.
 gitstatus=$(git status --porcelain)
 
 # Print modification log.
@@ -251,23 +304,24 @@ echo "Created:$(git status --porcelain | egrep "^(A| A)" | wc -l)"
 echo "Altered:$(git status --porcelain | egrep "^(M| M)" | wc -l)"
 echo "Deleted:$(git status --porcelain | egrep "^(D| D)" | wc -l)"
 
-# Is there any file created, modified, or deleted?
+# If there exists any file created, modified, or deleted, then:
+# 
+#   1. Delete missing files from the git index (automatically done with step 2)
+#   2. Commit the gh-pages branch.
+#   3. Push to the gh-pages branch at GitHub.
 if [ $(git status --porcelain | wc -l) -gt 0 ]; then
 
   echo "Synchronizing GitHub pages remotely..."
-
-  # Commit the gh-pages branch. Remove deleted files from the index
-  # automatically.
-  git commit -q -a -m "Docas dropped in. Synced with $commithash."
-
-  # Push to gh-pages branch at GitHub.
+  git commit -qam "Docas dropped in. Synced with $commithash"
   git push -q origin gh-pages
-
   echo http://$username.github.com/$repository is now up-to-date. \
     \(crowd applauds\)
 
+# Nothing to do when no file being created, modified, or deleted. The gh-pages
+# branch is synchronized with the master branch already.
 else
-  # gh-pages branch is synchronized already.
+
   echo Nothing happened to http://$username.github.com/$repository. \
     Keep working hard...
+
 fi
