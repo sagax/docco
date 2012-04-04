@@ -303,7 +303,7 @@ done
 # deleted files separately. And provide statistics.
 # cd $tempdir/gh-pages
 git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages add .
-gitstatus=$(git status --porcelain)
+gitstatus=$(git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages status --porcelain)
 
 echo "Created:$(echo "$gitstatus" | egrep "^(A| A)" | wc -l)"
 echo "Altered:$(echo "$gitstatus" | egrep "^(M| M)" | wc -l)"
@@ -317,13 +317,13 @@ echo "Deleted:$(echo "$gitstatus" | egrep "^(D| D)" | wc -l)"
 if [ $(echo "$gitstatus" | wc -l) -gt 0 ]; then
   echo "Synchronizing GitHub pages remotely..."
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages commit -qam "Docas dropped in. Synced with $commithash"
-  git --git-dir=$tempdir/gh-pages/.ght --work-tree=$tempdir/gh-pages push -q origin gh-pages
+  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages push -q origin gh-pages
   echo "http://$username.github.com/$repository is now up-to-date \
-    \(crowd applauds\)."
+    (crowd applauds)."
 
 # Nothing to do when no file being created, modified, or deleted. The gh-pages
 # branch is synchronized with the master branch already.
 else
   echo "Nothing happened to http://$username.github.com/$repository \
-    \(keep working hard\)."
+    (keep working hard)."
 fi
