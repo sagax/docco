@@ -268,12 +268,9 @@ done
 
 # Process the sources for each directory (exclude hidden directory).
 
-cd $tempdir/master
+# cd $tempdir/master
 
 cat $tempdir/changed_directories_full_path | while read dir; do
-# find $tempdir/master -type d -not -path '*/.*/*' -not -name '.*' | while read dir; do
-
-  # echo $dir
 
   if [ $dir = '.' ]; then
   
@@ -289,7 +286,6 @@ cat $tempdir/changed_directories_full_path | while read dir; do
       $tempdir/gh-pages/$dir # > /dev/null
 
   fi
-  # ${dir:$masterdirlength}
 
 done
 
@@ -308,7 +304,7 @@ echo "Deleted:$(echo "$gitstatus" | egrep "^(D| D)" | wc -l)"
 
 # If there exists any file created, modified, or deleted, then:
 # 
-#   1. Delete missing files from the git index (atomically in step 2),
+#   1. Delete missing files from the git index (with step 2 atomically),
 #   2. commit the gh-pages branch, and
 #   3. synchronize the gh-pages branch with GitHub.
 if [ $(echo "$gitstatus" | wc -l) -gt 0 ]; then
@@ -319,10 +315,10 @@ if [ $(echo "$gitstatus" | wc -l) -gt 0 ]; then
     commit -qam "Docas dropped in. Synced with $commithash"
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages \
     push -q origin gh-pages
-  echo "http://$user.github.com/$repo is now up-to-date (crowd applauds)."
+  echo "http://$user.github.com/$repo is now up-to-date. Crowd applauds."
 
 # Nothing to do when no file was created, modified, or deleted. The gh-pages
 # branch is in-sync with the master branch already. Inform the user anyway.
 else
-  echo "http://$user.github.com/$repo doesn't need to sync (code harder)."
+  echo "http://$user.github.com/$repo doesn't need to sync. Code harder."
 fi
