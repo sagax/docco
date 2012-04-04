@@ -268,7 +268,7 @@ done
 
 # Process the sources for each directory (exclude hidden directory).
 
-# cd $tempdir/master
+cd $tempdir/master
 
 cat $tempdir/changed_directories_full_path | while read dir; do
 
