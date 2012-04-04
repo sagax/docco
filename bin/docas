@@ -301,7 +301,7 @@ done
 # created or modified to the git index. Find out the status of the gh-pages
 # branch using the porcelain layer. Sort out number of added, modified, and
 # deleted files separately. And provide statistics.
-cd $tempdir/gh-pages
+# cd $tempdir/gh-pages
 git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages add .
 gitstatus=$(git status --porcelain)
 
@@ -313,20 +313,17 @@ echo "Deleted:$(echo "$gitstatus" | egrep "^(D| D)" | wc -l)"
 # 
 #   1. Delete missing files from the git index (automatically done with step 2),
 #   2. Commit the gh-pages branch, and
-#   3. Push to the gh-pages branch at GitHub.
+#   3. Push back to the gh-pages branch at GitHub.
 if [ $(echo "$gitstatus" | wc -l) -gt 0 ]; then
-
   echo "Synchronizing GitHub pages remotely..."
-  git commit -qam "Docas dropped in. Synced with $commithash"
-  git push -q origin gh-pages
-  echo http://$username.github.com/$repository is now up-to-date. \
-    \(crowd applauds\)
+  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages commit -qam "Docas dropped in. Synced with $commithash"
+  git --git-dir=$tempdir/gh-pages/.ght --work-tree=$tempdir/gh-pages push -q origin gh-pages
+  echo "http://$username.github.com/$repository is now up-to-date \
+    \(crowd applauds\)."
 
 # Nothing to do when no file being created, modified, or deleted. The gh-pages
 # branch is synchronized with the master branch already.
 else
-
-  echo Nothing happened to http://$username.github.com/$repository. \
-    Keep working hard...
-
+  echo "Nothing happened to http://$username.github.com/$repository \
+    \(keep working hard\)."
 fi
