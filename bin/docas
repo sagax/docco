@@ -74,8 +74,8 @@ tempdir=$(pwd -P)
 # the commit subject line of gh-pages branch to indicate a successful
 # synchronization.
 
-echo "Cloning git@github.com:$username/$repository.git..."
-git clone -q --depth=1 git@github.com:$username/$repository.git "$tempdir/master"
+echo "Cloning git@github.com:$user/$repo.git..."
+git clone -q --depth=1 git@github.com:$user/$repo.git "$tempdir/master"
 cd $tempdir/master
 commithash=$(git rev-parse HEAD | cut -c1-10)
 
@@ -231,7 +231,7 @@ if ! [ -f $tempdir/gh-pages/stylesheets/index.css ]; then
 fi
 
 # Invoke the docci command-line to generate index.html for master directory.
-docci -c "/$repository/stylesheets/index.css" -o $tempdir/gh-pages $tempdir/master
+docci -c "/$repo/stylesheets/index.css" -o $tempdir/gh-pages $tempdir/master
 
 # ### Phase 4: Generate Documents using Docco
 #
@@ -278,14 +278,14 @@ cat $tempdir/changed_directories_full_path | while read dir; do
   if [ $dir = '.' ]; then
   
     egrep "^[^\/]+$" $tempdir/list \
-      | xargs docco -c "/$repository/stylesheets/docco.css" -o \
+      | xargs docco -c "/$repo/stylesheets/docco.css" -o \
       $tempdir/gh-pages # > /dev/null
   else
 
   # Files directly belong to that directory will be processed together.
   # The link of the stylesheet will be '/<repository>/stylesheets/docco.css'.
     egrep "^$dir/[^\/]+$" $tempdir/list \
-      | xargs docco -c "/$repository/stylesheets/docco.css" -o \
+      | xargs docco -c "/$repo/stylesheets/docco.css" -o \
       $tempdir/gh-pages/$dir # > /dev/null
 
   fi
@@ -318,12 +318,10 @@ if [ $(echo "$gitstatus" | wc -l) -gt 0 ]; then
   echo "Synchronizing GitHub pages remotely..."
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages commit -qam "Docas dropped in. Synced with $commithash"
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages push -q origin gh-pages
-  echo "http://$username.github.com/$repository is now up-to-date \
-    (crowd applauds)."
+  echo "http://$user.github.com/$repo is now up-to-date (crowd applauds)."
 
 # Nothing to do when no file being created, modified, or deleted. The gh-pages
-# branch is synchronized with the master branch already.
+# branch is in-sync with the master branch already. Inform the user anyway.
 else
-  echo "Nothing happened to http://$username.github.com/$repository \
-    (keep working hard)."
+  echo "Nothing happened to http://$user.github.com/$repo (keep working hard)."
 fi
