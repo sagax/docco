@@ -51,8 +51,8 @@ if [ $# -lt 1 ]; then
 fi
 
 # Separate input arguments by slash into user name and repository name.
-username=$(echo $1 | cut -d'/' -f1)
-repository=$(echo $1 | cut -d'/' -f2)
+user=$(echo $1 | cut -d'/' -f1)
+repo=$(echo $1 | cut -d'/' -f2)
 
 # Prepare working directory, create a temporary directory to store the
 # repository's master branch and also the generated gh-pages branch.
@@ -293,17 +293,14 @@ cat $tempdir/changed_directories_full_path | while read dir; do
 
 done
 
+#### Phase 5: Synchronize with GitHub
 
-
-# ### Phase 5: Synchronize with GitHub
+# Docas will only touch the gh-pages branch when necessary.
 #
-# Docas will only touch your gh-pages branch when necessary. Add any files newly
-# created or modified to the git index. Find out the status of the gh-pages
-# branch using the porcelain layer. Sort out number of added, modified, and
-# deleted files separately. And provide statistics.
-# cd $tempdir/gh-pages
-git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages add .
-gitstatus=$(git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages status --porcelain)
+# Use the porcelain layer of git-status to count files created, modified, or
+# deleted. Inform the user these statistics numbers.
+gitstatus=$(git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages \
+  status --porcelain)
 
 echo "Created:$(echo "$gitstatus" | egrep "^(A| A)" | wc -l)"
 echo "Altered:$(echo "$gitstatus" | egrep "^(M| M)" | wc -l)"
@@ -311,17 +308,21 @@ echo "Deleted:$(echo "$gitstatus" | egrep "^(D| D)" | wc -l)"
 
 # If there exists any file created, modified, or deleted, then:
 # 
-#   1. Delete missing files from the git index (automatically done with step 2),
-#   2. Commit the gh-pages branch, and
-#   3. Push back to the gh-pages branch at GitHub.
+#   1. Delete missing files from the git index (atomically in step 2),
+#   2. commit the gh-pages branch, and
+#   3. synchronize the gh-pages branch with GitHub.
 if [ $(echo "$gitstatus" | wc -l) -gt 0 ]; then
   echo "Synchronizing GitHub pages remotely..."
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages commit -qam "Docas dropped in. Synced with $commithash"
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages push -q origin gh-pages
+  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages \
+    add .
+  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages \
+    commit -qam "Docas dropped in. Synced with $commithash"
+  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages \
+    push -q origin gh-pages
   echo "http://$user.github.com/$repo is now up-to-date (crowd applauds)."
 
-# Nothing to do when no file being created, modified, or deleted. The gh-pages
+# Nothing to do when no file was created, modified, or deleted. The gh-pages
 # branch is in-sync with the master branch already. Inform the user anyway.
 else
-  echo "Nothing happened to http://$user.github.com/$repo (keep working hard)."
+  echo "http://$user.github.com/$repo doesn't need to sync (code harder)."
 fi
