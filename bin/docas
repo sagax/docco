@@ -37,37 +37,38 @@
 
 
 
-# ## Script Procedure ##
+### Script Procedure ##
 #
-# ### Setup Phase ###
+# Some pre-preparations:
 #
-# Halt the execution immediately when encountering any non-zero return value.
+#   1. stop execution when encountering any error,
+#   2. ensure enough arguments are given,
+#   3. parse the arguments into user and repo,
+#   4. prepare a temporary working directory (and remove on exit, interruption,
+#   and termination), and resolve the temporary working directory's link to
+#   actual directory (in order to get consistent match, for node.js' resolve
+#   outputs referenced path).
+
 set -e
 
-# Ensure enough arguments are given.
 if [ $# -lt 1 ]; then
   echo -e "\nUsage: docas <username>/<repository>\n"
   exit
 fi
 
-# Separate input arguments by slash into user name and repository name.
 user=$(echo $1 | cut -d'/' -f1)
 repo=$(echo $1 | cut -d'/' -f2)
 
-# Prepare working directory, create a temporary directory to store the
-# repository's master branch and also the generated gh-pages branch.
 tempdir=$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)
-
-# Remove the temp directory on exit, interruption, and termination.
-# trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
-
-# Resolve link to actual directory. This will keep the shell script's directory
-# and node.js' path.resolve (which will provide the actual referenced path) in
-# consistency.
 cd $tempdir
 tempdir=$(pwd -P)
+trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
 
-# ### Download the Repository
+
+#### Phase 1: Clone the Repository
+
+
+#### Download the Repository
 #
 # (Shallow) clone the GitHub repository to master directory.
 # Keep the current commit hash of the master branch, which will be included in
