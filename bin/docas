@@ -233,8 +233,8 @@ fi
 # Invoke the docci command-line to generate index.html for master directory.
 docci -c "/$repo/stylesheets/index.css" -o $tempdir/gh-pages $tempdir/master
 
-# ### Phase 4: Generate Documents using Docco
-#
+#### Phase 4: Generate Documents (using Docco)
+
 # 
 echo "Generating documents..."
 
@@ -264,8 +264,6 @@ cat $tempdir/changed_directories_full_path | while read dir; do
 
 done
 
-
-
 # Process the sources for each directory (exclude hidden directory).
 
 cd $tempdir/master
@@ -293,21 +291,24 @@ done
 
 # Docas will only touch the gh-pages branch when necessary.
 #
-# Use the porcelain layer of git-status to count files created, modified, or
-# deleted. Inform the user these statistics numbers.
-gitstatus=$(git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages \
+# Use the [porcelain layer] of git-status to count files been created, modified,
+# or deleted. Inform the user these statistics numbers.
+#
+# [porcelain layer]:
+# http://schacon.github.com/git/git.html#_high_level_commands_porcelain
+status=$(git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages \
   status --porcelain)
 
-echo "Created:$(echo "$gitstatus" | egrep "^(A| A)" | wc -l)"
-echo "Altered:$(echo "$gitstatus" | egrep "^(M| M)" | wc -l)"
-echo "Deleted:$(echo "$gitstatus" | egrep "^(D| D)" | wc -l)"
+echo "Created:$(echo "$status" | egrep "^(A| A)" | wc -l)"
+echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
+echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 
 # If there exists any file created, modified, or deleted, then:
 # 
 #   1. Delete missing files from the git index (with step 2 atomically),
 #   2. commit the gh-pages branch, and
 #   3. synchronize the gh-pages branch with GitHub.
-if [ $(echo "$gitstatus" | wc -l) -gt 0 ]; then
+if [ $(echo "$status" | wc -l) -gt 0 ]; then
   echo "Synchronizing GitHub pages remotely..."
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages \
     add .
