@@ -232,7 +232,7 @@ highlight_start = '<div class="highlight"><pre>'
 # The end of each Pygments highlight block.
 highlight_end   = '</pre></div>'
 
-# To correctly recognize some shebang script, a pseduo extname should be passed
+# To correctly recognize shebang scripts, a pseduo extname should be passed
 # in, such as bin/docco.js_, the last underscore indicates there's no extname
 # actually. Dirty? But works:)
 real_source = (source) ->

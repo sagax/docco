@@ -267,7 +267,7 @@ done
 # document will contain links to sibling documents only.
 #
 # Following the [project pages] link structure, generated documents reference
-# `/<repo>/stylesheets/docco.css` in the HTML source.
+# `/<repo>/stylesheets/docco.css` in the HTML sources.
 #
 # [Project Pages]: http://help.github.com/pages/#project_pages_manually
 cat $tempdir/changed_directories_full_path | while read dir; do
