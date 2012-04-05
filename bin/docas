@@ -37,7 +37,7 @@
 
 
 
-### Script Procedure ##
+### Scripting Procedure
 #
 # Some pre-preparations:
 #
@@ -61,7 +61,7 @@ repo=$(echo $1 | cut -d'/' -f2)
 
 tempdir=$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)
 cd $tempdir
-tempdir=$(pwd -P)
+# tempdir=$(pwd -P)
 trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
 
 
