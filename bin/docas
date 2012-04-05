@@ -264,27 +264,22 @@ cat $tempdir/changed_directories_full_path | while read dir; do
 
 done
 
-# Process the sources for each directory (exclude hidden directory).
-
+# Process the sources for each directory, so the *JUMP TO* section of each
+# document will contain links to sibling documents only.
+#
+# Following the [project pages] link syntax, the stylesheet should be located at:
+# `/<repo>/stylesheets/docco.css` in the HTML, and resides in:
+# `/stylesheets/docco.css` in the gh-pages branch.
+#
+# [Project Pages]: http://help.github.com/pages/#project_pages_manually
 cd $tempdir/master
-
 cat $tempdir/changed_directories_full_path | while read dir; do
-
   if [ $dir = '.' ]; then
-  
-    egrep "^[^\/]+$" $tempdir/list \
-      | xargs docco -c "/$repo/stylesheets/docco.css" -o \
-      $tempdir/gh-pages # > /dev/null
+    egrep "^[^/]+$" $tempdir/list | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages # > /dev/null
   else
-
-  # Files directly belong to that directory will be processed together.
-  # The link of the stylesheet will be '/<repository>/stylesheets/docco.css'.
-    egrep "^$dir/[^\/]+$" $tempdir/list \
-      | xargs docco -c "/$repo/stylesheets/docco.css" -o \
-      $tempdir/gh-pages/$dir # > /dev/null
-
+    # The link of the stylesheet will be '/<repository>/stylesheets/docco.css'.
+    egrep "^$dir/[^/]+$" $tempdir/list | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null
   fi
-
 done
 
 #### Phase 5: Synchronize with GitHub
@@ -294,7 +289,7 @@ done
 # Use the [porcelain layer] of git-status to count files been created, modified,
 # or deleted. Inform the user these statistics numbers.
 #
-# [porcelain layer]:
+# [Porcelain Layer]:
 # http://schacon.github.com/git/git.html#_high_level_commands_porcelain
 status=$(git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages status --porcelain)
 
@@ -304,18 +299,18 @@ echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 
 # If there exists any file created, modified, or deleted, then:
 # 
-#   1. Synchronize local files with the git index,
+#   1. Synchronize git index with local files,
 #   2. commit the gh-pages branch, and,
-#   3. synchronize the gh-pages branch with GitHub.
+#   3. synchronize the gh-pages branch with GitHub remotely.
 if [ $(echo "$status" | wc -l) -gt 0 ]; then
   echo "Synchronizing GitHub pages remotely..."
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages add .
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages commit -qam "Docas synced with $commit"
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages push -q origin gh-pages
+  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages push -q
   echo "http://$user.github.com/$repo is now up-to-date. Crowd applauds."
 
 # Nothing to do when no file was created, modified, or deleted. The gh-pages
-# branch is in-sync with the master branch already. Inform the user anyway.
+# branch is in-sync with the master branch already.
 else
   echo "http://$user.github.com/$repo doesn't need to sync. Code harder."
 fi
