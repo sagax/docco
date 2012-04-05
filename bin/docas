@@ -289,7 +289,7 @@ done
 
 #### Phase 5: Synchronize with GitHub
 
-# Docas will only touch the gh-pages branch when necessary.
+# Docas will *only* touch the gh-pages branch when necessary.
 #
 # Use the [porcelain layer] of git-status to count files been created, modified,
 # or deleted. Inform the user these statistics numbers.
@@ -297,7 +297,7 @@ done
 # [porcelain layer]:
 # http://schacon.github.com/git/git.html#_high_level_commands_porcelain
 status=$(git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages \
-  status --porcelain)
+    status --porcelain)
 
 echo "Created:$(echo "$status" | egrep "^(A| A)" | wc -l)"
 echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
