@@ -58,79 +58,69 @@ trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
 
 #### Phase 1: Clone the Repository
 
-#### Download the Repository
-#
-# (Shallow) clone the GitHub repository to master directory.
-# Keep the current commit hash of the master branch, which will be included in
-# the commit subject line of gh-pages branch to indicate a successful
-# synchronization.
+##### Download the Repository
+
+# (Shallow) clone the GitHub repository to master directory. Keep the current
+# commit hash of the master branch, which will be included in the commit subject
+# line of the gh-pages branch to indicate a successful synchronization.
 echo "Cloning git@github.com:$user/$repo.git..."
 git clone -q --depth=1 git@github.com:$user/$repo.git "$tempdir/master"
-commit=$(git --git-dir=$tempdir/master/.git rev-parse HEAD | head -c 10)
+commit=$(git --git-dir=$tempdir/master/.git  rev-parse HEAD | cut -c1-10)
 
-# ### Ensure gh-pages Branch Exists.
+#### Phase 2: Ensure gh-pages Branch Exists, List Touched Directories
 
-# Test if gh-pages branch exists.
+generate_list_of_changed_directories () {
+  git --git-dir=$tempdir/master/.git ls-tree -r --name-only HEAD \
+    | while read file; do echo $(dirname $file); done \
+    | sort | uniq > $tempdir/changed_directories_full_path
+}
+
+# If gh-pages branch does not exist, then create the gh-pages branch following
+# [GitHub instruction]:
+#
+#   1. Duplicate master directory to gh-pages directory.
+#   2. Change to gh-pages directory.
+#   3. Create gh-pages branch. 
+#   4. Clear git index.
+#   5. Remove all files.
+#
+# [GitHub instruction]: http://help.github.com/pages/#project_pages_manually 
 if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
 
   echo "Creating gh-pages branch..."
-
-  # Duplicate master directory to gh-pages directory.
   cp -R $tempdir/master $tempdir/gh-pages
-
-  # Change to gh-pages directory.
   cd $tempdir/gh-pages
-
-  # Create gh-pages branch. 
   git symbolic-ref HEAD refs/heads/gh-pages > /dev/null
-  
-  # Clear git index.
   rm .git/index
-  
-  # Remove files.
   git clean -fdx > /dev/null
   
-  # Make index
-  # cp /usr/local/lib/docas/resources/docas.html index.html
+  # List all versioned directories.
+  generate_list_of_changed_directories
 
-  # List all versioned files.
-  cd $tempdir/master
-  git ls-tree -r --name-only HEAD \
-    | while read file; do dirname $file; done \
-    | uniq > $tempdir/changed_directories_full_path
-  # | sed 's?^?'"$tempdir/master"'/?' > $tempdir/changed_directories_full_path
-
-# If there exists an gh-pages, which means the gh-pages may contain docas
+# If there exists a gh-pages, which means the gh-pages may contain docas
 # synchronized content. So, docas will:
 #
-#   1. Duplicate master directory to gh-pages directory.
-#
+#   1. Duplicate master directory to gh-pages directory#
 #   2. Setup gh-pages directory to track remote gh-pages branch.
-#
 #   3. Analyze the directories which have been touched. Sources in these
 #   directories will be regenerated. Modified directories contains:
 #
 #      * Modified directories of the master branch, plus
 #      * Modified directories of the gh-pages branch.
 #      
-#      Touched files 
-#      All files in the touched directories will be re-generated since the
-#      original docco implementation use the file list to generate the jump to
-#      links, which might be broken if some source renamed/removed.
+#   All files in the touched directories will be re-generated since the
+#   original docco implementation use the file list to generate the jump to
+#   links, which might be broken if some source renamed/removed.
 else
-
   cp -R $tempdir/master $tempdir/gh-pages
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages checkout -q gh-pages
- 
   synced_ghpages_hash=$(git --git-dir=$tempdir/gh-pages/.git log --pretty=oneline \
     | egrep -m 1 -i "docas .* [0-9a-f]{10}$" \
     | head -c 10)
-
   synced_master_hash=$(git --git-dir=$tempdir/gh-pages/.git log --pretty=oneline \
     | egrep -m 1 -i "docas .* [0-9a-f]{10}$" \
     | tail -c 11 \
     | head -c 10)
-
   synced_master_hash=$(git --git-dir=$tempdir/master/.git log --pretty=oneline \
     | egrep -m 1 "^$synced_master_hash" \
     | head -c 10 \
@@ -139,31 +129,22 @@ else
   echo "$synced_master_hash | $synced_ghpages_hash"
 
   if [ -z $synced_ghpages_hash ] || [ -z $synced_master_hash ]; then
-   
-    git --git-dir=$tempdir/master/.git ls-tree -r --name-only HEAD \
-      | while read file; do echo $(dirname $file); done \
-      | sort | uniq > $tempdir/changed_directories_full_path
-
-     echo "gh-pages branch out-of sync for a long time, rebuilding..."
+    echo "gh-pages branch out-of sync for a long time, rebuilding..."
+    generate_list_of_changed_directories
  
   # If we can securely get all touched files in the master and gh-pages branch
   # (the shallow clone contains the log), we sort out the unique touched
   # directories into changed_directories_full_path file.
   else
-
     echo "Found docas comitted gh-pages, synced with $synced_master_hash"
-
     git --git-dir=$tempdir/gh-pages/.git diff --name-only $synced_ghpages_hash..HEAD \
       | while read file; do dirname $file; done \
       | uniq > $tempdir/changed_directories
-
     git --git-dir=$tempdir/master/.git diff --name-only $synced_master_hash..HEAD \
       | while read file; do dirname $file; done \
       | uniq >> $tempdir/changed_directories
-
     cat $tempdir/changed_directories \
       | sort -u > $tempdir/changed_directories_full_path
-
   fi
 
 fi
@@ -179,11 +160,6 @@ if [ $(cat $tempdir/changed_directories_full_path | wc -l) -eq 0 ]; then
   exit
 fi
 
-# Keep the path name of the master directory into a local variable, which will
-# be used to remove the prefix from the source list.
-masterdir=$tempdir/master
-masterdirlength=${#masterdir}+1
-
 #### Phase 3: Generate Cover Page (using Docci)
 echo "Generating cover page..."
 
@@ -192,6 +168,11 @@ echo "Generating cover page..."
 #
 #   1. a language statistics file named `stat`, and,
 #   2. a list of all recognized sources named `list`.
+#
+# Keep the path name of the master directory into a local variable, which will
+# be used to remove the prefix from the source list.
+masterdir=$tempdir/master
+masterdirlength=${#masterdir}+1
 cd /usr/local/lib/docas/vendor/linguist
 bundle exec linguist $tempdir/master > $tempdir/stat
 find $tempdir/master -type f \
