@@ -238,17 +238,14 @@ docci -c "/$repo/stylesheets/index.css" -o $tempdir/gh-pages $tempdir/master
 # 
 echo "Generating documents..."
 
-##### 1: Prepare Stylesheets
+##### 1: Prepare Docco Stylesheet
 #
 # Make sure a stylesheet for documents exists. User modification will be kept.
 # In case of the stylesheet doesn't exists. Copy the default stylesheet to the
 # `stylesheets` folder.
 if ! [ -f $tempdir/gh-pages/stylesheets/docco.css ]; then
-
   mkdir -p $tempdir/gh-pages/stylesheets
-  cp /usr/local/lib/docas/resources/docco.css \
-    $tempdir/gh-pages/stylesheets/docco.css
-
+  cp /usr/local/lib/docas/resources/docco.css $tempdir/gh-pages/stylesheets/docco.css
 fi
 
 ##### 2: Clean Touched Directories
@@ -270,16 +267,16 @@ done
 # document will contain links to sibling documents only.
 #
 # Following the [project pages] link syntax, the stylesheet should be:
-# `/<repo>/stylesheets/docco.css` in the HTML source, and resides at:
-# `/stylesheets/docco.css` of the gh-pages branch.
+# `/<repo>/stylesheets/docco.css` in the HTML source.
 #
 # [Project Pages]: http://help.github.com/pages/#project_pages_manually
 cd $tempdir/master
-
 cat $tempdir/changed_directories_full_path | while read dir; do
   if [ $dir = '.' ]; then match="^[^/]+$"; else match="^$dir/[^/]+$"; fi
-    egrep $match $tempdir/list \
-      | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null  
+  egrep $match $tempdir/list | while read file; do
+    echo $tempdir/master/$file
+  done \
+    | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null  
 done
 
 #### Phase 5: Synchronize with GitHub
