@@ -148,7 +148,7 @@ else
       | while read file; do dirname $file; done >  $tempdir/dirty_directories
     git --git-dir=$tempdir/master/.git diff --name-only $synced_master_hash..HEAD \
       | while read file; do dirname $file; done >> $tempdir/dirty_directories
-    sort -u dirty_directories -o dirty_directories
+    sort -u $tempdir/dirty_directories -o $tempdir/dirty_directories
   fi
 
 fi
