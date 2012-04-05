@@ -19,6 +19,7 @@
 #   4. Documente (documentable) sources for each directory.
 #   5. Push to the remote gh-pages branch.
 #
+
 ### Hosted Version ##
 #
 # Actually, for most of developers who want a quick and dirty mechanism for
@@ -27,6 +28,7 @@
 # real time when you make any commit. As simple as adding docas as your
 # collaborator.
 #
+
 ### Command-line usage:
 #
 #     docas username/repository
