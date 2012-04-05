@@ -77,7 +77,7 @@ tempdir=$(pwd -P)
 echo "Cloning git@github.com:$user/$repo.git..."
 git clone -q --depth=1 git@github.com:$user/$repo.git "$tempdir/master"
 cd $tempdir/master
-commithash=$(git rev-parse HEAD | cut -c1-10)
+commit=$(git rev-parse HEAD | cut -c1-10)
 
 
 
@@ -310,12 +310,9 @@ echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 #   3. synchronize the gh-pages branch with GitHub.
 if [ $(echo "$status" | wc -l) -gt 0 ]; then
   echo "Synchronizing GitHub pages remotely..."
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages \
-    add .
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages \
-    commit -qam "Docas dropped in. Synced with $commithash"
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages \
-    push -q origin gh-pages
+  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages add .
+  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages commit -qam "Docas synced with $commit"
+  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages push -q origin gh-pages
   echo "http://$user.github.com/$repo is now up-to-date. Crowd applauds."
 
 # Nothing to do when no file was created, modified, or deleted. The gh-pages
