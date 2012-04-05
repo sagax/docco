@@ -197,37 +197,26 @@ fi
 masterdir=$tempdir/master
 masterdirlength=${#masterdir}+1
 
-# ### Generate Cover Page using Docci
+#### Phase 3: Generate Cover Page (using Docci)
+echo "Generating cover page..."
+
+# Before calling the docci command line, the following materials should be
+# ready:
 #
-# Before calling the docci command line, we should prepare:
-#   1. a language statistics file, and also
-#   2. a list of all recognized sources.
+#   1. a language statistics file named `stat`, and,
+#   2. a list of all recognized sources named `list`.
 cd /usr/local/lib/docas/vendor/linguist
 bundle exec linguist $tempdir/master > $tempdir/stat
 find $tempdir/master -type f \
   | xargs bundle exec source_only \
   | while read file; do echo ${file:$masterdirlength}; done > $tempdir/list
 
-echo "Linguist Recognized Sources:"
-cat $tempdir/list
-
-cd $tempdir
-
-# Used on SaaS version, by leveraging
-# [linguist_http](http://github.com/baoshan/linguist_http).
-# wget -O "$tempdir/stat" "http://127.0.0.1:4567/stat$tempdir"
-# wget -O "$tempdir/list" "http://127.0.0.1:4567/list$tempdir"
-
 # Make sure a stylesheet for index.html exists. User modification will be kept.
-
-# In case of the stylesheet doesn't exists.
-# Copy the default stylesheet to the folder.
+# In case of the stylesheet doesn't exists, copy the default stylesheet to the
+# `stylesheet` folder.
 if ! [ -f $tempdir/gh-pages/stylesheets/index.css ]; then
-
   mkdir -p $tempdir/gh-pages/stylesheets
-  cp /usr/local/lib/docas/resources/index.css \
-    $tempdir/gh-pages/stylesheets/index.css
-
+  cp /usr/local/lib/docas/resources/index.css $tempdir/gh-pages/stylesheets/index.css
 fi
 
 # Invoke the docci command-line to generate index.html for master directory.
@@ -239,7 +228,7 @@ echo "Generating documents..."
 ##### 1: Prepare Docco Stylesheet
 
 # Make sure a stylesheet for documents exists. User modification will be kept.
-# In case of the stylesheet doesn't exists. Copy the default stylesheet to the
+# In case of the stylesheet doesn't exists, copy the default stylesheet to the
 # `stylesheets` folder.
 if ! [ -f $tempdir/gh-pages/stylesheets/docco.css ]; then
   mkdir -p $tempdir/gh-pages/stylesheets
