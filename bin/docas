@@ -13,14 +13,10 @@
 # Docas can be used stand alone on the developer's machine, which will:
 #
 #   1. Clone the git (current on GitHub only) repository into a temporary
-#      directory.
-#
+#   directory.
 #   2. (Optional) Create the gh-pages branch on GitHub if not exists.
-#
 #   3. Generate the cover page using docci.
-#
 #   4. Documente (documentable) sources for each directory.
-#
 #   5. Push to the remote gh-pages branch.
 #
 ### Hosted Version ##
