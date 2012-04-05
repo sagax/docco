@@ -45,9 +45,9 @@
 #   2. ensure enough arguments are given,
 #   3. parse the arguments into user and repo,
 #   4. prepare a temporary working directory (and remove on exit, interruption,
-#   and termination), and resolve the temporary working directory's link to
-#   actual directory (in order to get consistent match, for node.js' resolve
-#   outputs referenced path).
+#   and termination), resolve to actual directory rather than link, in order to
+#   get consistent match, for node.js' `path.resolve` api outputs referenced
+#   path.
 
 set -e
 
