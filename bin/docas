@@ -38,7 +38,7 @@
 
 
 ### Scripting Procedure
-#
+
 # Some pre-preparations:
 #
 #   1. stop execution when encountering any error,
@@ -46,7 +46,6 @@
 #   3. parse the arguments into user and repo,
 #   4. prepare a temporary working directory (and remove on exit, interruption,
 #   and termination).
-
 set -e
 
 if [ $# -lt 1 ]; then
