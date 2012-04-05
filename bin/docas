@@ -256,7 +256,7 @@ fi
 cat $tempdir/changed_directories_full_path | while read dir; do
   if [ -d $tempdir/gh-pages/$dir ]; then
     find $tempdir/gh-pages/$dir -depth 1 -type f -print0 \
-      | xargs -0 grep -l -i -Z '<meta name="generator" content="docco.*">' \
+      | xargs -0 grep -liZ '<meta name="generator" content="docco.*">' \
       | xargs -0 rm 
   fi
 done
@@ -266,15 +266,14 @@ done
 # Process the sources for each directory, so the **JUMP TO** section of each
 # document will contain links to sibling documents only.
 #
-# Following the [project pages] link structure, generated document should
-# reference `/<repo>/stylesheets/docco.css` in the HTML source.
+# Following the [project pages] link structure, generated documents reference
+# `/<repo>/stylesheets/docco.css` in the HTML source.
 #
 # [Project Pages]: http://help.github.com/pages/#project_pages_manually
 cat $tempdir/changed_directories_full_path | while read dir; do
   if [ $dir = '.' ]; then match="^[^/]+$"; else match="^$dir/[^/]+$"; fi
-  egrep $match $tempdir/list | while read file; do
-    echo $tempdir/master/$file
-  done \
+  egrep $match $tempdir/list \
+    | while read file; do echo "$tempdir/master/$file"; done \
     | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null  
 done
 
