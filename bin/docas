@@ -296,8 +296,7 @@ done
 #
 # [porcelain layer]:
 # http://schacon.github.com/git/git.html#_high_level_commands_porcelain
-status=$(git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages \
-    status --porcelain)
+status=$(git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages status --porcelain)
 
 echo "Created:$(echo "$status" | egrep "^(A| A)" | wc -l)"
 echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
@@ -305,8 +304,8 @@ echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 
 # If there exists any file created, modified, or deleted, then:
 # 
-#   1. Delete missing files from the git index (with step 2 atomically),
-#   2. commit the gh-pages branch, and
+#   1. Synchronize local files with the git index,
+#   2. commit the gh-pages branch, and,
 #   3. synchronize the gh-pages branch with GitHub.
 if [ $(echo "$status" | wc -l) -gt 0 ]; then
   echo "Synchronizing GitHub pages remotely..."
