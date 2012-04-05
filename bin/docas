@@ -273,7 +273,7 @@ done
 cd $tempdir/master
 cat $tempdir/changed_directories_full_path | while read dir; do
   if [ $dir = '.' ]; then match="^[^/]+$" else match="^$dir/[^/]+$" fi
-    egrep "$match" $tempdir/list \
+    egrep $match $tempdir/list \
       | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null
   # else
   #  egrep "^$dir/[^/]+$" $tempdir/list \
