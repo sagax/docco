@@ -23,7 +23,7 @@
 #
 #   5. Push to the remote gh-pages branch.
 #
-# ## Hosted Version ##
+### Hosted Version ##
 #
 # Actually, for most of developers who want a quick and dirty mechanism for
 # documentation synchronization, please goto [Docas.io](http://docas.io), an
@@ -31,7 +31,7 @@
 # real time when you make any commit. As simple as adding docas as your
 # collaborator.
 #
-# ### Command-line usage: ###
+### Command-line usage:
 #
 #     docas username/repository
 
@@ -65,7 +65,7 @@ echo "Cloning git@github.com:$user/$repo.git..."
 git clone -q --depth=1 git@github.com:$user/$repo.git "$tempdir/master"
 commit=$(git --git-dir=$tempdir/master/.git  rev-parse HEAD | cut -c1-10)
 
-#### Phase 2: Ensure `gh-pages` Branch Exists, List Touched Directories
+#### Phase 2: Checkout gh-pages Branch, List Dirty Directories
 
 # Docas will only re-generate sources in the *dirty* directories, in the
 # following occasions, docas consider all directories are dirty:
@@ -92,7 +92,7 @@ all_directories_are_dirty () {
 #   4. Clear git index.
 #   5. Remove all files.
 #
-# In this situation, docas consider all directories are dirty.
+#   In this situation, docas considers all directories are dirty.
 # [GitHub instruction]: http://help.github.com/pages/#project_pages_manually 
 if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
 
