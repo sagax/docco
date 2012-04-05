@@ -28,7 +28,7 @@ documentation service which synchronize the documents on gh-pages branch in
 real time when you make any commit. As simple as adding docas as your
 collaborator.</p>
 
-<h3>Command-line usage:</h3>
+<h2>Command-line usage:</h2>
 
 <pre><code>docas username/repository
 </code></pre>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight shebang"><pre><span>#!/usr/bin/env</span> <span>bash
@@ -53,7 +53,7 @@ and termination).</li>
 commit hash of the <code>master</code> branch, which will be included in the commit subject
 line of the <code>gh-pages</code> branch to indicate a successful synchronization.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nb">echo</span> <span class="s2">&quot;Cloning git@github.com:$user/$repo.git...&quot;</span>
 git clone -q --depth<span class="o">=</span>1 git@github.com:<span class="nv">$user</span>/<span class="nv">$repo</span>.git <span class="s2">&quot;$tempdir/master&quot;</span>
-<span class="nv">commit</span><span class="o">=</span><span class="k">$(</span>git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/master/.git  rev-parse HEAD | cut -c1-10<span class="k">)</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h3>Phase 2: Ensure <code>gh-pages</code> Branch Exists, List Touched Directories</h3>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>Docas will only re-generate sources in the <em>dirty</em> directories, in the
+<span class="nv">commit</span><span class="o">=</span><span class="k">$(</span>git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/master/.git  rev-parse HEAD | cut -c1-10<span class="k">)</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h3>Phase 2: Checkout gh-pages Branch, List Dirty Directories</h3>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>Docas will only re-generate sources in the <em>dirty</em> directories, in the
 following occasions, docas consider all directories are dirty:</p>
 
 <ol>
@@ -76,10 +76,10 @@ situation 3 can only be caused by shallow clone.</p>             </td>          
 <li>Change to <code>gh-pages</code> directory.</li>
 <li>Create <code>gh-pages</code> branch. </li>
 <li>Clear git index.</li>
-<li>Remove all files.</li>
-</ol>
+<li><p>Remove all files.</p>
 
-<p>In this situation, docas consider all directories are dirty.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>git branch -a | grep origin<span class="se">\/</span>gh-pages | wc -l<span class="k">)</span> <span class="o">=</span> 0 <span class="o">]</span>; <span class="k">then</span>
+<p>In this situation, docas considers all directories are dirty.</p></li>
+</ol>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>git branch -a | grep origin<span class="se">\/</span>gh-pages | wc -l<span class="k">)</span> <span class="o">=</span> 0 <span class="o">]</span>; <span class="k">then</span>
 
 <span class="k">  </span><span class="nb">echo</span> <span class="s2">&quot;Creating gh-pages branch...&quot;</span>
   cp -R <span class="nv">$tempdir</span>/master <span class="nv">$tempdir</span>/gh-pages
