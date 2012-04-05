@@ -47,20 +47,16 @@
 #   4. prepare a temporary working directory (and remove on exit, interruption,
 #   and termination).
 set -e
-
 if [ $# -lt 1 ]; then
   echo -e "\nUsage: docas <username>/<repository>\n"
   exit
 fi
-
 user=$(echo $1 | cut -d'/' -f1)
 repo=$(echo $1 | cut -d'/' -f2)
-
 tempdir=$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)
 trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
 
 #### Phase 1: Clone the Repository
-
 
 #### Download the Repository
 #
@@ -68,13 +64,9 @@ trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
 # Keep the current commit hash of the master branch, which will be included in
 # the commit subject line of gh-pages branch to indicate a successful
 # synchronization.
-
 echo "Cloning git@github.com:$user/$repo.git..."
 git clone -q --depth=1 git@github.com:$user/$repo.git "$tempdir/master"
-cd $tempdir/master
-commit=$(git rev-parse HEAD | cut -c1-10)
-
-
+commit=$(git --git-dir=$tempdir/master/.git rev-parse HEAD | head -c 10)
 
 # ### Ensure gh-pages Branch Exists.
 
