@@ -45,9 +45,7 @@
 #   2. ensure enough arguments are given,
 #   3. parse the arguments into user and repo,
 #   4. prepare a temporary working directory (and remove on exit, interruption,
-#   and termination), resolve to actual directory rather than link, in order to
-#   get consistent match, for node.js' `path.resolve` api outputs referenced
-#   path.
+#   and termination).
 
 set -e
 
@@ -60,10 +58,7 @@ user=$(echo $1 | cut -d'/' -f1)
 repo=$(echo $1 | cut -d'/' -f2)
 
 tempdir=$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)
-cd $tempdir
-# tempdir=$(pwd -P)
 trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
-
 
 #### Phase 1: Clone the Repository
 
