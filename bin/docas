@@ -254,31 +254,30 @@ fi
 #  -exec grep -l -i '<meta name="generator" content="docco.*">' '{}' + \
 #  | xargs rm
 cat $tempdir/changed_directories_full_path | while read dir; do
-
   echo $tempdir/gh-pages/$dir
   if [ -d $tempdir/gh-pages/$dir ]; then
     find $tempdir/gh-pages/$dir -depth 1 -type f -print0 \
       | xargs -0 grep -l -i -Z '<meta name="generator" content="docco.*">' \
       | xargs -0 rm 
   fi
-
 done
 
 # Process the sources for each directory, so the *JUMP TO* section of each
 # document will contain links to sibling documents only.
 #
-# Following the [project pages] link syntax, the stylesheet should be located at:
-# `/<repo>/stylesheets/docco.css` in the HTML, and resides in:
-# `/stylesheets/docco.css` in the gh-pages branch.
+# Following the [project pages] link syntax, the stylesheet should be:
+# `/<repo>/stylesheets/docco.css` from the HTML source, and resides in:
+# `/stylesheets/docco.css` of the gh-pages branch.
 #
 # [Project Pages]: http://help.github.com/pages/#project_pages_manually
 cd $tempdir/master
 cat $tempdir/changed_directories_full_path | while read dir; do
   if [ $dir = '.' ]; then
-    egrep "^[^/]+$" $tempdir/list | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages # > /dev/null
+    egrep "^[^/]+$" $tempdir/list \
+      | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages # > /dev/null
   else
-    # The link of the stylesheet will be '/<repository>/stylesheets/docco.css'.
-    egrep "^$dir/[^/]+$" $tempdir/list | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null
+    egrep "^$dir/[^/]+$" $tempdir/list \
+      | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null
   fi
 done
 
