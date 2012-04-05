@@ -266,18 +266,18 @@ done
 # document will contain links to sibling documents only.
 #
 # Following the [project pages] link syntax, the stylesheet should be:
-# `/<repo>/stylesheets/docco.css` from the HTML source, and resides in:
+# `/<repo>/stylesheets/docco.css` in the HTML source, and resides at:
 # `/stylesheets/docco.css` of the gh-pages branch.
 #
 # [Project Pages]: http://help.github.com/pages/#project_pages_manually
 cd $tempdir/master
 cat $tempdir/changed_directories_full_path | while read dir; do
-  if [ $dir = '.' ]; then
-    egrep "^[^/]+$" $tempdir/list \
-      | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages # > /dev/null
-  else
-    egrep "^$dir/[^/]+$" $tempdir/list \
+  if [ $dir = '.' ]; then match="^[^/]+$" else match="^$dir/[^/]+$" fi
+    egrep "$match" $tempdir/list \
       | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null
+  # else
+  #  egrep "^$dir/[^/]+$" $tempdir/list \
+  #    | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null
   fi
 done
 
