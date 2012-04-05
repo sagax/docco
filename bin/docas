@@ -262,7 +262,7 @@ cat $tempdir/changed_directories_full_path | while read dir; do
   fi
 done
 
-# Process the sources for each directory, so the *JUMP TO* section of each
+# Process the sources for each directory, so the **JUMP TO** section of each
 # document will contain links to sibling documents only.
 #
 # Following the [project pages] link syntax, the stylesheet should be:
@@ -274,11 +274,7 @@ cd $tempdir/master
 cat $tempdir/changed_directories_full_path | while read dir; do
   if [ $dir = '.' ]; then match="^[^/]+$"; else match="^$dir/[^/]+$"; fi
     egrep $match $tempdir/list \
-      | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null
-  # else
-  #  egrep "^$dir/[^/]+$" $tempdir/list \
-  #    | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null
-  
+      | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null  
 done
 
 #### Phase 5: Synchronize with GitHub
@@ -305,7 +301,7 @@ if [ $(echo "$status" | wc -l) -gt 0 ]; then
   echo "Synchronizing GitHub pages remotely..."
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages add .
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages commit -qam "Docas synced with $commit"
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages push -q
+  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages push -q origin gh-pages
   echo "http://$user.github.com/$repo is now up-to-date. Crowd applauds."
 
 # Nothing to do when no file was created, modified, or deleted. The gh-pages
