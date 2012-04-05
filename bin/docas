@@ -58,8 +58,6 @@ trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
 
 #### Phase 1: Clone the Repository
 
-##### Download the Repository
-
 # (Shallow) clone the GitHub repository to master directory. Keep the current
 # commit hash of the master branch, which will be included in the commit subject
 # line of the gh-pages branch to indicate a successful synchronization.
@@ -69,10 +67,20 @@ commit=$(git --git-dir=$tempdir/master/.git  rev-parse HEAD | cut -c1-10)
 
 #### Phase 2: Ensure gh-pages Branch Exists, List Touched Directories
 
-generate_list_of_changed_directories () {
+# Docas will only re-generate sources in the *dirty* directories, in the
+# following occasions, docas consider all directories are dirty:
+#
+#   1. gh-pages does not exist.
+#   2. No sync history found from the gh-pages commits.
+#   3. gh-pages sync history found, but could not found according master commit.
+#
+# Situation 2 can be caused by first synchronization, or shallow clone, while
+# situation 3 can only be caused by shallow clone.
+all_directories_are_dirty () {
   git --git-dir=$tempdir/master/.git ls-tree -r --name-only HEAD \
     | while read file; do echo $(dirname $file); done \
-    | sort | uniq > $tempdir/changed_directories_full_path
+    | sort | uniq > $tempdir/dirty_directories
+  return
 }
 
 # If gh-pages branch does not exist, then create the gh-pages branch following
@@ -84,6 +92,7 @@ generate_list_of_changed_directories () {
 #   4. Clear git index.
 #   5. Remove all files.
 #
+# In this situation, docas consider all directories are dirty.
 # [GitHub instruction]: http://help.github.com/pages/#project_pages_manually 
 if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
 
@@ -93,24 +102,21 @@ if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
   git symbolic-ref HEAD refs/heads/gh-pages > /dev/null
   rm .git/index
   git clean -fdx > /dev/null
-  
-  # List all versioned directories.
-  generate_list_of_changed_directories
+  all_directories_are_dirty
 
 # If there exists a gh-pages, which means the gh-pages may contain docas
 # synchronized content. So, docas will:
 #
-#   1. Duplicate master directory to gh-pages directory#
-#   2. Setup gh-pages directory to track remote gh-pages branch.
-#   3. Analyze the directories which have been touched. Sources in these
-#   directories will be regenerated. Modified directories contains:
+#   1. Duplicate `master` directory to `gh-pages` directory.
+#   2. Checkout `gh-pages` branch in `gh-pages` directory.
+#   3. Analyze dirty directories. Sources in these directories will be
+#   regenerated. Dirty directories are:
 #
-#      * Modified directories of the master branch, plus
-#      * Modified directories of the gh-pages branch.
+#      * Modified directories of the `master` branch, plus
+#      * Modified directories of the `gh-pages` branch.
 #      
-#   All files in the touched directories will be re-generated since the
-#   original docco implementation use the file list to generate the jump to
-#   links, which might be broken if some source renamed/removed.
+#   All sources in the touched directories will be re-generated since the
+#   *JUMP TO* links of sibling documents needs be synchronized.
 else
   cp -R $tempdir/master $tempdir/gh-pages
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages checkout -q gh-pages
@@ -128,34 +134,29 @@ else
 
   echo "$synced_master_hash | $synced_ghpages_hash"
 
+  # If we can not securely list all touched files, then docas treat all
+  # as dirty directories.
   if [ -z $synced_ghpages_hash ] || [ -z $synced_master_hash ]; then
     echo "gh-pages branch out-of sync for a long time, rebuilding..."
-    generate_list_of_changed_directories
+    all_directories_are_dirty
  
-  # If we can securely get all touched files in the master and gh-pages branch
-  # (the shallow clone contains the log), we sort out the unique touched
-  # directories into changed_directories_full_path file.
+  # If we can securely list all touched files in the master and gh-pages branch
+  # since last sync, output unique directories into touched_directories file.
   else
     echo "Found docas comitted gh-pages, synced with $synced_master_hash"
     git --git-dir=$tempdir/gh-pages/.git diff --name-only $synced_ghpages_hash..HEAD \
-      | while read file; do dirname $file; done \
-      | uniq > $tempdir/changed_directories
+      | while read file; do dirname $file; done >  $tempdir/dirty_directories
     git --git-dir=$tempdir/master/.git diff --name-only $synced_master_hash..HEAD \
-      | while read file; do dirname $file; done \
-      | uniq >> $tempdir/changed_directories
-    cat $tempdir/changed_directories \
-      | sort -u > $tempdir/changed_directories_full_path
+      | while read file; do dirname $file; done >> $tempdir/dirty_directories
+    sort -u dirty_directories -o dirty_directories
   fi
 
 fi
 
-echo Changed directories:
-cat $tempdir/changed_directories_full_path
-
 # If no file of the master or the gh-pages branch was changed, exit the
 # program with notification. Nothing needs be done further. Neither the cover
 # page nor any document needs be re-generated.
-if [ $(cat $tempdir/changed_directories_full_path | wc -l) -eq 0 ]; then 
+if [ $(cat $tempdir/dirty_directories | wc -l) -eq 0 ]; then 
   echo "No file has been touched. Are you kidding?"
   exit
 fi
@@ -203,8 +204,8 @@ if ! [ -f $tempdir/gh-pages/stylesheets/docco.css ]; then
   cp /usr/local/lib/docas/resources/docco.css $tempdir/gh-pages/stylesheets/docco.css
 fi
 
-# For each touched directory, do:
-cat $tempdir/changed_directories_full_path | while read dir; do
+# For each dirty directory, do:
+cat $tempdir/dirty_directories | while read dir; do
 
   ##### 2: Clear Touched Directories
 
@@ -243,7 +244,9 @@ done
 # http://schacon.github.com/git/git.html#_high_level_commands_porcelain
 status=$(git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages status --porcelain)
 
-echo "Created:$(echo "$status" | egrep "^(A| A)" | wc -l)"
+echo "$status"
+
+echo "Created:$(echo "$status" | egrep "^(\?\?)" | wc -l)"
 echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
 echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 
