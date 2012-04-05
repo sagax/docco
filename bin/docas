@@ -19,7 +19,7 @@
 #   4. Documente (documentable) sources for each directory.
 #   5. Push to the remote gh-pages branch.
 #
-
+#
 ### Hosted Version ##
 #
 # Actually, for most of developers who want a quick and dirty mechanism for
@@ -28,7 +28,7 @@
 # real time when you make any commit. As simple as adding docas as your
 # collaborator.
 #
-
+#
 ### Command-line usage:
 #
 #     docas username/repository
@@ -72,7 +72,7 @@ commit=$(git --git-dir=$tempdir/master/.git  rev-parse HEAD | cut -c1-10)
 #   2. No sync found from the `gh-pages` commits.
 #   3. `gh-pages` sync found, but could not found according `master` commit.
 #
-# Situation 2 can be caused by first synchronization, or shallow clone, while
+# Situation 2 can be caused by first synchronization, or shallow clone; while
 # situation 3 can only be caused by shallow clone.
 all_directories_are_dirty () {
   git --git-dir=$tempdir/master/.git ls-tree -r --name-only HEAD \
@@ -90,7 +90,7 @@ all_directories_are_dirty () {
 #   4. Clear git index.
 #   5. Remove all files.
 #
-#   In this situation, docas considers all directories are dirty.
+# In this situation, docas considers all directories are dirty.
 # [GitHub instruction]: http://help.github.com/pages/#project_pages_manually 
 if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
 
