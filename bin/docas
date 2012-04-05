@@ -271,10 +271,14 @@ done
 #
 # [Project Pages]: http://help.github.com/pages/#project_pages_manually
 cat $tempdir/changed_directories_full_path | while read dir; do
-  if [ $dir = '.' ]; then match="^[^/]+$"; else match="^$dir/[^/]+$"; fi
-  egrep $match $tempdir/list \
-    | while read file; do echo "$tempdir/master/$file"; done \
-    | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null  
+  if [ $dir = '.' ]; then
+    match="^[^/]+$"; 
+  else
+    match="^$dir/[^/]+$";
+  fi
+  egrep $match $tempdir/list | while read file; do
+    echo "$tempdir/master/$file";
+  done | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null  
 done
 
 #### Phase 5: Synchronize with GitHub
