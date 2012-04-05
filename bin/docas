@@ -263,19 +263,14 @@ done
 
 ##### 3: Generate Docuemnts
 #
-# Process the sources for each directory, so the **JUMP TO** section of each
-# document will contain links to sibling documents only.
-#
-# Following the [project pages] link structure, generated documents reference
-# `/<repo>/stylesheets/docco.css` in the HTML sources.
+# Process the sources for each directory, so the **JUMP TO** section will
+# contain links to sibling documents only. Following the [project pages] link
+# structure, generated documents reference `/<repo>/stylesheets/docco.css` in
+# the HTML sources.
 #
 # [Project Pages]: http://help.github.com/pages/#project_pages_manually
 cat $tempdir/changed_directories_full_path | while read dir; do
-  if [ $dir = '.' ]; then
-    match="^[^/]+$"; 
-  else
-    match="^$dir/[^/]+$";
-  fi
+  if [ $dir = '.' ]; then match="^[^/]+$"; else match="^$dir/[^/]+$"; fi
   egrep $match $tempdir/list | while read file; do
     echo "$tempdir/master/$file";
   done | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null  
