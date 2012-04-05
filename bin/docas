@@ -278,7 +278,7 @@ cat $tempdir/changed_directories_full_path | while read dir; do
   # else
   #  egrep "^$dir/[^/]+$" $tempdir/list \
   #    | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null
-  fi
+  
 done
 
 #### Phase 5: Synchronize with GitHub
