@@ -1,0 +1,196 @@
+<!DOCTYPE html>  <html> <head>   <title>docas</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <meta name="generator" content="Docco">   <link rel="stylesheet" media="all" href="/docas/stylesheets/docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="docas.html">                 docas.sh_               </a>                                           <a class="source" href="docci.html">                 docci.js_               </a>                                           <a class="source" href="docco.html">                 docco.js_               </a>                                           <a class="source" href="test.html">                 test.coffee_               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               docas             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>Docas help you document your git repository automatically. It relies on:</p>
+
+<ul>
+<li><p>[Docco][Docco], a quick and dirty, hundred-line-long, 
+ literate-programming style documentation generator, original by
+ Jeremy Ashkenas.</p></li>
+<li><p>Docci, generate an index.html cover page for your git repository. The
+ cover page contains the repository's recent commit history, a
+ statistics of languages and slocs, and a file browser for navigation.</p></li>
+</ul>
+
+<p>Docas can be used stand alone on the developer's machine, which will:</p>
+
+<ol>
+<li><p>Clone the git (current on GitHub only) repository into a temporary
+ directory.</p></li>
+<li><p>(Optional) Create the gh-pages branch on GitHub if not exists.</p></li>
+<li><p>Generate the cover page using docci.</p></li>
+<li><p>Documente (documentable) sources for each directory.</p></li>
+<li><p>Push to the remote gh-pages branch.</p></li>
+</ol>
+
+<h2>Hosted Version</h2>
+
+<p>Actually, for most of developers who want a quick and dirty mechanism for
+documentation synchronization, please goto <a href="http://docas.io">Docas.io</a>, an
+documentation service which synchronize the documents on gh-pages branch in
+real time when you make any commit. As simple as adding docas as your
+collaborator.</p>
+
+<h3>Command-line usage:</h3>
+
+<pre><code>docas username/repository
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight shebang"><pre><span>#!/usr/bin/env</span> <span>bash
+
+</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h2>Scripting Procedure</h2>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Some pre-preparations:</p>
+
+<ol>
+<li>stop execution when encountering any error,</li>
+<li>ensure enough arguments are given,</li>
+<li>parse the arguments into user and repo,</li>
+<li>prepare a temporary working directory (and remove on exit, interruption,
+and termination).</li>
+</ol>             </td>             <td class="code">               <div class="highlight"><pre><span class="nb">set</span> -e
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$# </span>-lt 1 <span class="o">]</span>; <span class="k">then</span>
+<span class="k">  </span><span class="nb">echo</span> -e <span class="s2">&quot;\nUsage: docas &lt;username&gt;/&lt;repository&gt;\n&quot;</span>
+  <span class="nb">exit</span>
+<span class="k">fi</span>
+<span class="nv">user</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$1</span> | cut -d<span class="s1">&#39;/&#39;</span> -f1<span class="k">)</span>
+<span class="nv">repo</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$1</span> | cut -d<span class="s1">&#39;/&#39;</span> -f2<span class="k">)</span>
+<span class="nv">tempdir</span><span class="o">=</span><span class="k">$(</span>mktemp -d /tmp/repo.<span class="nv">$$</span>.XXXXXXXXXX<span class="k">)</span>
+<span class="nb">trap</span> <span class="s2">&quot;rm -rf $tempdir; exit&quot;</span> 0 SIGINT SIGTERM</pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h3>Phase 1: Clone the Repository</h3>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h4>Download the Repository</h4>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>(Shallow) clone the GitHub repository to master directory. Keep the current
+commit hash of the master branch, which will be included in the commit subject
+line of the gh-pages branch to indicate a successful synchronization.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nb">echo</span> <span class="s2">&quot;Cloning git@github.com:$user/$repo.git...&quot;</span>
+git clone -q --depth<span class="o">=</span>1 git@github.com:<span class="nv">$user</span>/<span class="nv">$repo</span>.git <span class="s2">&quot;$tempdir/master&quot;</span>
+<span class="nv">commit</span><span class="o">=</span><span class="k">$(</span>git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/master/.git  rev-parse HEAD | cut -c1-10<span class="k">)</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <h3>Phase 2: Ensure gh-pages Branch Exists, List Touched Directories</h3>             </td>             <td class="code">               <div class="highlight"><pre>generate_list_of_changed_directories <span class="o">()</span> <span class="o">{</span>
+  git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/master/.git ls-tree -r --name-only HEAD <span class="se">\</span>
+    | <span class="k">while </span><span class="nb">read </span>file; <span class="k">do </span><span class="nb">echo</span> <span class="k">$(</span>dirname <span class="nv">$file</span><span class="k">)</span>; <span class="k">done</span> <span class="se">\</span>
+    | sort | uniq &gt; <span class="nv">$tempdir</span>/changed_directories_full_path
+<span class="o">}</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>If gh-pages branch does not exist, then create the gh-pages branch following
+<a href="http://help.github.com/pages/#project_pages_manually">GitHub instruction</a>:</p>
+
+<ol>
+<li>Duplicate master directory to gh-pages directory.</li>
+<li>Change to gh-pages directory.</li>
+<li>Create gh-pages branch. </li>
+<li>Clear git index.</li>
+<li>Remove all files.</li>
+</ol>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>git branch -a | grep origin<span class="se">\/</span>gh-pages | wc -l<span class="k">)</span> <span class="o">=</span> 0 <span class="o">]</span>; <span class="k">then</span>
+
+<span class="k">  </span><span class="nb">echo</span> <span class="s2">&quot;Creating gh-pages branch...&quot;</span>
+  cp -R <span class="nv">$tempdir</span>/master <span class="nv">$tempdir</span>/gh-pages
+  <span class="nb">cd</span> <span class="nv">$tempdir</span>/gh-pages
+  git symbolic-ref HEAD refs/heads/gh-pages &gt; /dev/null
+  rm .git/index
+  git clean -fdx &gt; /dev/null
+  </pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>List all versioned directories.</p>             </td>             <td class="code">               <div class="highlight"><pre>  generate_list_of_changed_directories</pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <p>If there exists a gh-pages, which means the gh-pages may contain docas
+synchronized content. So, docas will:</p>
+
+<ol>
+<li>Duplicate master directory to gh-pages directory#</li>
+<li>Setup gh-pages directory to track remote gh-pages branch.</li>
+<li><p>Analyze the directories which have been touched. Sources in these
+directories will be regenerated. Modified directories contains:</p>
+
+<ul><li>Modified directories of the master branch, plus</li>
+<li>Modified directories of the gh-pages branch.</li></ul>
+
+<p>All files in the touched directories will be re-generated since the
+original docco implementation use the file list to generate the jump to
+links, which might be broken if some source renamed/removed.</p></li>
+</ol>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">else</span>
+<span class="k">  </span>cp -R <span class="nv">$tempdir</span>/master <span class="nv">$tempdir</span>/gh-pages
+  git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/gh-pages/.git --work-tree<span class="o">=</span><span class="nv">$tempdir</span>/gh-pages checkout -q gh-pages
+  <span class="nv">synced_ghpages_hash</span><span class="o">=</span><span class="k">$(</span>git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/gh-pages/.git log --pretty<span class="o">=</span>oneline <span class="se">\</span>
+    | egrep -m 1 -i <span class="s2">&quot;docas .* [0-9a-f]{10}$&quot;</span> <span class="se">\</span>
+    | head -c 10<span class="k">)</span>
+  <span class="nv">synced_master_hash</span><span class="o">=</span><span class="k">$(</span>git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/gh-pages/.git log --pretty<span class="o">=</span>oneline <span class="se">\</span>
+    | egrep -m 1 -i <span class="s2">&quot;docas .* [0-9a-f]{10}$&quot;</span> <span class="se">\</span>
+    | tail -c 11 <span class="se">\</span>
+    | head -c 10<span class="k">)</span>
+  <span class="nv">synced_master_hash</span><span class="o">=</span><span class="k">$(</span>git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/master/.git log --pretty<span class="o">=</span>oneline <span class="se">\</span>
+    | egrep -m 1 <span class="s2">&quot;^$synced_master_hash&quot;</span> <span class="se">\</span>
+    | head -c 10 <span class="se">\</span>
+    | xargs <span class="nb">echo</span><span class="k">)</span>
+
+  <span class="nb">echo</span> <span class="s2">&quot;$synced_master_hash | $synced_ghpages_hash&quot;</span>
+
+  <span class="k">if</span> <span class="o">[</span> -z <span class="nv">$synced_ghpages_hash</span> <span class="o">]</span> <span class="o">||</span> <span class="o">[</span> -z <span class="nv">$synced_master_hash</span> <span class="o">]</span>; <span class="k">then</span>
+<span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;gh-pages branch out-of sync for a long time, rebuilding...&quot;</span>
+    generate_list_of_changed_directories
+ </pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <p>If we can securely get all touched files in the master and gh-pages branch
+(the shallow clone contains the log), we sort out the unique touched
+directories into changed<em>directories</em>full_path file.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="k">else</span>
+<span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;Found docas comitted gh-pages, synced with $synced_master_hash&quot;</span>
+    git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/gh-pages/.git diff --name-only <span class="nv">$synced_ghpages_hash</span>..HEAD <span class="se">\</span>
+      | <span class="k">while </span><span class="nb">read </span>file; <span class="k">do </span>dirname <span class="nv">$file</span>; <span class="k">done</span> <span class="se">\</span>
+      | uniq &gt; <span class="nv">$tempdir</span>/changed_directories
+    git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/master/.git diff --name-only <span class="nv">$synced_master_hash</span>..HEAD <span class="se">\</span>
+      | <span class="k">while </span><span class="nb">read </span>file; <span class="k">do </span>dirname <span class="nv">$file</span>; <span class="k">done</span> <span class="se">\</span>
+      | uniq &gt;&gt; <span class="nv">$tempdir</span>/changed_directories
+    cat <span class="nv">$tempdir</span>/changed_directories <span class="se">\</span>
+      | sort -u &gt; <span class="nv">$tempdir</span>/changed_directories_full_path
+  <span class="k">fi</span>
+
+<span class="k">fi</span>
+
+<span class="nb">echo </span>Changed directories:
+cat <span class="nv">$tempdir</span>/changed_directories_full_path</pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <p>If no file of the master or the gh-pages branch was changed, exit the
+program with notification. Nothing needs be done further. Neither the cover
+page nor any document needs be re-generated.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>cat <span class="nv">$tempdir</span>/changed_directories_full_path | wc -l<span class="k">)</span> -eq 0 <span class="o">]</span>; <span class="k">then </span>
+<span class="k">  </span><span class="nb">echo</span> <span class="s2">&quot;No file has been touched. Are you kidding?&quot;</span>
+  <span class="nb">exit</span>
+<span class="k">fi</span></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <h3>Phase 3: Generate Cover Page (using Docci)</h3>             </td>             <td class="code">               <div class="highlight"><pre><span class="nb">echo</span> <span class="s2">&quot;Generating cover page...&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>               <p>Before calling the docci command line, the following materials should be
+ready:</p>
+
+<ol>
+<li>a language statistics file named <code>stat</code>, and,</li>
+<li>a list of all recognized sources named <code>list</code>.</li>
+</ol>
+
+<p>Keep the path name of the master directory into a local variable, which will
+be used to remove the prefix from the source list.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">masterdir</span><span class="o">=</span><span class="nv">$tempdir</span>/master
+<span class="nv">masterdirlength</span><span class="o">=</span><span class="k">${#</span><span class="nv">masterdir</span><span class="k">}</span>+1
+<span class="nb">cd</span> /usr/local/lib/docas/vendor/linguist
+bundle <span class="nb">exec </span>linguist <span class="nv">$tempdir</span>/master &gt; <span class="nv">$tempdir</span>/stat
+find <span class="nv">$tempdir</span>/master -type f <span class="se">\</span>
+  | xargs bundle <span class="nb">exec </span>source_only <span class="se">\</span>
+  | <span class="k">while </span><span class="nb">read </span>file; <span class="k">do </span><span class="nb">echo</span> <span class="k">${</span><span class="nv">file</span><span class="p">:</span><span class="nv">$masterdirlength</span><span class="k">}</span>; <span class="k">done</span> &gt; <span class="nv">$tempdir</span>/list</pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>               <p>Make sure a stylesheet for index.html exists. User modification will be kept.
+In case of the stylesheet doesn't exists, copy the default stylesheet to the
+<code>stylesheet</code> folder.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">if</span> ! <span class="o">[</span> -f <span class="nv">$tempdir</span>/gh-pages/stylesheets/index.css <span class="o">]</span>; <span class="k">then</span>
+<span class="k">  </span>mkdir -p <span class="nv">$tempdir</span>/gh-pages/stylesheets
+  cp /usr/local/lib/docas/resources/index.css <span class="nv">$tempdir</span>/gh-pages/stylesheets/index.css
+<span class="k">fi</span></pre></div>             </td>           </tr>                               <tr id="section-17">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-17">&#182;</a>               </div>               <p>Invoke the docci command-line to generate index.html for master directory.</p>             </td>             <td class="code">               <div class="highlight"><pre>docci -c <span class="s2">&quot;/$repo/stylesheets/index.css&quot;</span> -o <span class="nv">$tempdir</span>/gh-pages <span class="nv">$tempdir</span>/master</pre></div>             </td>           </tr>                               <tr id="section-18">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-18">&#182;</a>               </div>               <h3>Phase 4: Generate Documents (using Docco)</h3>             </td>             <td class="code">               <div class="highlight"><pre><span class="nb">echo</span> <span class="s2">&quot;Generating documents...&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-19">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-19">&#182;</a>               </div>               <h4>1: Prepare Docco Stylesheet</h4>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-20">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-20">&#182;</a>               </div>               <p>Make sure a stylesheet for documents exists. User modification will be kept.
+In case of the stylesheet doesn't exists, copy the default stylesheet to the
+<code>stylesheets</code> folder.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">if</span> ! <span class="o">[</span> -f <span class="nv">$tempdir</span>/gh-pages/stylesheets/docco.css <span class="o">]</span>; <span class="k">then</span>
+<span class="k">  </span>mkdir -p <span class="nv">$tempdir</span>/gh-pages/stylesheets
+  cp /usr/local/lib/docas/resources/docco.css <span class="nv">$tempdir</span>/gh-pages/stylesheets/docco.css
+<span class="k">fi</span></pre></div>             </td>           </tr>                               <tr id="section-21">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-21">&#182;</a>               </div>               <p>For each touched directory, do:</p>             </td>             <td class="code">               <div class="highlight"><pre>cat <span class="nv">$tempdir</span>/changed_directories_full_path | <span class="k">while </span><span class="nb">read </span>dir; <span class="k">do</span></pre></div>             </td>           </tr>                               <tr id="section-22">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-22">&#182;</a>               </div>               <h4>2: Clear Touched Directories</h4>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-23">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-23">&#182;</a>               </div>               <p>Remove all files generated by docco in the touched directories. A <code>generator</code>
+meta tag in the docco template is used as a signagure to identify docco
+generated documents.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="k">if</span> <span class="o">[</span> -d <span class="nv">$tempdir</span>/gh-pages/<span class="nv">$dir</span> <span class="o">]</span>; <span class="k">then</span>
+<span class="k">    </span>find <span class="nv">$tempdir</span>/gh-pages/<span class="nv">$dir</span> -depth 1 -type f -print0 <span class="se">\</span>
+      | xargs -0 grep -liZ <span class="s1">&#39;&lt;meta name=&quot;generator&quot; content=&quot;docco.*&quot;&gt;&#39;</span> <span class="se">\</span>
+      | xargs -0 rm 
+  <span class="k">fi</span></pre></div>             </td>           </tr>                               <tr id="section-24">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-24">&#182;</a>               </div>               <h4>3: Generate Documents</h4>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-25">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-25">&#182;</a>               </div>               <p>Process sources for each directory, so the <em>JUMP TO</em> section will contain
+links to sibling documents only. Following the <a href="http://help.github.com/pages/#project_pages_manually">project page</a> link
+structure, generated documents reference <code>/&lt;repo&gt;/stylesheets/docco.css</code> in
+the HTML sources.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="k">if</span> <span class="o">[</span> <span class="nv">$dir</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span> <span class="o">]</span>; <span class="k">then </span><span class="nv">match</span><span class="o">=</span><span class="s2">&quot;^[^/]+$&quot;</span>; <span class="k">else </span><span class="nv">match</span><span class="o">=</span><span class="s2">&quot;^$dir/[^/]+$&quot;</span>; <span class="k">fi</span>
+<span class="k">  </span>egrep <span class="nv">$match</span> <span class="nv">$tempdir</span>/list | <span class="k">while </span><span class="nb">read </span>file; <span class="k">do</span>
+<span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;$tempdir/master/$file&quot;</span>;
+  <span class="k">done</span> | xargs docco -c <span class="s2">&quot;/$repo/stylesheets/docco.css&quot;</span> -o <span class="nv">$tempdir</span>/gh-pages/<span class="nv">$dir</span> <span class="c"># &gt; /dev/null  </span>
+
+<span class="k">done</span></pre></div>             </td>           </tr>                               <tr id="section-26">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-26">&#182;</a>               </div>               <h3>Phase 5: Synchronize with GitHub</h3>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-27">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-27">&#182;</a>               </div>               <p>Docas will <em>only</em> touch the gh-pages branch when necessary.</p>
+
+<p>Use the <a href="http://schacon.github.com/git/git.html#_high_level_commands_porcelain">porcelain layer</a> of git-status to count files been created, modified,
+or deleted. Inform the user these statistics numbers.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">status</span><span class="o">=</span><span class="k">$(</span>git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/gh-pages/.git --work-tree<span class="o">=</span><span class="nv">$tempdir</span>/gh-pages status --porcelain<span class="k">)</span>
+
+<span class="nb">echo</span> <span class="s2">&quot;Created:$(echo &quot;</span><span class="nv">$status</span><span class="s2">&quot; | egrep &quot;</span>^<span class="o">(</span>A| A<span class="o">)</span><span class="s2">&quot; | wc -l)&quot;</span>
+<span class="nb">echo</span> <span class="s2">&quot;Altered:$(echo &quot;</span><span class="nv">$status</span><span class="s2">&quot; | egrep &quot;</span>^<span class="o">(</span>M| M<span class="o">)</span><span class="s2">&quot; | wc -l)&quot;</span>
+<span class="nb">echo</span> <span class="s2">&quot;Deleted:$(echo &quot;</span><span class="nv">$status</span><span class="s2">&quot; | egrep &quot;</span>^<span class="o">(</span>D| D<span class="o">)</span><span class="s2">&quot; | wc -l)&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-28">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-28">&#182;</a>               </div>               <p>If there exists any file created, modified, or deleted, then:</p>
+
+<ol>
+<li>Synchronize git index with local files,</li>
+<li>commit the gh-pages branch, and,</li>
+<li>synchronize the gh-pages branch with GitHub remotely.</li>
+</ol>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">if</span> <span class="o">[</span> <span class="k">$(</span><span class="nb">echo</span> <span class="s2">&quot;$status&quot;</span> | wc -l<span class="k">)</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
+<span class="k">  </span><span class="nb">echo</span> <span class="s2">&quot;Synchronizing GitHub pages remotely...&quot;</span>
+  git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/gh-pages/.git --work-tree<span class="o">=</span><span class="nv">$tempdir</span>/gh-pages add .
+  git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/gh-pages/.git --work-tree<span class="o">=</span><span class="nv">$tempdir</span>/gh-pages commit -qam <span class="s2">&quot;Docas synced with $commit&quot;</span>
+  git --git-dir<span class="o">=</span><span class="nv">$tempdir</span>/gh-pages/.git --work-tree<span class="o">=</span><span class="nv">$tempdir</span>/gh-pages push -q origin gh-pages
+  <span class="nb">echo</span> <span class="s2">&quot;http://$user.github.com/$repo is now up-to-date. Crowd applauds.&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-29">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-29">&#182;</a>               </div>               <p>Nothing to do when no file was created, modified, or deleted. The gh-pages
+branch is in-sync with the master branch already.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">else</span>
+<span class="k">  </span><span class="nb">echo</span> <span class="s2">&quot;http://$user.github.com/$repo doesn&#39;t need to sync. Code harder.&quot;</span>
+<span class="k">fi</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
