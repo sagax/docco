@@ -169,7 +169,7 @@ to the <code>stylesheets</code> folder.</p>             </td>             <td cl
 identify docco generated documents.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="k">if</span> <span class="o">[</span> -d <span class="nv">$tempdir</span>/gh-pages/<span class="nv">$dir</span> <span class="o">]</span>; <span class="k">then</span>
 <span class="k">    </span>find <span class="nv">$tempdir</span>/gh-pages/<span class="nv">$dir</span> -maxdepth 1 -type f -print0 <span class="se">\</span>
       | xargs -0 grep -liZ <span class="s1">&#39;&lt;meta name=&quot;generator&quot; content=&quot;docco.*&quot;&gt;&#39;</span> <span class="se">\</span>
-      | xargs -0 rm 
+      | xargs -0 rm -f
   <span class="k">fi</span></pre></div>             </td>           </tr>                               <tr id="section-24">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-24">&#182;</a>               </div>               <h4>3: Generate Documents</h4>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-25">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-25">&#182;</a>               </div>               <p>Process sources for each directory, so the <strong>jump to</strong> section will contain
 links to sibling documents only. Following the <a href="http://help.github.com/pages/#project_pages_manually">project page</a> link
 structure, generated documents should reference
