@@ -2,7 +2,7 @@
 
 # **Docas** help you document your git repository automatically. It relies on:
 #
-#   * [**Docco**], a quick and dirty, hundred-line-long, literate-programming
+#   * [__Docco__], a quick and dirty, hundred-line-long, literate-programming
 #   style documentation generator by [Jeremy Ashkenas].
 #
 #   * [**Docci**], generate an `index.html` cover page for your git repository.
