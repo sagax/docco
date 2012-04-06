@@ -1,26 +1,34 @@
 #!/usr/bin/env bash
 
-# Docas help you document your git repository automatically. It relies on:
+# **Docas** help you document your git repository automatically. It relies on:
 #
-#   *  [Docco][Docco], a quick and dirty, hundred-line-long, 
-#      literate-programming style documentation generator, original by
-#      Jeremy Ashkenas.
+#   * `[Docco]`, a quick and dirty, hundred-line-long, literate-programming
+#   style documentation generator by [Jeremy Ashkenas].
 #
-#   *  Docci, generate an index.html cover page for your git repository. The
-#      cover page contains the repository's recent commit history, a
-#      statistics of languages and slocs, and a file browser for navigation.
+#   * `[Docci]`, generate an `index.html` cover page for your git repository.
+#   The cover page contains the repository's recent commit history, a
+#   statistics of languages and slocs, and a file browser for navigation.
+#   Currently not a stand-alone command (only work with docas).
 #
-# Docas can be used stand alone on the developer's machine, which will:
+# [Docco]: http://jashkenas.github.com/docco
+# [Jeremy Ashkenas]: http://jashkenas.github.com
+# [Docci]: http://baoshan.github.com/docas/src/docci.html
 #
-#   1. Clone the git (current on GitHub only) repository into a temporary
-#   directory.
-#   2. (Optional) Create the gh-pages branch on GitHub if not exists.
+# **Docas** can be used as a stand-alone command on the developer's machine,
+# which will:
+#
+#   1. Clone the GitHub repository into a temporary directory.
+#   2. Create gh-pages branch (optional) and list dirty directories.
 #   3. Generate the cover page using docci.
-#   4. Documente (documentable) sources for each directory.
+#   4. Documente sources for each directory using docco.
 #   5. Push to the remote gh-pages branch.
 #
+# However, it's recommended to automate such tasks for your every commit using
+# a service version of docas ---- [docas.io].
 #
-### Hosted Version ##
+# [docas.io]: http://docas.io
+#
+### Service Version
 #
 # Actually, for most of developers who want a quick and dirty mechanism for
 # documentation synchronization, please goto [Docas.io](http://docas.io), an
@@ -37,12 +45,12 @@
 
 ### Scripting Procedure
 
-# Some pre-preparations:
+# Preparations:
 #
-#   1. stop execution when encountering any error,
-#   2. ensure enough arguments are given,
-#   3. parse the arguments into user and repo,
-#   4. prepare a temporary working directory (and remove on exit, interruption,
+#   1. Stop execution when encountering any error,
+#   2. Ensure enough arguments are given,
+#   3. Parse the arguments into user and repo,
+#   4. Prepare a temporary working directory (and remove on exit, interruption,
 #   and termination).
 set -e
 if [ $# -lt 1 ]; then
@@ -162,7 +170,7 @@ fi
 #### Phase 3: Generate Cover Page (using Docci)
 echo "Generating cover page..."
 
-# Before calling the docci command line, the following materials should be
+# Before calling the **docci** command line, following materials should be
 # ready:
 #
 #   1. a language statistics file named `stat`, and,
@@ -178,9 +186,9 @@ find $tempdir/master -type f \
   | xargs bundle exec source_only \
   | while read file; do echo ${file:$masterdirlength}; done > $tempdir/list
 
-# Make sure a stylesheet for index.html exists. User modification will be kept.
-# In case of the stylesheet doesn't exists, copy the default stylesheet to the
-# `stylesheet` folder.
+# Make sure a stylesheet for `index.html` exists. User modification will be
+# honored. In case of the stylesheet doesn't exists, copy the default stylesheet
+# to the `stylesheet` folder.
 if ! [ -f $tempdir/gh-pages/stylesheets/index.css ]; then
   mkdir -p $tempdir/gh-pages/stylesheets
   cp /usr/local/lib/docas/resources/index.css $tempdir/gh-pages/stylesheets/index.css
@@ -195,9 +203,9 @@ echo "Generating documents..."
 
 ##### 1: Prepare Docco Stylesheet
 
-# Make sure a stylesheet for documents exists. User modification will be kept.
-# In case of the stylesheet doesn't exists, copy the default stylesheet to the
-# `stylesheets` folder.
+# Make sure a stylesheet for documents exists. User modification will be
+# honored. In case of the stylesheet doesn't exists, copy the default stylesheet
+# to the `stylesheets` folder.
 if ! [ -f $tempdir/gh-pages/stylesheets/docco.css ]; then
   mkdir -p $tempdir/gh-pages/stylesheets
   cp /usr/local/lib/docas/resources/docco.css $tempdir/gh-pages/stylesheets/docco.css
@@ -219,10 +227,10 @@ cat $tempdir/dirty_directories | while read dir; do
 
   ##### 3: Generate Documents
 
-  # Process sources for each directory, so the *JUMP TO* section will contain
+  # Process sources for each directory, so the **jump to** section will contain
   # links to sibling documents only. Following the [project page] link
-  # structure, generated documents reference `/<repo>/stylesheets/docco.css` in
-  # the HTML sources.
+  # structure, generated documents should reference
+  # `/<repo>/stylesheets/docco.css` in the HTML sources.
   #
   # [Project Page]: http://help.github.com/pages/#project_pages_manually
   if [ $dir = '.' ]; then match="^[^/]+$"; else match="^$dir/[^/]+$"; fi
@@ -237,13 +245,11 @@ done
 # Docas will *only* touch the gh-pages branch when necessary.
 #
 # Use the [porcelain layer] of git-status to count files been created, modified,
-# or deleted. Inform the user these statistics numbers.
+# or deleted. Output these numbers to the terminal.
 #
 # [Porcelain Layer]:
 # http://schacon.github.com/git/git.html#_high_level_commands_porcelain
 status=$(git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages status --porcelain)
-
-echo "$status"
 
 echo "Created:$(echo "$status" | egrep "^(\?\?)" | wc -l)"
 echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
