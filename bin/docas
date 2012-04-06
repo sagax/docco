@@ -24,7 +24,7 @@
 #   5. Push to the remote gh-pages branch.
 #
 # However, it's recommended to automate such tasks for your every commit using
-# a service version of docas ---- [docas.io].
+# a service version of docas -- [docas.io].
 #
 # [docas.io]: http://docas.io
 #
