@@ -2,10 +2,10 @@
 
 # **Docas** help you document your git repository automatically. It relies on:
 #
-#   * __[Docco]__, a quick and dirty, hundred-line-long, literate-programming
+#   * **[Docco]**, a quick and dirty, hundred-line-long, literate-programming
 #   style documentation generator by [Jeremy Ashkenas].
 #
-#   * [**Docci**], generate an `index.html` cover page for your git repository.
+#   * **[Docci]**, generate an `index.html` cover page for your git repository.
 #   The cover page contains the repository's recent commit history, a
 #   statistics of languages and slocs, and a file browser for navigation.
 #   Currently not a stand-alone command (only work with docas).
