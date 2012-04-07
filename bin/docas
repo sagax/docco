@@ -9,7 +9,7 @@
 #   1. Add **[docas]** as your collaborator.
 #   2. Add service hook **[http://docas.io](http://docas.io)**.
 #
-# Docas.io synchronizes the documents on GitHub pages in real time when you push
+# Docas.io syncs the documents on GitHub pages in real time when you push
 # sources to GitHub.
 #
 ### Back to the Topic
