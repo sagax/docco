@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 
-# **Docas** streamlines GitHub repository documentation task. It relies on:
+# **Docas** is a command-line program which streamlines GitHub repository
+# documentation task. It relies on:
 #
 #   - **[Docco]**, a quick and dirty, hundred-line-long, literate-programming
 #   style documentation generator invented by [Jeremy Ashkenas].
 #
 #   - **[Docci]**, render an `index.html` for git repository, including: recent
 #   commits log, a stats of languages and [slocs], and a file browser for
-#   documents. (Not a stand-alone command yet).
+#   documents. *not a stand-alone command yet.*
 #
 #   - **[Linguist]**, the language savant behind GitHub, inspecting over 150
 #   languages.
