@@ -1,18 +1,22 @@
 #!/usr/bin/env bash
 
-# **Docas** help you document your Git(Hub) repository automatically. It relies on:
+# **Docas** streamlines GitHub repository documentation task. It relies on:
 #
-#   * **[Docco]**, a quick and dirty, hundred-line-long, literate-programming
+#   - **[Docco]**, a quick and dirty, hundred-line-long, literate-programming
 #   style documentation generator invented by [Jeremy Ashkenas].
 #
-#   * **[Docci]**, generate an `index.html` cover page for your git repository.
-#   The cover page contains the repository's recent commit history, a
-#   statistics of languages and slocs, and a file browser for navigation.
-#   Currently not a stand-alone command (only work with docas).
+#   - **[Docci]**, render an `index.html` for git repository, including: recent
+#   commits log, a stats of languages and [slocs], and a file browser for
+#   documents. (Not a stand-alone command yet).
+#
+#   - **[Linguist]**, the language savant behind GitHub, inspecting over 150
+#   languages.
 #
 # [Docco]: http://jashkenas.github.com/docco
 # [Jeremy Ashkenas]: http://jashkenas.github.com
 # [Docci]: http://baoshan.github.com/docas/src/docci.html
+# [SLOCs]: http://en.wikipedia.org/wiki/Source_lines_of_code "Source lines of code"
+# [Linguist]: https://github.com/github/linguist
 #
 # **Docas** can be used as a stand-alone command on the developer's machine,
 # which will:
