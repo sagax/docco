@@ -28,6 +28,7 @@
 #
 # [docas.io]: http://docas.io
 #
+#
 ### Service Version
 #
 # Actually, for most of developers who want a quick and dirty mechanism for
@@ -110,7 +111,7 @@ if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
   git clean -fdx > /dev/null
   all_directories_are_dirty
 
-# If there exists a `gh-pages` branch, which means the branch may contain docas
+# If there exists a `gh-pages` branch, which means the branch *may* contain docas
 # synchronized content. So, docas will:
 #
 #   1. Duplicate `master` directory to `gh-pages` directory.
