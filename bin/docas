@@ -1,17 +1,13 @@
 #!/usr/bin/env bash
 
-#
-#
-#
-#
 ### Introducing Docas.io
 #
-# For most developers expecting an elegant and natural approach to document
-# their source code, [Docas.io] is simplier than this stand-alone command. An
-# always synchronized documentation in just 2 steps:
+# For most developers expecting an elegant and natural approach documenting
+# their source code, [Docas.io] is simplier than this stand-alone version.
+# Real-time synced documentation in just 2 steps:
 #
-#   1. Add `docas` as your collaborator.
-#   2. Add `http://docas.io` as a service hook.
+#   1. Add *[docas]* as your collaborator.
+#   2. Add *[http://docas.io]* as a service hook.
 #
 # Docas.io synchronizs the documents on GitHub pages in real time when you push
 # sources to GitHub.
