@@ -1,25 +1,33 @@
 #!/usr/bin/env bash
 
+### *Advertising Docas.io*
+#
+# For most developers expecting an elegant and natural approach to document
+# their source code, [Docas.io] is simplier than this stand-alone command. An
+# always synchronized documentation in just 2 steps:
+#
+#   1. Add `docas` as your collaborator.
+#   2. Add `http://docas.io` as a service hook.
+#
+# Docas.io synchronizs the documents on GitHub pages in real time when you push
+# sources to GitHub.
+#
+### Back to the Topic
+#
 # **Docas** is a command-line program which streamlines GitHub repository
 # documentation task. It relies on:
 #
 #   - **[Docco]**, a quick and dirty, hundred-line-long, literate-programming
 #   style documentation generator invented by [Jeremy Ashkenas].
 #
-#   - **[Docci]**, render an `index.html` for git repository, including: recent
-#   commits log, a stats of languages and [slocs], and a file browser for
-#   documents. *(Not a stand-alone command yet.)*
+#   - **[Docci]**, renders an `index.html` for git repository, including: recent
+#   commits log, stats of languages and [slocs], and a file browser for
+#   documentations. *(Not a stand-alone command yet.)*
 #
 #   - **[Linguist]**, the language savant behind GitHub, inspecting over 150
 #   languages.
 #
-# [Docco]: http://jashkenas.github.com/docco
-# [Jeremy Ashkenas]: http://jashkenas.github.com
-# [Docci]: http://baoshan.github.com/docas/src/docci.html
-# [SLOCs]: http://en.wikipedia.org/wiki/Source_lines_of_code "Source lines of code"
-# [Linguist]: https://github.com/github/linguist
-#
-# **Docas** can be used as a stand-alone command on the developer's machine,
+# **Docas** can be executed as a stand-alone command from the developer's machine,
 # which will:
 #
 #   1. Clone the GitHub repository into a temporary directory.
@@ -28,20 +36,16 @@
 #   4. Documente sources for each directory using docco.
 #   5. Push to the remote gh-pages branch.
 #
-# However, it's recommended to automate such tasks for your every commit using
-# a service version of docas -- [docas.io].
+# **However**, it's recommended to further simplify the task for your every
+# commit using **[docas.io]**, a service keeps your documentation in sync with
+# source code automatically.
 #
-#
+# [Docco]: http://jashkenas.github.com/docco
+# [Jeremy Ashkenas]: http://jashkenas.github.com
+# [Docci]: http://baoshan.github.com/docas/src/docci.html
+# [SLOCs]: http://en.wikipedia.org/wiki/Source_lines_of_code "Source lines of code"
+# [Linguist]: https://github.com/github/linguist
 # [docas.io]: http://docas.io
-#
-### Service Version
-#
-# Actually, for most of developers who want a quick and dirty mechanism for
-# documentation synchronization, please goto [Docas.io](http://docas.io), an
-# documentation service which synchronize the documents on gh-pages branch in
-# real time when you make any commit. As simple as adding docas as your
-# collaborator.
-#
 #
 ### Command-line usage:
 #
