@@ -8,7 +8,7 @@
 #
 #   - **[Docci]**, render an `index.html` for git repository, including: recent
 #   commits log, a stats of languages and [slocs], and a file browser for
-#   documents. *not a stand-alone command yet.*
+#   documents. *(Not a stand-alone command yet.)*
 #
 #   - **[Linguist]**, the language savant behind GitHub, inspecting over 150
 #   languages.
