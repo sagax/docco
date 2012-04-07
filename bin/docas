@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-# **Docas** help you document your git repository automatically. It relies on:
+# **Docas** help you document your Git(Hub) repository automatically. It relies on:
 #
 #   * **[Docco]**, a quick and dirty, hundred-line-long, literate-programming
-#   style documentation generator by [Jeremy Ashkenas].
+#   style documentation generator invented by [Jeremy Ashkenas].
 #
 #   * **[Docci]**, generate an `index.html` cover page for your git repository.
 #   The cover page contains the repository's recent commit history, a
@@ -26,8 +26,8 @@
 # However, it's recommended to automate such tasks for your every commit using
 # a service version of docas -- [docas.io].
 #
-# [docas.io]: http://docas.io
 #
+# [docas.io]: http://docas.io
 #
 ### Service Version
 #
