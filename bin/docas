@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-### *Advertising Docas.io*
+#
+#
+#
+#
+### Introducing Docas.io
 #
 # For most developers expecting an elegant and natural approach to document
 # their source code, [Docas.io] is simplier than this stand-alone command. An
@@ -40,6 +44,7 @@
 # commit using **[docas.io]**, a service keeps your documentation in sync with
 # source code automatically.
 #
+# [Docas]: http://docas.github.com
 # [Docco]: http://jashkenas.github.com/docco
 # [Jeremy Ashkenas]: http://jashkenas.github.com
 # [Docci]: http://baoshan.github.com/docas/src/docci.html
