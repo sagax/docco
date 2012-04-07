@@ -1,17 +1,33 @@
-<!DOCTYPE html>  <html> <head>   <title>docas</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <meta name="generator" content="Docco">   <link rel="stylesheet" media="all" href="/docas/stylesheets/docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="docas.html">                 docas.sh_               </a>                                           <a class="source" href="docci.html">                 docci.js_               </a>                                           <a class="source" href="docco.html">                 docco.js_               </a>                                           <a class="source" href="test.html">                 test.coffee_               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               docas             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p><strong>Docas</strong> is a command-line program which streamlines GitHub repository
+<!DOCTYPE html>  <html> <head>   <title>docas</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <meta name="generator" content="Docco">   <link rel="stylesheet" media="all" href="/docas/stylesheets/docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="docas.html">                 docas.sh_               </a>                                           <a class="source" href="docci.html">                 docci.js_               </a>                                           <a class="source" href="docco.html">                 docco.js_               </a>                                           <a class="source" href="test.html">                 test.coffee_               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               docas             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <h2><em>Advertising Docas.io</em></h2>
+
+<p>For most developers expecting an elegant and natural approach to document
+their source code, <a href="http://docas.io">Docas.io</a> is simplier than this stand-alone command. An
+always synchronized documentation in just 2 steps:</p>
+
+<ol>
+<li>Add <code>docas</code> as your collaborator.</li>
+<li>Add <code>http://docas.io</code> as a service hook.</li>
+</ol>
+
+<p>Docas.io synchronizs the documents on GitHub pages in real time when you push
+sources to GitHub.</p>
+
+<h2>Back to the Topic</h2>
+
+<p><strong>Docas</strong> is a command-line program which streamlines GitHub repository
 documentation task. It relies on:</p>
 
 <ul>
 <li><p><strong><a href="http://jashkenas.github.com/docco">Docco</a></strong>, a quick and dirty, hundred-line-long, literate-programming
 style documentation generator invented by <a href="http://jashkenas.github.com">Jeremy Ashkenas</a>.</p></li>
-<li><p><strong><a href="http://baoshan.github.com/docas/src/docci.html">Docci</a></strong>, render an <code>index.html</code> for git repository, including: recent
-commits log, a stats of languages and <a href="http://en.wikipedia.org/wiki/Source_lines_of_code" title="Source lines of code">slocs</a>, and a file browser for
-documents. <em>(Not a stand-alone command yet.)</em></p></li>
+<li><p><strong><a href="http://baoshan.github.com/docas/src/docci.html">Docci</a></strong>, renders an <code>index.html</code> for git repository, including: recent
+commits log, stats of languages and <a href="http://en.wikipedia.org/wiki/Source_lines_of_code" title="Source lines of code">slocs</a>, and a file browser for
+documentations. <em>(Not a stand-alone command yet.)</em></p></li>
 <li><p><strong><a href="https://github.com/github/linguist">Linguist</a></strong>, the language savant behind GitHub, inspecting over 150
 languages.</p></li>
 </ul>
 
-<p><strong>Docas</strong> can be used as a stand-alone command on the developer's machine,
+<p><strong>Docas</strong> can be executed as a stand-alone command from the developer's machine,
 which will:</p>
 
 <ol>
@@ -22,16 +38,9 @@ which will:</p>
 <li>Push to the remote gh-pages branch.</li>
 </ol>
 
-<p>However, it's recommended to automate such tasks for your every commit using
-a service version of docas -- <a href="http://docas.io">docas.io</a>.</p>
-
-<h2>Service Version</h2>
-
-<p>Actually, for most of developers who want a quick and dirty mechanism for
-documentation synchronization, please goto <a href="http://docas.io">Docas.io</a>, an
-documentation service which synchronize the documents on gh-pages branch in
-real time when you make any commit. As simple as adding docas as your
-collaborator.</p>
+<p><strong>However</strong>, it's recommended to further simplify the task for your every
+commit using <strong><a href="http://docas.io">docas.io</a></strong>, a service keeps your documentation in sync with
+source code automatically.</p>
 
 <h2>Command-line usage:</h2>
 
