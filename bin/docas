@@ -239,22 +239,23 @@ cat $tempdir/dirty_directories | while read dir; do
   ##### 3: Generate Documents
 
   # Process sources for each directory, so the **jump to** section will contain
-  # links to sibling documents only. Following the [project page] link
-  # structure, generated documents should reference
-  # `/<repo>/stylesheets/docco.css` in the HTML sources.
+  # links to sibling documents only. Since both the GitHub [project page] link
+  # structure, aka `<user>.github.com/<repo>`, and CNAME version, e.g.
+  # `docs.awesomeproject.com` should be supported, relative stylesheet path
+  # should be used in the HTML sources.
   #
   # [Project Page]: http://help.github.com/pages/#project_pages_manually
   if [ $dir = '.' ]; then
-    match="^[^/]+$"; 
-    relative_path_of_root=""
+    match="^[^/]+$"
+    relative_path_to_root=""
   else
-    match="^$dir/[^/]+$";
+    match="^$dir/[^/]+$"
     depth=$(($(grep -o "/" <<< "$dir" | wc -l) + 1))
-    relative_path_of_root=$(eval printf "../%.0s" {1..$depth})
+    relative_path_to_root=$(eval printf "../%.0s" {1..$depth})
   fi
   egrep $match $tempdir/list | while read file; do
-    echo "$tempdir/master/$file";
-  done | xargs docco -c "$relative_path_of_root"stylesheets/docco.css -o $tempdir/gh-pages/$dir # > /dev/null  
+    echo "$tempdir/master/$file"
+  done | xargs docco -c "$relative_path_to_root"stylesheets/docco.css -o $tempdir/gh-pages/$dir # > /dev/null  
 
 done
 
