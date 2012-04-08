@@ -245,9 +245,11 @@ cat $tempdir/dirty_directories | while read dir; do
   #
   # [Project Page]: http://help.github.com/pages/#project_pages_manually
   if [ $dir = '.' ]; then match="^[^/]+$"; else match="^$dir/[^/]+$"; fi
+  depth=$(grep -o "/" <<< "$dir" | wc -l)
+  path_of_root=$(eval printf "../%.0s" {1..$depth})
   egrep $match $tempdir/list | while read file; do
     echo "$tempdir/master/$file";
-  done | xargs docco -c "/$repo/stylesheets/docco.css" -o $tempdir/gh-pages/$dir # > /dev/null  
+  done | xargs docco -c "$path_of_root"stylesheets/docco.css -o $tempdir/gh-pages/$dir # > /dev/null  
 
 done
 
