@@ -244,12 +244,17 @@ cat $tempdir/dirty_directories | while read dir; do
   # `/<repo>/stylesheets/docco.css` in the HTML sources.
   #
   # [Project Page]: http://help.github.com/pages/#project_pages_manually
-  if [ $dir = '.' ]; then match="^[^/]+$"; else match="^$dir/[^/]+$"; fi
-  depth=$(grep -o "/" <<< "$dir" | wc -l)
-  path_of_root=$(eval printf "../%.0s" {1..$depth})
+  if [ $dir = '.' ]; then
+    match="^[^/]+$"; 
+    relative_path_of_root=""
+  else
+    match="^$dir/[^/]+$";
+    depth=$(($(grep -o "/" <<< "$dir" | wc -l) + 1))
+    relative_path_of_root=$(eval printf "../%.0s" {1..$depth})
+  fi
   egrep $match $tempdir/list | while read file; do
     echo "$tempdir/master/$file";
-  done | xargs docco -c "$path_of_root"stylesheets/docco.css -o $tempdir/gh-pages/$dir # > /dev/null  
+  done | xargs docco -c "$relative_path_of_root"stylesheets/docco.css -o $tempdir/gh-pages/$dir # > /dev/null  
 
 done
 
