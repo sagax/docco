@@ -49,6 +49,13 @@
 # [docas.io]: http://docas.io
 #
 ### Command-line usage:
+# 
+# Document a repository under your own user name:
+#
+#     docas repository
+#
+# Document a repository under another user (or organization) name which you have
+# write permission:
 #
 #     docas username/repository
 
@@ -64,12 +71,21 @@
 #   4. Prepare a temporary working directory (and remove on exit, interruption,
 #   and termination).
 set -e
-if [ $# -lt 1 ]; then
-  echo -e "\nUsage: docas <username>/<repository>\n"
+if [ $# -ne 1 ]; then
+  echo -e "
+Usage:\n
+  docas <repository>\n
+  or\n    
+  docas <username>/<repository>\n"
   exit
 fi
-user=$(echo $1 | cut -d'/' -f1)
-repo=$(echo $1 | cut -d'/' -f2)
+if [[ $1 == */* ]]; then
+  user=$(echo $1 | cut -d'/' -f1)
+  repo=$(echo $1 | cut -d'/' -f2)
+else
+  user=$(git config github.user)
+  repo=$1
+fi
 tempdir=$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)
 trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
 
