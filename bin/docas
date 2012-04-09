@@ -60,14 +60,13 @@
 #     docas username/repository
 
 
-
 ### Scripting Procedure
 
 # Preparations:
 #
 #   1. Stop execution when encountering any error,
 #   2. Ensure enough arguments are given,
-#   3. Parse the arguments into user and repo,
+#   3. Parse arguments into user and repo,
 #   4. Prepare a temporary working directory (and remove on exit, interruption,
 #   and termination).
 set -e
