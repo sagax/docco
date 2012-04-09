@@ -95,7 +95,7 @@ trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
 # line of the `gh-pages` branch to indicate a successful synchronization.
 echo "Cloning git@github.com:$user/$repo.git..."
 git clone -q --depth=1 git@github.com:$user/$repo.git "$tempdir/master"
-commit=$(git --git-dir=$tempdir/master/.git  rev-parse HEAD | cut -c1-10)
+commit=$(git --git-dir=$tempdir/master/.git  rev-parse HEAD | head -c 10)
 
 #### Phase 2: Checkout gh-pages Branch, List Dirty Directories
 
