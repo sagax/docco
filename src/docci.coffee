@@ -25,7 +25,7 @@
 
 # Once all of the code is finished highlighting, we can generate the HTML file
 # and write out the documentation. Pass the completed sections into the template
-# found in `resources/docco.jst`
+# found in `resources/docci.jst`
 generate_index = (dirname, dest) ->
   generate_statistics dirname, (err, data) ->
     statistics = data
@@ -137,7 +137,7 @@ template = (str) ->
        "');}return p.join('');"
 
 # Create the template that we will use to generate the Docco HTML page.
-index_template  = template fs.readFileSync(__dirname + '/../resources/index.jst').toString()
+index_template  = template fs.readFileSync(__dirname + '/../resources/docci.jst').toString()
 
 # The CSS styles we'd like to apply to the documentation.
 index_styles    = fs.readFileSync(__dirname + '/../resources/index.css').toString()

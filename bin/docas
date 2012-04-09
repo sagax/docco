@@ -217,12 +217,12 @@ find $tempdir/master -type f \
 # to the `stylesheet` folder.
 if ! [ -f $tempdir/gh-pages/stylesheets/index.css ]; then
   mkdir -p $tempdir/gh-pages/stylesheets
-  cp /usr/local/lib/docas/resources/index.css $tempdir/gh-pages/stylesheets/index.css
+  cp /usr/local/lib/docas/resources/docci.css $tempdir/gh-pages/stylesheets/index.css
 fi
 
 # Invoke the **docci** command-line to generate `index.html` for `master`
 # directory.
-docci -c "/$repo/stylesheets/index.css" -o $tempdir/gh-pages $tempdir/master
+docci -c "stylesheets/index.css" -o $tempdir/gh-pages $tempdir/master
 
 #### Phase 4: Generate Documents (using Docco)
 echo "Generating documents..."
