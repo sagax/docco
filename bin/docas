@@ -66,16 +66,16 @@
 #
 #   1. Stop execution when encountering any error,
 #   2. Ensure enough arguments are given,
-#   3. Parse arguments into user and repo,
-#   4. Prepare a temporary working directory (and remove on exit, interruption,
-#   and termination).
+#   3. Parse arguments into user and repo variable,
+#   4. Prepare a temporary working directory (don't forget to remove on exit,
+#   interruption, or termination).
 set -e
 if [ $# -ne 1 ]; then
   echo -e "
-Usage:\n
-  docas <repository>\n
-  or\n    
-  docas <username>/<repository>\n"
+Usage:\n\033[36m
+  docas <repository>\033[0m              (repo under local-configured github user name)\n
+or\n\033[36m    
+  docas <username>/<repository>\033[0m   (repo under another user or organization name which you have write permission)\n"
   exit
 fi
 if [[ $1 == */* ]]; then
@@ -151,7 +151,7 @@ if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
 #   *JUMP TO* links of sibling documents needs be synchronized.
 else
   cp -R $tempdir/master $tempdir/gh-pages
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages checkout -q gh-pages
+  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages checkout -qb gh-pages origin/gh-pages
   synced_ghpages_hash=$(git --git-dir=$tempdir/gh-pages/.git log --pretty=oneline \
     | egrep -m 1 -i "docas .* [0-9a-f]{10}$" \
     | head -c 10)
@@ -298,7 +298,7 @@ if [ $(echo "$status" | wc -l) -gt 0 ]; then
   echo "Synchronizing GitHub pages remotely..."
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages add .
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages commit -qam "Docas synced with $commit"
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages push -q origin gh-pages
+  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages push -qf origin gh-pages
   echo "http://$user.github.com/$repo is now up-to-date. Crowd applauds."
 
 # Nothing to do when no file was created, modified, or deleted. The `gh-pages`
