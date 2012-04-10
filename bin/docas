@@ -188,7 +188,7 @@ fi
 # program with notification. Nothing needs be done further. Neither the cover
 # page nor any document needs be re-generated.
 if [ $(cat $tempdir/dirty_directories | wc -l) -eq 0 ]; then 
-  echo "No file has been touched. Are you kidding?"
+  echo "No file has been touched. Keep working hard!"
   exit
 fi
 
