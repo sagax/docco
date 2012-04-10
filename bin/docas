@@ -94,7 +94,7 @@ trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
 # line of the `gh-pages` branch to indicate a successful synchronization.
 echo "Cloning git@github.com:$user/$repo.git..."
 git clone -q --depth=1 git@github.com:$user/$repo.git "$tempdir/master"
-head=$(git --git-dir=$tempdir/master/.git rev-parse HEAD | head -c 10)
+head=$(git --git-dir=$tempdir/master/.git rev-parse HEAD | head -c 7)
 
 #### Phase 2: Checkout gh-pages Branch, List Dirty Directories
 
@@ -152,15 +152,15 @@ else
   cp -R $tempdir/master $tempdir/gh-pages
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages checkout -qb gh-pages origin/gh-pages
   synced_ghpages_hash=$(git --git-dir=$tempdir/gh-pages/.git log --pretty=oneline \
-    | egrep -m 1 -i "docas .* [0-9a-f]{10}$" \
-    | head -c 10)
+    | egrep -m 1 -i "docas .* [0-9a-f]{7}$" \
+    | head -c 7)
   synced_master_hash=$(git --git-dir=$tempdir/gh-pages/.git log --pretty=oneline \
-    | egrep -m 1 -i "docas .* [0-9a-f]{10}$" \
-    | tail -c 11 \
-    | head -c 10)
+    | egrep -m 1 -i "docas .* [0-9a-f]{7}$" \
+    | tail -c 8 \
+    | head -c 7)
   synced_master_hash=$(git --git-dir=$tempdir/master/.git log --pretty=oneline \
     | egrep -m 1 "^$synced_master_hash" \
-    | head -c 10 \
+    | head -c 7 \
     | xargs echo)
 
   echo "$synced_master_hash | $synced_ghpages_hash"
