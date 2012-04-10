@@ -50,12 +50,12 @@
 #
 ### Command-line usage:
 # 
-# Document a repository under your own user name:
+# Document a repository under local configured github username:
 #
 #     docas repository
 #
-# Document a repository under another user (or organization) name which you have
-# write permission:
+# Document a repository under another user or organization name which you have
+# write permission (being a collaborator or a team member):
 #
 #     docas username/repository
 
@@ -94,15 +94,15 @@ trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
 # line of the `gh-pages` branch to indicate a successful synchronization.
 echo "Cloning git@github.com:$user/$repo.git..."
 git clone -q --depth=1 git@github.com:$user/$repo.git "$tempdir/master"
-commit=$(git --git-dir=$tempdir/master/.git  rev-parse HEAD | head -c 10)
+head=$(git --git-dir=$tempdir/master/.git rev-parse HEAD | head -c 10)
 
 #### Phase 2: Checkout gh-pages Branch, List Dirty Directories
 
 # Docas will only re-generate sources in the *dirty* directories, in the
 # following occasions, docas consider all directories are dirty:
 #
-#   1. `gh-pages` does not exist.
-#   2. No sync found from the `gh-pages` commits.
+#   1. `gh-pages` does not exist, or
+#   2. No sync found from the `gh-pages` commits, or
 #   3. `gh-pages` sync found, but could not found according `master` commit.
 #
 # Situation 2 can be caused by first synchronization, or shallow clone; while
@@ -296,7 +296,7 @@ echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 if [ $(echo "$status" | wc -l) -gt 0 ]; then
   echo "Synchronizing GitHub pages remotely..."
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages add .
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages commit -qam "Docas synced with $commit"
+  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages commit -qam "Docas synced with $head"
   git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages push -qf origin gh-pages
   echo "http://$user.github.com/$repo is now up-to-date. Crowd applauds."
 
