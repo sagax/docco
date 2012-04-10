@@ -62,7 +62,7 @@
 
 ### Scripting Procedure
 
-# Preparations:
+#### Phase 0: Preparations
 #
 #   1. Stop execution when encountering any error,
 #   2. Ensure enough arguments are given,
@@ -72,10 +72,9 @@
 set -e
 if [ $# -ne 1 ]; then
   echo -e "
-Usage:\n\033[36m
-  docas <repository>\033[0m              (repo under local-configured github user name)\n
-or\n\033[36m    
-  docas <username>/<repository>\033[0m   (repo under another user or organization name which you have write permission)\n"
+Usage:\033[36m docas <repository>\033[0m            (repo under local configured github user name)
+   or:\033[36m docas <username>/<repository>\033[0m (repo under another user or organization name, write permission required)
+"
   exit
 fi
 if [[ $1 == */* ]]; then
