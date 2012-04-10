@@ -63,7 +63,7 @@
 ### Scripting Procedure
 
 #### Phase 0: Preparations
-#
+
 #   1. Stop execution when encountering any error,
 #   2. Ensure enough arguments are given,
 #   3. Parse arguments into user and repo variable,
