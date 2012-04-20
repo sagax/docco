@@ -46,7 +46,7 @@ generate_index = (dirname, dest) ->
 get_language = (source) -> languages[path.extname(source)]
 
 generate_statistics = (dir, callback) ->
-  data = fs.readFileSync(dir + '/../stat').toString()
+  data = fs.readFileSync(dir + '/../stats').toString()
   # exec "wget -qO- http://127.0.0.1:4567/stat#{dir}", (err, data) ->
   #callback err, data if err
   data = data.split '\n'

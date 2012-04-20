@@ -69,34 +69,28 @@
 #   3. Parse arguments into user and repo variable,
 #   4. Prepare a temporary working directory (don't forget to remove on exit,
 #   interruption, or termination).
+
 set -e
-if [ $# -ne 1 ]; then
-  echo -e "
-Usage:\033[36m docas <repository>\033[0m            (repo under local configured github user name)
-   or:\033[36m docas <username>/<repository>\033[0m (repo under another user or organization name, write permission required)
-"
+
+if [ $(git rev-parse --is-inside-work-tree) != 'true' ]; then
+  
+  echo "Please invoke docas from git repository."
   exit
+
 fi
-if [[ $1 == */* ]]; then
-  user=$(echo $1 | cut -d'/' -f1)
-  repo=$(echo $1 | cut -d'/' -f2)
-else
-  user=$(git config github.user)
-  repo=$1
-fi
+
+remote=$(git remote -v | egrep "origin.*(push)")
+user=$(echo $remote | grep -P "(?<=\:).*(?=\/)" -o)
+repo=$(echo $remote | grep -P "(?<=\/)[^\.]*(?= )" -o)
 tempdir=$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)
-trap "rm -rf $tempdir; exit" 0 SIGINT SIGTERM
 
-#### Phase 1: Clone the Repository
+# trap "rm -rf $tempdir; cd $workdir; exit" 0 SIGINT SIGTERM
 
-# (Shallow) clone the GitHub repository to `master` directory. Keep the current
-# commit hash of the `master` branch, which will be included in the commit subject
-# line of the `gh-pages` branch to indicate a successful synchronization.
-echo "Cloning git@github.com:$user/$repo.git..."
-git clone -q --depth=1 git@github.com:$user/$repo.git "$tempdir/master"
-head=$(git --git-dir=$tempdir/master/.git rev-parse HEAD | head -c 7)
+cp -R . "$tempdir/master"
 
-#### Phase 2: Checkout gh-pages Branch, List Dirty Directories
+head=$(git --git-dir $tempdir/master/.git rev-parse HEAD | head -c 7)
+
+#### Phase 1: Checkout gh-pages Branch, List Touched Sources
 
 # Docas will only re-generate sources in the *dirty* directories, in the
 # following occasions, docas consider all directories are dirty:
@@ -107,11 +101,14 @@ head=$(git --git-dir=$tempdir/master/.git rev-parse HEAD | head -c 7)
 #
 # Situation 2 can be caused by first synchronization, or shallow clone; while
 # situation 3 can only be caused by shallow clone.
+#
 all_directories_are_dirty () {
-  git --git-dir=$tempdir/master/.git ls-tree -r --name-only HEAD \
-    | while read file; do echo $(dirname $file); done \
-    | sort | uniq > $tempdir/dirty_directories
+
+  git --git-dir $tempdir/master/.git ls-tree -r --name-only HEAD \
+       > $tempdir/.touched
+  echo > $tempdir/.deleted
   return
+
 }
 
 # If `gh-pages` branch does not exist, create the `gh-pages` branch following
@@ -125,21 +122,25 @@ all_directories_are_dirty () {
 #
 # In this situation, docas considers all directories are dirty.
 # [GitHub instruction]: http://help.github.com/pages/#project_pages_manually 
-if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
+#
+if [ $(git --git-dir $tempdir/master/.git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
 
   echo "Creating gh-pages branch..."
   cp -R $tempdir/master $tempdir/gh-pages
   cd $tempdir/gh-pages
-  git symbolic-ref HEAD refs/heads/gh-pages > /dev/null
+  git symbolic-ref HEAD refs/heads/gh-pages # > /dev/null
   rm .git/index
-  git clean -fdx > /dev/null
+  git clean -fdx # > /dev/null
+  
   all_directories_are_dirty
 
 # If there exists a `gh-pages` branch, which means the branch *may* contain docas
 # synchronized content. So, docas will:
 #
 #   1. Duplicate `master` directory to `gh-pages` directory.
-#   2. Checkout `gh-pages` branch in `gh-pages` directory.
+#   2. Empty `gh-pages` incase of submodules exists (unable to rmdir warning). 
+#   3. Checkout `gh-pages` branch in `gh-pages` directory.
+#   4. Stop tracking `master` branch to decrease possibility of concurrency.
 #   3. Analyze dirty directories. Sources in these directories will be
 #   regenerated. Dirty directories are:
 #
@@ -149,16 +150,20 @@ if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
 #   All sources in the touched directories will be re-generated since the
 #   *JUMP TO* links of sibling documents needs be synchronized.
 else
+
   cp -R $tempdir/master $tempdir/gh-pages
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages checkout -qb gh-pages origin/gh-pages
-  synced_ghpages_hash=$(git --git-dir=$tempdir/gh-pages/.git log --pretty=oneline \
-    | egrep -m 1 -i "docas .* [0-9a-f]{7}$" \
-    | head -c 7)
-  synced_master_hash=$(git --git-dir=$tempdir/gh-pages/.git log --pretty=oneline \
-    | egrep -m 1 -i "docas .* [0-9a-f]{7}$" \
-    | tail -c 8 \
-    | head -c 7)
-  synced_master_hash=$(git --git-dir=$tempdir/master/.git log --pretty=oneline \
+  rm -rf $tempdir/gh-pages/*
+  git --git-dir $tempdir/gh-pages/.git --work-tree $tempdir/gh-pages checkout --force --quiet -b gh-pages origin/gh-pages
+  git --git-dir $tempdir/gh-pages/.git --work-tree $tempdir/gh-pages branch -D master
+ 
+  latest_sync=$(git --git-dir "$tempdir/gh-pages/.git" log --pretty=oneline \
+    | egrep -m 1 -i "docas .* [0-9a-f]{7}$")
+
+  synced_ghpages_hash=$(echo "$latest_sync" | head -c 7)
+
+  synced_master_hash=$(echo "$latest_sync" | tail -c 8 | head -c 7)
+
+  synced_master_hash=$(git --git-dir "$tempdir/master/.git" log --pretty=oneline \
     | egrep -m 1 "^$synced_master_hash" \
     | head -c 7 \
     | xargs echo)
@@ -168,29 +173,32 @@ else
   # If we can not securely list all touched files, then docas treat all
   # as dirty directories.
   if [ -z $synced_ghpages_hash ] || [ -z $synced_master_hash ]; then
+
     echo "gh-pages branch out-of sync for a long time, rebuilding..."
     all_directories_are_dirty
- 
+    
   # If we can securely list all touched files in the `master` and `gh-pages`
   # branch since last sync, output unique directories into dirty_directories file.
   else
+
     echo "Found docas comitted gh-pages, synced with $synced_master_hash"
-    git --git-dir=$tempdir/gh-pages/.git diff --name-only $synced_ghpages_hash..HEAD \
-      | while read file; do dirname $file; done >  $tempdir/dirty_directories
-    git --git-dir=$tempdir/master/.git diff --name-only $synced_master_hash..HEAD \
-      | while read file; do dirname $file; done >> $tempdir/dirty_directories
-    sort -u $tempdir/dirty_directories -o $tempdir/dirty_directories
+    git --git-dir=$tempdir/gh-pages/.git diff --name-status $synced_ghpages_hash..HEAD > $tempdir/.git-diff
+    egrep "^(A|M)" $tempdir/.git-diff | cut -c 3- > $tempdir/.touched
+    egrep "^D" $tempdir/.git-diff | cut -c 3- > $tempdir/.deleted
+
   fi
 
 fi
 
+curl --silent --output $tempdir/.touched_source http://127.0.0.1:4567/touched?path=$tempdir
+
 # If no file of the `master` or the `gh-pages` branch was changed, exit the
 # program with notification. Nothing needs be done further. Neither the cover
 # page nor any document needs be re-generated.
-if [ $(cat $tempdir/dirty_directories | wc -l) -eq 0 ]; then 
-  echo "No file has been touched. Keep working hard!"
-  exit
-fi
+#if [ $(cat $tempdir/.touched_source | wc -l) -eq 0 ]; then 
+#  echo "No file has been touched. Keep Coding hard!"
+#  exit
+#fi
 
 #### Phase 3: Generate Cover Page (using Docci)
 echo "Generating cover page..."
@@ -206,10 +214,14 @@ echo "Generating cover page..."
 masterdir=$tempdir/master
 masterdirlength=${#masterdir}+1
 cd /usr/local/lib/docas/vendor/linguist
-bundle exec linguist $tempdir/master > $tempdir/stat
-find $tempdir/master -type f \
-  | xargs bundle exec source_only \
-  | while read file; do echo ${file:$masterdirlength}; done > $tempdir/list
+curl --silent --output $tempdir/stats http://127.0.0.1:4567/stats?path=$tempdir
+echo "stats finished"
+
+# cat $tempdir/.created $tempdir/.altered
+# cat $tempdir/.created $tempdir/.altered \
+#   | tr '\n' '\0' \
+#   | xargs -0 bundle exec source_only \
+#   | while read file; do echo ${file:$masterdirlength}; done > $tempdir/list
 
 # Make sure a stylesheet for `index.html` exists. User modification will be
 # honored. In case of the stylesheet doesn't exists, copy the default stylesheet
@@ -237,18 +249,13 @@ if ! [ -f $tempdir/gh-pages/stylesheets/docco.css ]; then
 fi
 
 # For each dirty directory, do:
-cat $tempdir/dirty_directories | while read dir; do
+# cat $tempdir/dirty_directories | while read dir; do
 
-  ##### 2: Clear Touched Directories
+  ##### 2: Synchronize Deleted Sources
 
-  # Remove all files generated by **docco** in the touched directories. A
-  # `generator` meta tag in the docco template is used as a signagure to
-  # identify docco generated documents.
-  if [ -d $tempdir/gh-pages/$dir ]; then
-    find $tempdir/gh-pages/$dir -maxdepth 1 -type f -print0 \
-      | xargs -0 grep -liZ '<meta name="generator" content="docco.*">' \
-      | xargs -0 rm -f
-  fi
+  cat $tempdir/.deleted | while read file; do
+    rm -f $tempdir/gh-pages/${file%.*}.html
+  done
 
   ##### 3: Generate Documents
 
@@ -259,19 +266,22 @@ cat $tempdir/dirty_directories | while read dir; do
   # should be used in the HTML sources.
   #
   # [Project Page]: http://help.github.com/pages/#project_pages_manually
-  if [ $dir = '.' ]; then
-    match="^[^/]+$"
-    relative_path_to_root=""
-  else
-    match="^$dir/[^/]+$"
-    depth=$(($(grep -o "/" <<< "$dir" | wc -l) + 1))
-    relative_path_to_root=$(eval printf "../%.0s" {1..$depth})
-  fi
-  egrep $match $tempdir/list | while read file; do
-    echo "$tempdir/master/$file"
-  done | xargs docco -c "$relative_path_to_root"stylesheets/docco.css -o $tempdir/gh-pages/$dir # > /dev/null  
 
-done
+  #if [ $dir = '.' ]; then
+  #  match="^[^/]+$"
+  #  relative_path_to_root=""
+  #else
+  #  match="^$dir/[^/]+$"
+  #  depth=$(($(grep -o "/" <<< "$dir" | wc -l) + 1))
+  #  relative_path_to_root=$(eval printf "../%.0s" {1..$depth})
+  #fi
+  #egrep $match $tempdir/list | while read file; do
+  #  echo "$tempdir/master/$file"
+  #done | xargs docco -c "$relative_path_to_root"stylesheets/docco.css -o $tempdir/gh-pages/$dir # > /dev/null  
+  cd $tempdir/master
+  cat $tempdir/.touched_source | tr '\n' '\0' | xargs -0 docco -o $tempdir/gh-pages
+
+# done
 
 #### Phase 5: Synchronize with GitHub
 
@@ -282,7 +292,8 @@ done
 #
 # [Porcelain Layer]:
 # http://schacon.github.com/git/git.html#_high_level_commands_porcelain
-status=$(git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages status --porcelain)
+#
+status=$(git --git-dir $tempdir/gh-pages/.git --work-tree $tempdir/gh-pages status --porcelain)
 
 echo "Created:$(echo "$status" | egrep "^(\?\?)" | wc -l)"
 echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
@@ -293,15 +304,20 @@ echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 #   1. Synchronize git index with local files,
 #   2. commit the `gh-pages` branch, and,
 #   3. synchronize the `gh-pages` branch with GitHub remotely.
+#
 if [ $(echo "$status" | wc -l) -gt 0 ]; then
+
   echo "Synchronizing GitHub pages remotely..."
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages add .
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages commit -qam "Docas synced with $head"
-  git --git-dir=$tempdir/gh-pages/.git --work-tree=$tempdir/gh-pages push -qf origin gh-pages
+  git --git-dir $tempdir/gh-pages/.git --work-tree $tempdir/gh-pages add    --all
+  git --git-dir $tempdir/gh-pages/.git --work-tree $tempdir/gh-pages commit --all --quiet --message "Docas synced with $head"
+  git --git-dir $tempdir/gh-pages/.git --work-tree $tempdir/gh-pages push         --quiet --force   origin gh-pages
   echo "http://$user.github.com/$repo is now up-to-date. Crowd applauds."
 
 # Nothing to do when no file was created, modified, or deleted. The `gh-pages`
 # branch is in-sync with the `master` branch already.
+#
 else
+
   echo "http://$user.github.com/$repo doesn't need to sync. Code harder."
+
 fi

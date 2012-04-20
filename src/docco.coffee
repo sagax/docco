@@ -155,7 +155,8 @@ generate_html = (source, sections) ->
     title: title, sections: sections, sources: sources, path: path, destination: destination, opts: process.OPTS
   }
   console.log "docco: #{source} -> #{dest}"
-  fs.writeFile dest, html
+  ensure_directory (path.dirname dest), ->
+    fs.writeFile dest, html
 
 #### Helpers & Setup
 
@@ -199,7 +200,7 @@ get_language = (source) ->
 # Compute the destination HTML path for an input source file path. If the source
 # is `lib/example.coffee`, the HTML will be at `docs/example.html`
 destination = (filepath) ->
-  destdir + '/' + path.basename(filepath, path.extname(filepath)) + '.html'
+  destdir + '/' + (path.dirname filepath) + '/' + (path.basename(filepath, path.extname(filepath))) + '.html'
 
 # Ensure that the destination directory exists.
 ensure_directory = (dir, callback) ->
