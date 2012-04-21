@@ -54,6 +54,7 @@ ghpages_dir="$working_dir/ghpages"
 
 cd $sources_dir
 head_hash=$(git rev-parse HEAD | head -c 7)
+echo "head_hash" $head_hash
 git ls-tree -r --name-only HEAD > "$working_dir/.all"
 
 #### Phase 1: Checkout gh-pages Branch, List Touched Sources
@@ -117,6 +118,18 @@ else
   rm -rf $ghpages_dir/*
   cd $ghpages_dir
   git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
+
+  # In the hosted version, i.e. docas.io, the `gh-pages` repository is up-to-dated
+  # (in virtue of) GitHub-Synchronizer. Otherwise, pull `gh-pages` to prevent
+  # `non-fast-forward` error.
+
+  if [ "$hosted" != "true" ]; then
+
+    echo "Pulling gh-pages branch..."
+    cd $ghpages_dir
+    git pull --quiet
+
+  fi
  
   synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]{7}$")
   synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)
@@ -145,18 +158,6 @@ else
     egrep "^D"     $working_dir/.git-diff | cut -c 3- > $working_dir/.deleted
 
   fi
-
-fi
-
-# In the hosted version, i.e. docas.io, the `gh-pages` repository is up-to-dated
-# (in virtue of) GitHub-Synchronizer. Otherwise, pull `gh-pages` to prevent
-# `non-fast-forward` error.
-
-if [ "$hosted" != "true" ]; then
-
-  echo "Pulling gh-pages branch..."
-  cd $ghpages_dir
-  git pull --quiet
 
 fi
 
