@@ -76,7 +76,9 @@ generate_documentation = (source, callback) ->
           #   if idx < sections.length
           #     sections.splice idx, 0, sections[0]
           #     sections.splice 0, 1
-      generate_html source, sections
+      depth = source.split('/').length - 1
+      if depth then css = [0..depth-1].map(-> '..').join('/') + '/stylesheets/docco.css' else css = 'stylesheets/docco.css'
+      generate_html source, css, sections
       callback()
 
 # Given a string of source code, parse out each comment and the code that
@@ -148,11 +150,11 @@ highlight = (source, sections, callback) ->
 # Once all of the code is finished highlighting, we can generate the HTML file
 # and write out the documentation. Pass the completed sections into the template
 # found in `resources/docco.jst`
-generate_html = (source, sections) ->
+generate_html = (source, css, sections) ->
   title = path.basename real_source source
   dest  = destination source
   html  = docco_template {
-    title: title, sections: sections, sources: sources, path: path, destination: destination, opts: process.OPTS
+    title: title, sections: sections, css: css
   }
   console.log "docco: #{source} -> #{dest}"
   ensure_directory (path.dirname dest), ->

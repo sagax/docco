@@ -46,7 +46,7 @@ generate_index = (dirname, dest) ->
 get_language = (source) -> languages[path.extname(source)]
 
 generate_statistics = (dir, callback) ->
-  data = fs.readFileSync(dir + '/../stats').toString()
+  data = fs.readFileSync(destdir + '/../.stats').toString()
   # exec "wget -qO- http://127.0.0.1:4567/stat#{dir}", (err, data) ->
   #callback err, data if err
   data = data.split '\n'
@@ -137,7 +137,7 @@ template = (str) ->
        "');}return p.join('');"
 
 # Create the template that we will use to generate the Docco HTML page.
-index_template  = template fs.readFileSync(__dirname + '/../resources/docci.jst').toString()
+index_template  = template fs.readFileSync(__dirname + '/../resources/index.jst').toString()
 
 # The CSS styles we'd like to apply to the documentation.
 index_styles    = fs.readFileSync(__dirname + '/../resources/index.css').toString()

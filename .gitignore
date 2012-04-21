@@ -2,3 +2,5 @@
 output
 docs
 lib
+*.swp
+*.swo

@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+### Prerequist
+
+# Upon execution of this shell script, GitHub-Synchronizer has finished its
+# job. (Bravo...!) Since on docas.io environment, master branch will be read
+# only, so there'll be nothing in `git diff` and `git diff HEAD`. But always
+# remember when invoking docas on a development environment, docas will not 
+# try to checkout HEAD, but documenting the working directory, which can 
+# lead to inconsistency between `gh-pages` and `master` branch. Do it with
+# consciousness (or why not `commit` first?).
+
 ### Scripting Procedure
 
 #### Phase 0: Preparations
@@ -13,29 +23,27 @@ set -e
 
 if [ $(git rev-parse --is-inside-work-tree) != 'true' ]; then
   
-  echo "Invoke docas from git repository."
+  echo "Docas want to be invoked from git repositories."
   exit
 
 fi
 
-remote=$(git remote -v | egrep "origin.*(push)")
-user=$(echo $remote | grep -P "(?<=\:).*(?=\/)" -o)
-repo=$(echo $remote | grep -P "(?<=\/)[^\.]*(?= )" -o)
-tempdir=$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)
+tmpdir=$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)
+# trap "rm -rf $tmpdir; exit" 0 SIGINT SIGTERM
+master_srcdir=$(pwd)
+ghpage_srcdir=$tmpdir/ghpage
 
-# trap "rm -rf $tempdir; cd $workdir; exit" 0 SIGINT SIGTERM
-
-cp -R . "$tempdir/master"
-
-head=$(git --git-dir $tempdir/master/.git rev-parse HEAD | head -c 7)
+cd "$master_srcdir"
+head=$(git rev-parse HEAD | head -c 7)
+git ls-tree -r --name-only HEAD > "$tmpdir/.allfiles"
 
 #### Phase 1: Checkout gh-pages Branch, List Touched Sources
 
-# Docas will only re-generate sources in the *dirty* directories, in the
-# following occasions, docas consider all directories are dirty:
+# Docas will only re-render touched sources, in the following scenarios, docas
+# consider all files are touched:
 #
-#   1. `gh-pages` does not exist, or
-#   2. No sync found from the `gh-pages` commits, or
+#   1. `gh-pages` does not exist, or,
+#   2. No docas commit found from the `gh-pages` branch, or,
 #   3. `gh-pages` sync found, but could not found according `master` commit.
 #
 # Situation 2 can be caused by first synchronization, or shallow clone; while
@@ -43,15 +51,14 @@ head=$(git --git-dir $tempdir/master/.git rev-parse HEAD | head -c 7)
 #
 all_directories_are_dirty () {
 
-  git --git-dir $tempdir/master/.git ls-tree -r --name-only HEAD \
-       > $tempdir/.touched
-  echo > $tempdir/.deleted
+  cd "$master_srcdir"
+  cp "$tmpdir/.allfiles" "$tmpdir/.touched"
+  echo > "$tmpdir/.deleted"
   return
 
 }
 
-# If `gh-pages` branch does not exist, create the `gh-pages` branch following
-# [GitHub instruction]:
+#  create `gh-pages` branch if not exist, see: [GitHub instruction]:
 #
 #   1. Duplicate `master` directory to `gh-pages` directory.
 #   2. Change to `gh-pages` directory.
@@ -61,16 +68,17 @@ all_directories_are_dirty () {
 #
 # In this situation, docas considers all directories are dirty.
 # [GitHub instruction]: http://help.github.com/pages/#project_pages_manually 
-#
-if [ $(git --git-dir $tempdir/master/.git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
+
+if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
 
   echo "Creating gh-pages branch..."
-  cp -R $tempdir/master $tempdir/gh-pages
-  cd $tempdir/gh-pages
+  echo $master_srcdir $ghpage_srcdir
+  cp -R $master_srcdir $ghpage_srcdir
+  cd $ghpage_srcdir
   git symbolic-ref HEAD refs/heads/gh-pages # > /dev/null
-  rm .git/index
-  git clean -fdx # > /dev/null
-  
+  rm -f .git/index
+  git clean --quiet -fdx # > /dev/null
+  rm -rf *
   all_directories_are_dirty
 
 # If there exists a `gh-pages` branch, which means the branch *may* contain docas
@@ -90,19 +98,25 @@ if [ $(git --git-dir $tempdir/master/.git branch -a | grep origin\/gh-pages | wc
 #   *JUMP TO* links of sibling documents needs be synchronized.
 else
 
-  cp -R $tempdir/master $tempdir/gh-pages
-  rm -rf $tempdir/gh-pages/*
-  git --git-dir $tempdir/gh-pages/.git --work-tree $tempdir/gh-pages checkout --force --quiet -b gh-pages origin/gh-pages
-  git --git-dir $tempdir/gh-pages/.git --work-tree $tempdir/gh-pages branch -D master
+  cp -R . "$ghpage_srcdir"
+  echo "XXXX"
+  rm -rf $ghpage_srcdir/*
+  find .
+  echo "XXXX"
+  cd "$ghpage_srcdir"
+  git checkout --force --quiet -b gh-pages origin/gh-pages
+  git branch -D master
+  find .
  
-  latest_sync=$(git --git-dir "$tempdir/gh-pages/.git" log --pretty=oneline \
+  latest_sync=$(git log --pretty=oneline \
     | egrep -m 1 -i "docas .* [0-9a-f]{7}$")
 
   synced_ghpages_hash=$(echo "$latest_sync" | head -c 7)
 
   synced_master_hash=$(echo "$latest_sync" | tail -c 8 | head -c 7)
 
-  synced_master_hash=$(git --git-dir "$tempdir/master/.git" log --pretty=oneline \
+  cd "$master_srcdir"
+  synced_master_hash=$(git log --pretty=oneline \
     | egrep -m 1 "^$synced_master_hash" \
     | head -c 7 \
     | xargs echo)
@@ -121,142 +135,112 @@ else
   else
 
     echo "Found docas comitted gh-pages, synced with $synced_master_hash"
-    git --git-dir=$tempdir/master/.git diff --name-status $synced_master_hash > $tempdir/.git-diff
-    egrep "^(A|M)" $tempdir/.git-diff | cut -c 3- > $tempdir/.touched
-    egrep "^D" $tempdir/.git-diff | cut -c 3- > $tempdir/.deleted
+    cd "$master_srcdir"
+    git diff --name-status $synced_master_hash..HEAD > $tmpdir/.git-diff
+    egrep "^(A|M)" $tmpdir/.git-diff | cut -c 3- > $tmpdir/.touched
+    egrep "^D" $tmpdir/.git-diff | cut -c 3- > $tmpdir/.deleted
 
   fi
 
 fi
 
-curl --silent --output $tempdir/.touched_source http://127.0.0.1:4567/touched?path=$tempdir
-
-# If no file of the `master` or the `gh-pages` branch was changed, exit the
-# program with notification. Nothing needs be done further. Neither the cover
-# page nor any document needs be re-generated.
-#if [ $(cat $tempdir/.touched_source | wc -l) -eq 0 ]; then 
-#  echo "No file has been touched. Keep Coding hard!"
-#  exit
-#fi
+curl --silent --output $tmpdir/.stats "http://127.0.0.1:4567/stats?path=$master_srcdir"
+curl --silent --output $tmpdir/.all_source "http://127.0.0.1:4567/touched?path=$master_srcdir&list=$tmpdir/.allfiles"
+curl --silent --output $tmpdir/.touched_source "http://127.0.0.1:4567/touched?path=$master_srcdir&list=$tmpdir/.touched"
 
 #### Phase 3: Generate Cover Page (using Docci)
+
 echo "Generating cover page..."
 
-# Before calling the **docci** command line, following materials should be
-# ready:
+# Upon this phase, following materials were all ready:
 #
-#   1. a language statistics file named `stat`, and,
-#   2. a list of all recognized sources named `list`.
+#   1. a language statistics named `.stats`, and,
+#   2. a list of all recognized sources named `.all_source`.
 #
-# Keep the path name of the master directory into a local variable, which will
-# be used to remove the prefix from the source list.
-masterdir=$tempdir/master
-masterdirlength=${#masterdir}+1
-cd /usr/local/lib/docas/vendor/linguist
-curl --silent --output $tempdir/stats http://127.0.0.1:4567/stats?path=$tempdir
-echo "stats finished"
-
-# cat $tempdir/.created $tempdir/.altered
-# cat $tempdir/.created $tempdir/.altered \
-#   | tr '\n' '\0' \
-#   | xargs -0 bundle exec source_only \
-#   | while read file; do echo ${file:$masterdirlength}; done > $tempdir/list
-
 # Make sure a stylesheet for `index.html` exists. User modification will be
-# honored. In case of the stylesheet doesn't exists, copy the default stylesheet
-# to the `stylesheet` folder.
-if ! [ -f $tempdir/gh-pages/stylesheets/index.css ]; then
-  mkdir -p $tempdir/gh-pages/stylesheets
-  cp /usr/local/lib/docas/resources/docci.css $tempdir/gh-pages/stylesheets/index.css
+# honored.
+
+cd "$ghpage_srcdir"
+if ! [ -f stylesheets/index.css ]; then
+ 
+  mkdir -p stylesheets
+  cp /usr/local/lib/docas/resources/index.css stylesheets/index.css
+
 fi
 
-# Invoke the **docci** command-line to generate `index.html` for `master`
-# directory.
-docci -c "stylesheets/index.css" -o $tempdir/gh-pages $tempdir/master
+# Invoke the **docci** command-line to generate `index.html`.
+
+docci -o "$ghpage_srcdir" "$master_srcdir"
 
 #### Phase 4: Generate Documents (using Docco)
+
 echo "Generating documents..."
 
-##### 1: Prepare Docco Stylesheet
+##### 4.1: Prepare Docco Stylesheet
 
 # Make sure a stylesheet for documents exists. User modification will be
 # honored. In case of the stylesheet doesn't exists, copy the default stylesheet
 # to the `stylesheets` folder.
-if ! [ -f $tempdir/gh-pages/stylesheets/docco.css ]; then
-  mkdir -p $tempdir/gh-pages/stylesheets
-  cp /usr/local/lib/docas/resources/docco.css $tempdir/gh-pages/stylesheets/docco.css
+
+cd "$ghpage_srcdir"
+if ! [ -f stylesheets/docco.css ]; then
+
+  mkdir -p stylesheets
+  cp /usr/local/lib/docas/resources/docco.css stylesheets/docco.css
+
 fi
 
-# For each dirty directory, do:
-# cat $tempdir/dirty_directories | while read dir; do
+##### 4.2: Synchronize Deleted Sources
 
-  ##### 2: Synchronize Deleted Sources
+cd "$ghpage_srcdir"
+cat $tmpdir/.deleted | while read file; do
 
-  cat $tempdir/.deleted | while read file; do
-    rm -f $tempdir/gh-pages/${file%.*}.html
-  done
+  rm -f "${file%.*}.html"
 
-  ##### 3: Generate Documents
+done
 
-  # Process sources for each directory, so the **jump to** section will contain
-  # links to sibling documents only. Since both the GitHub [project page] link
-  # structure, aka `<user>.github.com/<repo>`, and CNAME version, e.g.
-  # `docs.awesomeproject.com` should be supported, relative stylesheet path
-  # should be used in the HTML sources.
-  #
-  # [Project Page]: http://help.github.com/pages/#project_pages_manually
+##### 4.3: Generate Documents
 
-  #if [ $dir = '.' ]; then
-  #  match="^[^/]+$"
-  #  relative_path_to_root=""
-  #else
-  #  match="^$dir/[^/]+$"
-  #  depth=$(($(grep -o "/" <<< "$dir" | wc -l) + 1))
-  #  relative_path_to_root=$(eval printf "../%.0s" {1..$depth})
-  #fi
-  #egrep $match $tempdir/list | while read file; do
-  #  echo "$tempdir/master/$file"
-  #done | xargs docco -c "$relative_path_to_root"stylesheets/docco.css -o $tempdir/gh-pages/$dir # > /dev/null  
-  cd $tempdir/master
-  cat $tempdir/.touched_source | tr '\n' '\0' | xargs -0 docco -o $tempdir/gh-pages
-
-# done
-
-#### Phase 5: Synchronize with GitHub
-
-# Docas will *only* touch the gh-pages branch when necessary.
+# Document all touched sources.
+# 
+# Since both the GitHub [project page] link structure, i.e.,
+# `<user>.github.com/<repo>`, and the CNAME version, e.g.
+# `docs.awesomeproject.com` should be supported, relative stylesheet path
+# is be used in the HTML sources.
 #
-# Use the [porcelain layer] of git-status to count files been created, modified,
-# or deleted. Output these numbers to the terminal.
+# [Project Page]: http://help.github.com/pages/#project_pages_manually
+
+cd "$master_srcdir"
+cat "$tmpdir/.touched_source" | tr '\n' '\0' | xargs -0 docco -o "$ghpage_srcdir"
+
+#### Phase 5: Push to Upstream
+
+# Upon this phase, updated cover page (always) and documentations (probably) are
+# all ready. It's time to push back to `gh-pages` branch on GitHub.
+#
+# The [porcelain layer] of git-status is used to count files been created,
+# modified, or deleted. Output these numbers to the terminal.
 #
 # [Porcelain Layer]:
 # http://schacon.github.com/git/git.html#_high_level_commands_porcelain
-#
-status=$(git --git-dir $tempdir/gh-pages/.git --work-tree $tempdir/gh-pages status --porcelain)
 
+cd "$ghpage_srcdir"
+status=$(git status --porcelain)
+echo $status
 echo "Created:$(echo "$status" | egrep "^(\?\?)" | wc -l)"
 echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
 echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 
-# If there exists any file created, modified, or deleted, then:
+# Following below steps to update gh-pages:
 # 
 #   1. Synchronize git index with local files,
 #   2. commit the `gh-pages` branch, and,
 #   3. synchronize the `gh-pages` branch with GitHub remotely.
-#
-if [ $(echo "$status" | wc -l) -gt 0 ]; then
 
-  echo "Synchronizing GitHub pages remotely..."
-  git --git-dir $tempdir/gh-pages/.git --work-tree $tempdir/gh-pages add    --all
-  git --git-dir $tempdir/gh-pages/.git --work-tree $tempdir/gh-pages commit --all --quiet --message "Docas synced with $head"
-  git --git-dir $tempdir/gh-pages/.git --work-tree $tempdir/gh-pages push         --quiet --force   origin gh-pages
-  echo "http://$user.github.com/$repo is now up-to-date. Crowd applauds."
-
-# Nothing to do when no file was created, modified, or deleted. The `gh-pages`
-# branch is in-sync with the `master` branch already.
-#
-else
-
-  echo "http://$user.github.com/$repo doesn't need to sync. Code harder."
-
-fi
+echo "Pushing to gh-pages branch on GitHub..."
+git add    --all
+echo added
+git commit --all --quiet --message "Docas synced with $head"
+echo committed
+git push         --quiet --force    origin gh-pages
+echo "Branch gh-pages synced with master. Crowd applauds."
