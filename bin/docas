@@ -249,7 +249,7 @@ echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 #   3. synchronize the `gh-pages` branch with GitHub remotely.
 echo $status
 echo "Pushing to gh-pages branch on GitHub..."
-git add    --all
+git add    .
 git commit --all --quiet --message "Docas.io synced with $head_hash"
 git push         --quiet           origin gh-pages
 echo "Branch gh-pages synced with master. Crowd applauds."
