@@ -139,6 +139,13 @@ else
 
   echo "$synced_sources_hash | $synced_ghpages_hash"
 
+  if [ "$synced_sources_hash" == "$head_hash" ]; then
+
+    echo "Already synced with head"
+    exit 0
+
+  fi
+
   # If we can not securely list all touched files, docas will treat all files as
   # touched.
   if [ -z $synced_ghpages_hash ] || [ -z $synced_sources_hash ]; then
@@ -162,6 +169,7 @@ fi
 
 curl --silent --output $working_dir/.statist         "http://127.0.0.1:4567/statist?path=$sources_dir"
 curl --silent --output $working_dir/.all_sources     "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.all"
+echo > $working_dir/.touched_sources
 curl --silent --output $working_dir/.touched_sources "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.touched"
 
 #### Phase 3: Generate Cover Page (using Docci)
