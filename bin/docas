@@ -29,6 +29,23 @@ if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" != "true" ]; then
 
 fi
 
+while [ $# -gt 0 ]
+do
+
+  case $1 in
+
+  -h)    hosted=true
+         ;;
+  -*)    echo $0: $1: unrecognized option >&2
+         ;;
+  *)     break
+         ;;
+  esac
+
+  shift
+
+done
+
 sources_dir="$(pwd)"
 working_dir="$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)"
 ghpages_dir="$working_dir/ghpages"
@@ -99,7 +116,7 @@ else
   cp -R "$sources_dir" "$ghpages_dir"
   rm -rf $ghpages_dir/*
   cd $ghpages_dir
-  git checkout --force --quiet -b gh-pages origin/gh-pages
+  git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
  
   synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]{7}$")
   synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)
@@ -128,6 +145,18 @@ else
     egrep "^D"     $working_dir/.git-diff | cut -c 3- > $working_dir/.deleted
 
   fi
+
+fi
+
+# In the hosted version, i.e. docas.io, the `gh-pages` repository is up-to-dated
+# (in virtue of) GitHub-Synchronizer. Otherwise, pull `gh-pages` to prevent
+# `non-fast-forward` error.
+
+if [ "$hosted" != "true" ]; then
+
+  echo "Pulling gh-pages branch..."
+  cd $ghpages_dir
+  git pull --quiet
 
 fi
 
@@ -218,9 +247,9 @@ echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 #   1. Synchronize git index with local files,
 #   2. commit the `gh-pages` branch, and,
 #   3. synchronize the `gh-pages` branch with GitHub remotely.
-
+echo $status
 echo "Pushing to gh-pages branch on GitHub..."
 git add    --all
-git commit --all --quiet --message "Docas synced with $head_hash"
-git push         --quiet --force    origin gh-pages
+git commit --all --quiet --message "Docas.io synced with $head_hash"
+git push         --quiet           origin gh-pages
 echo "Branch gh-pages synced with master. Crowd applauds."

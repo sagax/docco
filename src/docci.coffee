@@ -146,5 +146,5 @@ index_styles    = fs.readFileSync(__dirname + '/../resources/index.css').toStrin
 # For each recognized source file passed in as an argument, generate the documentation. Log sources of unknown types.
 destdir = process.OPTS.out ? 'docs'
 ensure_directory destdir, ->
-  fs.writeFile destdir + '/index.css', index_styles if !process.OPTS.css
+  # fs.writeFile destdir + '/index.css', index_styles if !process.OPTS.css
   generate_index (process.ARGV[0]), destdir + '/index.html'

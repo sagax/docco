@@ -251,7 +251,7 @@ sources = process.ARGV.filter((source) -> (get_language source) ? console.log "U
 destdir = process.OPTS.out ? 'docs'
 if sources.length
   ensure_directory destdir, ->
-    fs.writeFile destdir + '/docco.css', docco_styles if !process.OPTS.css
+    # fs.writeFile destdir + '/docco.css', docco_styles if !process.OPTS.css
     files = sources.slice(0)
     next_file = -> generate_documentation files.shift(), next_file if files.length
     next_file()
