@@ -4,3 +4,5 @@ docs
 lib
 *.swp
 *.swo
+*.rdb
+node_modules
