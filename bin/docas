@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-### Prerequist
-
+### Note
+#
 # Upon execution of this shell script, GitHub-Synchronizer has finished its
-# job. (Bravo...!) Since on docas.io environment, master branch will be read
+# job. *Bravo...!* Since on docas.io environment, master branch will be read
 # only, so there'll be nothing in `git diff` and `git diff HEAD`. But always
-# remember when invoking docas on a development environment, docas will not 
+# remember when invoking docas on a development environment, docas will **not** 
 # try to checkout HEAD, but documenting the working directory, which can 
 # lead to inconsistency between `gh-pages` and `master` branch. Do it with
 # consciousness (or why not `commit` first?).
@@ -16,51 +16,53 @@
 
 #   1. Stop execution on error.
 #   2. Ensure working directory is documentable (a git repo).
-#   3. Parse arguments into user and repo variable,
-#   4. Prepare a temporary working directory (and remove on exit).
+#   3. Prepare a temporary working directory (and remove on exit).
+#   4. Get sources' HEAD hash, which will be included in commit message.
+#   5. List all file (for generating `.files`, a file index).
 
 set -e
 
-if [ $(git rev-parse --is-inside-work-tree) != 'true' ]; then
+if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" != "true" ]; then
   
-  echo "Docas want to be invoked from git repositories."
+  echo "Docas is intended to be invoked from a git repository"
   exit
 
 fi
 
-tmpdir=$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)
-# trap "rm -rf $tmpdir; exit" 0 SIGINT SIGTERM
-master_srcdir=$(pwd)
-ghpage_srcdir=$tmpdir/ghpage
+sources_dir="$(pwd)"
+working_dir="$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)"
+ghpages_dir="$working_dir/ghpages"
 
-cd "$master_srcdir"
-head=$(git rev-parse HEAD | head -c 7)
-git ls-tree -r --name-only HEAD > "$tmpdir/.allfiles"
+# trap "rm -rf $working_dir; exit;" 0 SIGINT SIGTERM
+
+cd $sources_dir
+head_hash=$(git rev-parse HEAD | head -c 7)
+git ls-tree -r --name-only HEAD > "$working_dir/.all"
 
 #### Phase 1: Checkout gh-pages Branch, List Touched Sources
 
-# Docas will only re-render touched sources, in the following scenarios, docas
-# consider all files are touched:
+# Docas will only re-render documents for touched sources, in some scenarios,
+# docas treats all files as touched:
 #
-#   1. `gh-pages` does not exist, or,
-#   2. No docas commit found from the `gh-pages` branch, or,
-#   3. `gh-pages` sync found, but could not found according `master` commit.
-#
-# Situation 2 can be caused by first synchronization, or shallow clone; while
-# situation 3 can only be caused by shallow clone.
-#
-all_directories_are_dirty () {
+#   1. `gh-pages` branch does not exist, which could be mis-judged when invoking
+#   from a development environment (remote `gh-pages` branch is untracked). Not
+#   a problem on docas.io environment.
+#   2. No docas commit found from the `gh-pages` branch, which could be caused
+#   by first synchronization, or shallow clone.
+#   3. `gh-pages` sync found, but could not target according `master` commit,
+#   caused by shallow clone.
 
-  cd "$master_srcdir"
-  cp "$tmpdir/.allfiles" "$tmpdir/.touched"
-  echo > "$tmpdir/.deleted"
+all_files_are_touched () {
+
+  cp "$working_dir/.all" "$working_dir/.touched"
+  echo > "$working_dir/.deleted"
   return
 
 }
 
 #  create `gh-pages` branch if not exist, see: [GitHub instruction]:
 #
-#   1. Duplicate `master` directory to `gh-pages` directory.
+#   1. Copy sources to `gh-pages` directory.
 #   2. Change to `gh-pages` directory.
 #   3. Create `gh-pages` branch. 
 #   4. Clear git index.
@@ -72,81 +74,66 @@ all_directories_are_dirty () {
 if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
 
   echo "Creating gh-pages branch..."
-  echo $master_srcdir $ghpage_srcdir
-  cp -R $master_srcdir $ghpage_srcdir
-  cd $ghpage_srcdir
-  git symbolic-ref HEAD refs/heads/gh-pages # > /dev/null
+  cp -R $sources_dir $ghpages_dir
+  cd $ghpages_dir
+  git symbolic-ref HEAD refs/heads/gh-pages
   rm -f .git/index
-  git clean --quiet -fdx # > /dev/null
-  rm -rf *
-  all_directories_are_dirty
+  git clean --quiet -fdx
+  
+  all_files_are_touched
 
 # If there exists a `gh-pages` branch, which means the branch *may* contain docas
 # synchronized content. So, docas will:
 #
-#   1. Duplicate `master` directory to `gh-pages` directory.
+#   1. Copy sources to `gh-pages` directory.
 #   2. Empty `gh-pages` incase of submodules exists (unable to rmdir warning). 
 #   3. Checkout `gh-pages` branch in `gh-pages` directory.
-#   4. Stop tracking `master` branch to decrease possibility of concurrency.
-#   3. Analyze dirty directories. Sources in these directories will be
-#   regenerated. Dirty directories are:
+#   4. Analyze touched files. Touched files are:
 #
-#      * Modified directories of the `master` branch, plus
-#      * Modified directories of the `gh-pages` branch.
-#      
-#   All sources in the touched directories will be re-generated since the
-#   *JUMP TO* links of sibling documents needs be synchronized.
+#     a. When docas can securely locate the synchronized sources commit, then
+#     the `diff` between that commit and `HEAD` are touched.
+#     b. Otherwise, docas treats all git versioned files are touched.
+
 else
 
-  cp -R . "$ghpage_srcdir"
-  echo "XXXX"
-  rm -rf $ghpage_srcdir/*
-  find .
-  echo "XXXX"
-  cd "$ghpage_srcdir"
+  cp -R "$sources_dir" "$ghpages_dir"
+  rm -rf $ghpages_dir/*
+  cd $ghpages_dir
   git checkout --force --quiet -b gh-pages origin/gh-pages
-  git branch -D master
-  find .
  
-  latest_sync=$(git log --pretty=oneline \
-    | egrep -m 1 -i "docas .* [0-9a-f]{7}$")
+  synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]{7}$")
+  synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)
+  synced_sources_hash=$(echo "$synced_docas_commit" | tail -c 8 | head -c 7)
 
-  synced_ghpages_hash=$(echo "$latest_sync" | head -c 7)
+  cd $sources_dir
+  synced_sources_hash=$(git log --pretty=oneline | egrep -m 1 "^$synced_sources_hash" | head -c 7 | xargs echo)
 
-  synced_master_hash=$(echo "$latest_sync" | tail -c 8 | head -c 7)
+  echo "$synced_sources_hash | $synced_ghpages_hash"
 
-  cd "$master_srcdir"
-  synced_master_hash=$(git log --pretty=oneline \
-    | egrep -m 1 "^$synced_master_hash" \
-    | head -c 7 \
-    | xargs echo)
+  # If we can not securely list all touched files, docas will treat all files as
+  # touched.
+  if [ -z $synced_ghpages_hash ] || [ -z $synced_sources_hash ]; then
 
-  echo "$synced_master_hash | $synced_ghpages_hash"
-
-  # If we can not securely list all touched files, then docas treat all
-  # as dirty directories.
-  if [ -z $synced_ghpages_hash ] || [ -z $synced_master_hash ]; then
-
-    echo "gh-pages branch out-of sync for a long time, rebuilding..."
-    all_directories_are_dirty
+    echo "gh-pages branch out-of-sync for a long time, rebuilding..."
+    all_files_are_touched
     
   # If we can securely list all touched files in the `master` and `gh-pages`
   # branch since last sync, output unique directories into dirty_directories file.
   else
 
-    echo "Found docas comitted gh-pages, synced with $synced_master_hash"
-    cd "$master_srcdir"
-    git diff --name-status $synced_master_hash..HEAD > $tmpdir/.git-diff
-    egrep "^(A|M)" $tmpdir/.git-diff | cut -c 3- > $tmpdir/.touched
-    egrep "^D" $tmpdir/.git-diff | cut -c 3- > $tmpdir/.deleted
+    echo "Docas comitted gh-pages found, synced with $synced_sources_hash"
+    cd $sources_dir
+    git diff --name-status $synced_sources_hash..HEAD > $working_dir/.git-diff
+    egrep "^(A|M)" $working_dir/.git-diff | cut -c 3- > $working_dir/.touched
+    egrep "^D"     $working_dir/.git-diff | cut -c 3- > $working_dir/.deleted
 
   fi
 
 fi
 
-curl --silent --output $tmpdir/.stats "http://127.0.0.1:4567/stats?path=$master_srcdir"
-curl --silent --output $tmpdir/.all_source "http://127.0.0.1:4567/touched?path=$master_srcdir&list=$tmpdir/.allfiles"
-curl --silent --output $tmpdir/.touched_source "http://127.0.0.1:4567/touched?path=$master_srcdir&list=$tmpdir/.touched"
+curl --silent --output $working_dir/.statist         "http://127.0.0.1:4567/statist?path=$sources_dir"
+curl --silent --output $working_dir/.all_sources     "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.all"
+curl --silent --output $working_dir/.touched_sources "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.touched"
 
 #### Phase 3: Generate Cover Page (using Docci)
 
@@ -154,13 +141,15 @@ echo "Generating cover page..."
 
 # Upon this phase, following materials were all ready:
 #
-#   1. a language statistics named `.stats`, and,
-#   2. a list of all recognized sources named `.all_source`.
+#   1. a language statistics named `.statist`, and,
+#   2. a list of all recognized sources named `.all_sources`.
 #
-# Make sure a stylesheet for `index.html` exists. User modification will be
-# honored.
+# Make sure a stylesheet for `index.html` exists. (User modification will be
+# honored.)
+# 
+# Invoke the **docci** command-line program to generate `index.html`.
 
-cd "$ghpage_srcdir"
+cd $ghpages_dir
 if ! [ -f stylesheets/index.css ]; then
  
   mkdir -p stylesheets
@@ -168,21 +157,17 @@ if ! [ -f stylesheets/index.css ]; then
 
 fi
 
-# Invoke the **docci** command-line to generate `index.html`.
-
-docci -o "$ghpage_srcdir" "$master_srcdir"
+docci -o $ghpages_dir $sources_dir
 
 #### Phase 4: Generate Documents (using Docco)
 
 echo "Generating documents..."
 
-##### 4.1: Prepare Docco Stylesheet
-
 # Make sure a stylesheet for documents exists. User modification will be
 # honored. In case of the stylesheet doesn't exists, copy the default stylesheet
 # to the `stylesheets` folder.
 
-cd "$ghpage_srcdir"
+cd $ghpages_dir
 if ! [ -f stylesheets/docco.css ]; then
 
   mkdir -p stylesheets
@@ -190,16 +175,14 @@ if ! [ -f stylesheets/docco.css ]; then
 
 fi
 
-##### 4.2: Synchronize Deleted Sources
+# Synchronize Deleted Sources
 
-cd "$ghpage_srcdir"
-cat $tmpdir/.deleted | while read file; do
+cd $ghpages_dir
+cat $working_dir/.deleted | while read file; do
 
   rm -f "${file%.*}.html"
 
 done
-
-##### 4.3: Generate Documents
 
 # Document all touched sources.
 # 
@@ -210,8 +193,8 @@ done
 #
 # [Project Page]: http://help.github.com/pages/#project_pages_manually
 
-cd "$master_srcdir"
-cat "$tmpdir/.touched_source" | tr '\n' '\0' | xargs -0 docco -o "$ghpage_srcdir"
+cd $sources_dir
+cat $working_dir/.touched_sources | tr '\n' '\0' | xargs -0 docco -o $ghpages_dir
 
 #### Phase 5: Push to Upstream
 
@@ -224,9 +207,8 @@ cat "$tmpdir/.touched_source" | tr '\n' '\0' | xargs -0 docco -o "$ghpage_srcdir
 # [Porcelain Layer]:
 # http://schacon.github.com/git/git.html#_high_level_commands_porcelain
 
-cd "$ghpage_srcdir"
+cd $ghpages_dir
 status=$(git status --porcelain)
-echo $status
 echo "Created:$(echo "$status" | egrep "^(\?\?)" | wc -l)"
 echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
 echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
@@ -239,8 +221,6 @@ echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 
 echo "Pushing to gh-pages branch on GitHub..."
 git add    --all
-echo added
-git commit --all --quiet --message "Docas synced with $head"
-echo committed
+git commit --all --quiet --message "Docas synced with $head_hash"
 git push         --quiet --force    origin gh-pages
 echo "Branch gh-pages synced with master. Crowd applauds."
