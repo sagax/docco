@@ -54,7 +54,6 @@ ghpages_dir="$working_dir/ghpages"
 
 cd $sources_dir
 head_hash=$(git rev-parse HEAD | head -c 7)
-echo "head_hash" $head_hash
 git ls-tree -r --name-only HEAD > "$working_dir/.all"
 
 #### Phase 1: Checkout gh-pages Branch, List Touched Sources
