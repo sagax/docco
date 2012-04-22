@@ -22,31 +22,68 @@
 
 set -e
 
-if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" != "true" ]; then
-  
-  echo "Docas is intended to be invoked from a git repository"
-  exit
+if [ $# -eq 0 ]; then
+
+  if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" == "true" ]; then
+
+    remote=$(git remote -v | egrep "origin.*(push)")
+    repo=$(echo $remote | grep -P "(?<=\:).*(?=\/)" -o)/$(echo $remote | grep -P "(?<=\/)[^\.]*(?= )" -o)
+
+  else
+
+    echo "Docas is intended to be invoked from a git repository"
+
+  fi
+
+else
+
+  repo=$1
 
 fi
 
-while [ $# -gt 0 ]
-do
+# if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" != "true" ]; then
+#   
+#   echo "Docas is intended to be invoked from a git repository"
+#   exit
+# 
+# fi
 
-  case $1 in
+# while [ $# -gt 0 ]
+# do
+# 
+#   case $1 in
+# 
+#   -h)    hosted=true
+#          ;;
+#   -*)    echo $0: $1: unrecognized option >&2
+#          ;;
+#   *)     break
+#          ;;
+#   esac
+# 
+#   shift
+# 
+# done
 
-  -h)    hosted=true
-         ;;
-  -*)    echo $0: $1: unrecognized option >&2
-         ;;
-  *)     break
-         ;;
-  esac
+storage_dir="$(echo $HOME)/docas-repos/$repo" && mkdir -p "$storage_dir" # && cd "$storage_dir" && storage_dir=$(pwd -P)
+sources_dir="$storage_dir/master"
+sources_git="$sources_dir/.git"
 
-  shift
+# ## Fetch (or Clone) from GitHub 
 
-done
+if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-inside-work-tree)" = "true" ]; then
 
-sources_dir="$(pwd)"
+  cd "$master"
+  git fetch --quiet --force
+  git reset --quiet --hard  origin/master
+
+else
+
+  rm -rf "$storage_dir"
+  git clone --depth 1 git@github.com:$repo.git "$sources_dir"
+
+fi
+
 working_dir="$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)"
 ghpages_dir="$working_dir/ghpages"
 
@@ -91,20 +128,21 @@ all_files_are_touched () {
 if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
 
   echo "Creating gh-pages branch..."
-  cp -R $sources_dir $ghpages_dir
-  cd $ghpages_dir
+  cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir"
   git symbolic-ref HEAD refs/heads/gh-pages
   rm -f .git/index
   git clean --quiet -fdx
-  
+
   all_files_are_touched
 
 # If there exists a `gh-pages` branch, which means the branch *may* contain docas
 # synchronized content. So, docas will:
 #
-#   1. Copy sources to `gh-pages` directory.
-#   2. Empty `gh-pages` incase of submodules exists (unable to rmdir warning). 
-#   3. Checkout `gh-pages` branch in `gh-pages` directory.
+#   1. Copy sources to `ghpages` directory.
+#   2. Empty `ghpages` directory, incase of submodules were touched on dev
+#   machine, which will cause `unable to rmdir *name of submodule*: Directory
+#   not empty` warning and unwanted files being left.
+#   3. Switch to branch `gh-pages`.
 #   4. Analyze touched files. Touched files are:
 #
 #     a. When docas can securely locate the synchronized sources commit, then
@@ -113,24 +151,23 @@ if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
 
 else
 
-  cp -R "$sources_dir" "$ghpages_dir"
-  rm -rf $ghpages_dir/*
-  cd $ghpages_dir
+  cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir"
+  rm -rf *
   git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
 
   # In the hosted version, i.e. docas.io, the `gh-pages` repository is up-to-dated
   # (in virtue of) GitHub-Synchronizer. Otherwise, pull `gh-pages` to prevent
   # `non-fast-forward` error.
 
-  if [ "$hosted" != "true" ]; then
-
-    echo "Pulling gh-pages branch..."
-    cd $ghpages_dir
-    git pull --quiet
-
-  fi
+#   if [ "$hosted" != "true" ]; then
+# 
+#     echo "Pulling gh-pages branch..."
+#     cd $ghpages_dir
+#     git pull --quiet
+# 
+#   fi
  
-  synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]{7}$")
+  synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]+$")
   synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)
   synced_sources_hash=$(echo "$synced_docas_commit" | tail -c 8 | head -c 7)
 
@@ -141,14 +178,14 @@ else
 
   if [ "$synced_sources_hash" == "$head_hash" ]; then
 
-    echo "Already synced with head"
+    echo "Already synchronized with latest commit."
     exit 0
 
   fi
 
   # If we can not securely list all touched files, docas will treat all files as
   # touched.
-  if [ -z $synced_ghpages_hash ] || [ -z $synced_sources_hash ]; then
+  if [ -z "$synced_ghpages_hash" ] || [ -z "$synced_sources_hash" ]; then
 
     echo "gh-pages branch out-of-sync for a long time, rebuilding..."
     all_files_are_touched
@@ -158,19 +195,23 @@ else
   else
 
     echo "Docas comitted gh-pages found, synced with $synced_sources_hash"
-    cd $sources_dir
-    git diff --name-status $synced_sources_hash..HEAD > $working_dir/.git-diff
-    egrep "^(A|M)" $working_dir/.git-diff | cut -c 3- > $working_dir/.touched
-    egrep "^D"     $working_dir/.git-diff | cut -c 3- > $working_dir/.deleted
+    cd "$sources_dir"
+    git diff --name-status $synced_sources_hash..HEAD > "$working_dir/.git-diff"
+    egrep "^(A|M)" "$working_dir/.git-diff" | cut -c 3- > "$working_dir/.touched"
+    egrep "^D"     "$working_dir/.git-diff" | cut -c 3- > "$working_dir/.deleted"
 
   fi
 
 fi
 
-curl --silent --output $working_dir/.statist         "http://127.0.0.1:4567/statist?path=$sources_dir"
-curl --silent --output $working_dir/.all_sources     "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.all"
-echo > $working_dir/.touched_sources
-curl --silent --output $working_dir/.touched_sources "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.touched"
+# Get language statustics, all sources, and touched sources from `Linguist HTTP`
+# server hosted on local port 4567.
+
+echo > "$working_dir/.all_sources"
+echo > "$working_dir/.touched_sources"
+curl --silent --output "$working_dir/.statist"         "http://127.0.0.1:4567/statist?path=$sources_dir"
+curl --silent --output "$working_dir/.all_sources"     "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.all"
+curl --silent --output "$working_dir/.touched_sources" "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.touched"
 
 #### Phase 3: Generate Cover Page (using Docci)
 
@@ -187,14 +228,14 @@ echo "Generating cover page..."
 # Invoke the **docci** command-line program to generate `index.html`.
 
 cd $ghpages_dir
-if ! [ -f stylesheets/index.css ]; then
+if ! [ -f "stylesheets/index.css" ]; then
  
-  mkdir -p stylesheets
-  cp /usr/local/lib/docas/resources/index.css stylesheets/index.css
+  mkdir -p "stylesheets"
+  cp "/usr/local/lib/docas/resources/index.css" "stylesheets/index.css"
 
 fi
 
-docci -o $ghpages_dir $sources_dir
+docci -o "$ghpages_dir" "$sources_dir"
 
 #### Phase 4: Generate Documents (using Docco)
 
@@ -205,17 +246,17 @@ echo "Generating documents..."
 # to the `stylesheets` folder.
 
 cd $ghpages_dir
-if ! [ -f stylesheets/docco.css ]; then
+if ! [ -f "stylesheets/docco.css" ]; then
 
-  mkdir -p stylesheets
-  cp /usr/local/lib/docas/resources/docco.css stylesheets/docco.css
+  mkdir -p "stylesheets"
+  cp "/usr/local/lib/docas/resources/docco.css" "stylesheets/docco.css"
 
 fi
 
 # Synchronize Deleted Sources
 
-cd $ghpages_dir
-cat $working_dir/.deleted | while read file; do
+cd "$ghpages_dir"
+cat "$working_dir/.deleted" | while read file; do
 
   rm -f "${file%.*}.html"
 
@@ -230,8 +271,8 @@ done
 #
 # [Project Page]: http://help.github.com/pages/#project_pages_manually
 
-cd $sources_dir
-cat $working_dir/.touched_sources | tr '\n' '\0' | xargs -0 docco -o $ghpages_dir
+cd "$sources_dir"
+cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages_dir"
 
 #### Phase 5: Push to Upstream
 
@@ -244,7 +285,7 @@ cat $working_dir/.touched_sources | tr '\n' '\0' | xargs -0 docco -o $ghpages_di
 # [Porcelain Layer]:
 # http://schacon.github.com/git/git.html#_high_level_commands_porcelain
 
-cd $ghpages_dir
+cd "$ghpages_dir"
 status=$(git status --porcelain)
 echo "Created:$(echo "$status" | egrep "^(\?\?)" | wc -l)"
 echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
@@ -255,9 +296,17 @@ echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 #   1. Synchronize git index with local files,
 #   2. commit the `gh-pages` branch, and,
 #   3. synchronize the `gh-pages` branch with GitHub remotely.
-echo $status
+echo "$status"
 echo "Pushing to gh-pages branch on GitHub..."
 git add    .
 git commit --all --quiet --message "Docas.io synced with $head_hash"
 git push         --quiet           origin gh-pages
 echo "Branch gh-pages synced with master. Crowd applauds."
+
+# ## Coda
+
+# Pull again to make following synchronization quicker for no need to fetch
+# documentations (just pushed) again.
+
+cd "$sources_dir"
+git pull --quiet
