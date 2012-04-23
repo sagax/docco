@@ -18,7 +18,7 @@ source_queue  = yamg.queue 'docas'
 #   * `/repos/#{user}/#{repo}/master` for `master` branch, and
 #   * `/repos/#{user}/#{repo}/gh-pages` for `gh-pages`.
 docas_repo = (repo, callback) ->
-  exec "docas -h", {cwd: "/repos/#{repo}/master"}, (err, stdout, stderr) ->
+  exec "docas $repo", {cwd: "/repos/#{repo}/master"}, (err, stdout, stderr) ->
     if err
       console.log "err", err, stdout, stderr
       callback {please: 'retry'}, null
