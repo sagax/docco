@@ -13,10 +13,10 @@
 # To use docas as a stand-alone program on your development machine, invoke
 # docas from your local git repository.
 #
-#     $ pwd
-#     /path/to/your/repo
-#     $ docas
-#   
+#       $ pwd
+#       /path/to/your/repo
+#        docas
+#
 #   [Git]:             http://git-scm.com
 #   [Docas.io]:        http://docas.io
 #   [Docco]:           http://jashkenas.github.com/docco
