@@ -13,6 +13,8 @@
 # To use docas as a stand-alone program on your development machine, invoke
 # docas from your local git repository.
 #
+#     $ pwd
+#     /path/to/your/repo
 #     $ docas
 #   
 #   [Git]:             http://git-scm.com
