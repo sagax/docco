@@ -1,37 +1,39 @@
 #!/usr/bin/env bash
 
-### Note
-#
-# Upon execution of this shell script, GitHub-Synchronizer has finished its
-# job. *Bravo...!* Since on docas.io environment, master branch will be read
-# only, so there'll be nothing in `git diff` and `git diff HEAD`. But always
-# remember when invoking docas on a development environment, docas will **not** 
-# try to checkout HEAD, but documenting the working directory, which can 
-# lead to inconsistency between `gh-pages` and `master` branch. Do it with
-# consciousness (or why not `commit` first?).
+# ## Scripting Procedure
 
-### Scripting Procedure
+# ### Phase 0: Preparations
 
-#### Phase 0: Preparations
-
-#   1. Stop execution on error.
-#   2. Ensure working directory is documentable (a git repo).
-#   3. Prepare a temporary working directory (and remove on exit).
-#   4. Get sources' HEAD hash, which will be included in commit message.
-#   5. List all file (for generating `.files`, a file index).
+# 1. Stop execution on error.
 
 set -e
+
+# 2. Ensure correct invocation pattern.
+#
+#   * When no argument is given, working directory is used to extract user and
+#   repo name which are used to fetch (or clone) from GitHub. Local files are
+#   not used to guarantee consistency.
+#   * Else, provided argument should be of <user>/<repo> pattern and will be
+#   used to fetch (or clone) from GitHub.
 
 if [ $# -eq 0 ]; then
 
   if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" == "true" ]; then
 
-    remote=$(git remote -v | egrep "origin.*(push)")
-    repo=$(echo $remote | grep -P "(?<=\:).*(?=\/)" -o)/$(echo $remote | grep -P "(?<=\/)[^\.]*(?= )" -o)
+    addr="$(git remote -v | egrep -m 1 "origin")"
+    repo="$(echo "$addr"  | grep -P "(?<=\:).*(?=\.)" -o)"
 
   else
 
-    echo "Docas is intended to be invoked from a git repository"
+    echo -e "
+    Docas documents git repository and publish as GitHub pages.
+
+    Usage:\033[36m docas \033[0m              (document current directory) *
+    or:   \033[36m docas <user>/<repo>\033[0m (document repository by user and repository name)
+    
+    * Sources on GitHub will be used instead of local files to guarantee consistency.
+    "
+    exit
 
   fi
 
@@ -41,59 +43,58 @@ else
 
 fi
 
-# if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" != "true" ]; then
-#   
-#   echo "Docas is intended to be invoked from a git repository"
-#   exit
-# 
-# fi
+git_ssh="git@github.com:$repo.git"
 
-# while [ $# -gt 0 ]
-# do
-# 
-#   case $1 in
-# 
-#   -h)    hosted=true
-#          ;;
-#   -*)    echo $0: $1: unrecognized option >&2
-#          ;;
-#   *)     break
-#          ;;
-#   esac
-# 
-#   shift
-# 
-# done
+# 3. Prepare required directories. Total 4 folders are used to accomplish the
+# whole task:
+#
+#   * `storage` directory, which should be a local non-volatile folder. All
+#   fetched (or cloned) repositories are persisted on this location to
+#   accelerate following fetches from GitHub. `storage` directory locates at
+#   `~/docas-repos/`
+#   * `sources` directory, holding files of the master branch. `source`
+#   directory locates at `user/repo` inside `storage` directory.
+#   * `working` directory, holding docas required language statistics, list of
+#   (all and touched) sources, and also below `ghpages` directory. Which is a 
+#   volatile (temporary) folder and should be removed on exit.
+#   * `ghpages` directory, holding generated documentation. `ghpages` directory
+#   locates at `ghpages` inside `working` directory.
 
-storage_dir="$(echo $HOME)/docas-repos/$repo" && mkdir -p "$storage_dir" # && cd "$storage_dir" && storage_dir=$(pwd -P)
-sources_dir="$storage_dir/master"
+storage_dir="$(echo $HOME)/docas-repos" && mkdir -p "$storage_dir" # && cd "$storage_dir" && storage_dir=$(pwd -P)
+sources_dir="$storage_dir/$repo"
+working_dir="$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)" && trap "rm -rf "$working_dir"; exit;" 0 SIGINT SIGTERM
+ghpages_dir="$working_dir/ghpages"
+
+#   4. Get sources' HEAD hash, which will be included in commit message.
+###   5. List all file (for generating `.files`, a file index).
+
+# ### Phase 1: Fetch (or Clone) from GitHub
+
+# If `sources_dir` already is a git repository, then fetch from upstream. The
+# remote git address is specified again to handle repository (or user) rename.
+
 sources_git="$sources_dir/.git"
+if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-inside-work-tree)" == "true" ]; then
 
-# ## Fetch (or Clone) from GitHub 
-
-if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-inside-work-tree)" = "true" ]; then
-
-  cd "$master"
-  git fetch --quiet --force
+  cd "$sources_dir"
+  git fetch --quiet --force "$git_ssh"
   git reset --quiet --hard  origin/master
+
+# Else, before clone the repository, clear the content of `storage_dir`. Shallow
+# clone is used to save bandwidth and increase speed.
 
 else
 
   rm -rf "$storage_dir"
-  git clone --depth 1 git@github.com:$repo.git "$sources_dir"
+  git clone --depth 1 "$git_ssh" "$sources_dir"
 
 fi
 
-working_dir="$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)"
-ghpages_dir="$working_dir/ghpages"
-
-# trap "rm -rf $working_dir; exit;" 0 SIGINT SIGTERM
-
-cd $sources_dir
-head_hash=$(git rev-parse HEAD | head -c 7)
+cd "$sources_dir"
+head_hash="$(git rev-parse HEAD | head -c 7)"
 git ls-tree -r --name-only HEAD > "$working_dir/.all"
 
-#### Phase 1: Checkout gh-pages Branch, List Touched Sources
+# ### Phase 2: Checkout gh-pages Branch, List Touched Sources
 
 # Docas will only re-render documents for touched sources, in some scenarios,
 # docas treats all files as touched:
@@ -125,7 +126,7 @@ all_files_are_touched () {
 # In this situation, docas considers all directories are dirty.
 # [GitHub instruction]: http://help.github.com/pages/#project_pages_manually 
 
-if [ $(git branch -a | grep origin\/gh-pages | wc -l) = 0 ]; then
+if [ "$(git branch -a | grep origin\/gh-pages | wc -l)" -eq 0 ]; then
 
   echo "Creating gh-pages branch..."
   cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir"
@@ -155,18 +156,6 @@ else
   rm -rf *
   git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
 
-  # In the hosted version, i.e. docas.io, the `gh-pages` repository is up-to-dated
-  # (in virtue of) GitHub-Synchronizer. Otherwise, pull `gh-pages` to prevent
-  # `non-fast-forward` error.
-
-#   if [ "$hosted" != "true" ]; then
-# 
-#     echo "Pulling gh-pages branch..."
-#     cd $ghpages_dir
-#     git pull --quiet
-# 
-#   fi
- 
   synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]+$")
   synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)
   synced_sources_hash=$(echo "$synced_docas_commit" | tail -c 8 | head -c 7)
@@ -213,7 +202,7 @@ curl --silent --output "$working_dir/.statist"         "http://127.0.0.1:4567/st
 curl --silent --output "$working_dir/.all_sources"     "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.all"
 curl --silent --output "$working_dir/.touched_sources" "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.touched"
 
-#### Phase 3: Generate Cover Page (using Docci)
+# ### Phase 3: Generate Cover Page (using Docci)
 
 echo "Generating cover page..."
 
@@ -237,7 +226,7 @@ fi
 
 docci -o "$ghpages_dir" "$sources_dir"
 
-#### Phase 4: Generate Documents (using Docco)
+# ### Phase 4: Generate Documents (using Docco)
 
 echo "Generating documents..."
 
@@ -286,7 +275,7 @@ cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages
 # http://schacon.github.com/git/git.html#_high_level_commands_porcelain
 
 cd "$ghpages_dir"
-status=$(git status --porcelain)
+status="$(git status --porcelain)"
 echo "Created:$(echo "$status" | egrep "^(\?\?)" | wc -l)"
 echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
 echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
@@ -303,10 +292,12 @@ git commit --all --quiet --message "Docas.io synced with $head_hash"
 git push         --quiet           origin gh-pages
 echo "Branch gh-pages synced with master. Crowd applauds."
 
-# ## Coda
+# ### Phase 6: Coda
 
-# Pull again to make following synchronization quicker for no need to fetch
-# documentations (just pushed) again.
+# Pull the source in the storage directory again to make following
+# synchronization quicker for no need to fetch documentations (just pushed)
+# again.
 
 cd "$sources_dir"
-git pull --quiet
+git fetch --quiet --force "$git_ssh"
+git reset --quiet --hard  origin/master

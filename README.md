@@ -71,3 +71,14 @@ Relational Database Project for International Classical Music Database
   * T-SQL Script
 
 ## yContribution
+
+
+### Note
+#
+# Upon execution of this shell script, GitHub-Synchronizer has finished its
+# job. *Bravo...!* Since on docas.io environment, master branch will be read
+# only, so there'll be nothing in `git diff` and `git diff HEAD`. But always
+# remember when invoking docas on a development environment, docas will **not** 
+# try to checkout HEAD, but documenting the working directory, which can 
+# lead to inconsistency between `gh-pages` and `master` branch. Do it with
+# consciousness (or why not `commit` first?).
