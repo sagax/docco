@@ -9,11 +9,11 @@
 # 2. **[Docco]**, a literate-programming style document generator by [Jeremey]
 # 3. **[Linguist HTTP]**, a HTTP wrapper for [Linguist]
 #
-# [Docas.io]: http://docas.io
-# [Docco]: http://jashkenas.github.com/docco
-# [Jeremey]: http://jashkenas.github.com
-# [Linguist]: http://github.com/github/linguist
-# [Linguist HTTP]: http://github.com/baoshan/linguist_http
+#   [Docas.io]:      http://docas.io
+#   [Docco]:         http://jashkenas.github.com/docco
+#   [Jeremey]:       http://jashkenas.github.com
+#   [Linguist]:      http://github.com/github/linguist
+#   [Linguist HTTP]: http://github.com/baoshan/linguist_http
 
 # ## Scripting Procedure
 
