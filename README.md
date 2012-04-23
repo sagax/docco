@@ -82,3 +82,7 @@ Relational Database Project for International Classical Music Database
 # try to checkout HEAD, but documenting the working directory, which can 
 # lead to inconsistency between `gh-pages` and `master` branch. Do it with
 # consciousness (or why not `commit` first?).
+
+
+#   4. Get sources' HEAD hash, which will be included in commit message.
+###   5. List all file (for generating `.files`, a file index).

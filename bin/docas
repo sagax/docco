@@ -2,7 +2,7 @@
 
 # ## Scripting Procedure
 
-# ### Phase 0: Preparations
+# ### Step 0: Preparations
 
 # 1. Stop execution on error.
 
@@ -19,9 +19,9 @@ set -e
 if [ $# -eq 0 ]; then
 
   if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" == "true" ]; then
-
+ 
     addr="$(git remote -v | egrep -m 1 "origin")"
-    repo="$(echo "$addr"  | grep -P "(?<=\:).*(?=\.)" -o)"
+    repo="$(echo $addr  | grep -P "(?<=\:).*(?= )" -o)"
 
   else
 
@@ -43,8 +43,6 @@ else
 
 fi
 
-git_ssh="git@github.com:$repo.git"
-
 # 3. Prepare required directories. Total 4 folders are used to accomplish the
 # whole task:
 #
@@ -65,36 +63,31 @@ sources_dir="$storage_dir/$repo"
 working_dir="$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)" && trap "rm -rf "$working_dir"; exit;" 0 SIGINT SIGTERM
 ghpages_dir="$working_dir/ghpages"
 
-#   4. Get sources' HEAD hash, which will be included in commit message.
-###   5. List all file (for generating `.files`, a file index).
+# ### Step 1: Fetch (or Clone) from GitHub
 
-# ### Phase 1: Fetch (or Clone) from GitHub
-
-# If `sources_dir` already is a git repository, then fetch from upstream. The
-# remote git address is specified again to handle repository (or user) rename.
+# If `sources_dir` is a git repository already, then fetch from upstream. The
+# `--hard` option is feeded into `git reset` to handle repository (or user)
+# rename scenarios.
 
 sources_git="$sources_dir/.git"
 if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-inside-work-tree)" == "true" ]; then
 
+  echo "Fetching from GitHub"
   cd "$sources_dir"
-  git fetch --quiet --force "$git_ssh"
+  git fetch --quiet --force
   git reset --quiet --hard  origin/master
 
 # Else, before clone the repository, clear the content of `storage_dir`. Shallow
-# clone is used to save bandwidth and increase speed.
+# clone is used to save bandwidth and improve speed.
 
 else
 
   rm -rf "$storage_dir"
-  git clone --depth 1 "$git_ssh" "$sources_dir"
+  git clone --depth 1 --quiet "git@github.com:$repo.git" "$sources_dir"
 
 fi
 
-cd "$sources_dir"
-head_hash="$(git rev-parse HEAD | head -c 7)"
-git ls-tree -r --name-only HEAD > "$working_dir/.all"
-
-# ### Phase 2: Checkout gh-pages Branch, List Touched Sources
+# ### Step 2: Checkout (or Generate) gh-pages Branch, List Touched Files
 
 # Docas will only re-render documents for touched sources, in some scenarios,
 # docas treats all files as touched:
@@ -115,7 +108,13 @@ all_files_are_touched () {
 
 }
 
-#  create `gh-pages` branch if not exist, see: [GitHub instruction]:
+# Get `HEAD` commit hash, and list all git versioned files.
+
+cd "$sources_dir"
+head_hash="$(git rev-parse HEAD | head -c 7)"
+git ls-tree -r --name-only HEAD > "$working_dir/.all"
+
+# Create `gh-pages` branch if not exist, see: [GitHub instruction]:
 #
 #   1. Copy sources to `gh-pages` directory.
 #   2. Change to `gh-pages` directory.
@@ -193,8 +192,10 @@ else
 
 fi
 
-# Get language statustics, all sources, and touched sources from `Linguist HTTP`
-# server hosted on local port 4567.
+# ### Step 3: Language Analysis, List Touched Sources
+
+# Get language statustics, all and touched sources from `Linguist HTTP` server
+# listening local port 4567.
 
 echo > "$working_dir/.all_sources"
 echo > "$working_dir/.touched_sources"
@@ -202,7 +203,7 @@ curl --silent --output "$working_dir/.statist"         "http://127.0.0.1:4567/st
 curl --silent --output "$working_dir/.all_sources"     "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.all"
 curl --silent --output "$working_dir/.touched_sources" "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.touched"
 
-# ### Phase 3: Generate Cover Page (using Docci)
+# ### Step 4: Generate Cover Page (using Docci)
 
 echo "Generating cover page..."
 
@@ -226,10 +227,20 @@ fi
 
 docci -o "$ghpages_dir" "$sources_dir"
 
-# ### Phase 4: Generate Documents (using Docco)
+# ### Step 5: Synchronize Documents (using Docco)
 
 echo "Generating documents..."
 
+# 1. Synchronize deleted sources
+
+cd "$ghpages_dir"
+cat "$working_dir/.deleted" | while read file; do
+
+  rm -f "${file%.*}.html"
+
+done
+
+# 2. Make sure a stylesheet for documents exists.
 # Make sure a stylesheet for documents exists. User modification will be
 # honored. In case of the stylesheet doesn't exists, copy the default stylesheet
 # to the `stylesheets` folder.
@@ -241,29 +252,12 @@ if ! [ -f "stylesheets/docco.css" ]; then
   cp "/usr/local/lib/docas/resources/docco.css" "stylesheets/docco.css"
 
 fi
-
-# Synchronize Deleted Sources
-
-cd "$ghpages_dir"
-cat "$working_dir/.deleted" | while read file; do
-
-  rm -f "${file%.*}.html"
-
-done
-
-# Document all touched sources.
-# 
-# Since both the GitHub [project page] link structure, i.e.,
-# `<user>.github.com/<repo>`, and the CNAME version, e.g.
-# `docs.awesomeproject.com` should be supported, relative stylesheet path
-# is be used in the HTML sources.
-#
-# [Project Page]: http://help.github.com/pages/#project_pages_manually
-
+ 
+# 3. Generate documents using docco.
 cd "$sources_dir"
 cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages_dir"
 
-#### Phase 5: Push to Upstream
+# ### Step 5: Push to Upstream
 
 # Upon this phase, updated cover page (always) and documentations (probably) are
 # all ready. It's time to push back to `gh-pages` branch on GitHub.
@@ -283,8 +277,9 @@ echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 # Following below steps to update gh-pages:
 # 
 #   1. Synchronize git index with local files,
-#   2. commit the `gh-pages` branch, and,
-#   3. synchronize the `gh-pages` branch with GitHub remotely.
+#   2. Commit the `gh-pages` branch, and,
+#   3. Synchronize the `gh-pages` branch with GitHub remotely.
+
 echo "$status"
 echo "Pushing to gh-pages branch on GitHub..."
 git add    .
@@ -292,12 +287,11 @@ git commit --all --quiet --message "Docas.io synced with $head_hash"
 git push         --quiet           origin gh-pages
 echo "Branch gh-pages synced with master. Crowd applauds."
 
-# ### Phase 6: Coda
+# ### Step 6: Coda
 
-# Pull the source in the storage directory again to make following
-# synchronization quicker for no need to fetch documentations (just pushed)
-# again.
+# Update `sources` directory again to make following synchronizations quicker
+# for no need to fetch (just pushed) documentations again.
 
 cd "$sources_dir"
-git fetch --quiet --force "$git_ssh"
+git fetch --quiet --force
 git reset --quiet --hard  origin/master
