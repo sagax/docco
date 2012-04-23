@@ -6,8 +6,8 @@
 # and update documentation for GitHub repos. It relies on:
 #
 # 1. Git (ofcourse!)
-# 2. Docco (http://jashkenas.github.com/docco)
-# 3. Linguist HTTP(http://github.com/baoshan/linguist_http)
+# 2. [Docco] (http://jashkenas.github.com/docco)
+# 3. [Linguist HTTP] (http://github.com/baoshan/linguist_http)
 
 # ## Scripting Procedure
 
