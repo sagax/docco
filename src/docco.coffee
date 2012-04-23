@@ -81,6 +81,8 @@ parse = (source, code) ->
   language = get_language source
   has_code = docs_text = code_text = ''
 
+  return unless language
+
   save = (docs, code) ->
     sections.push docs_text: docs, code_text: code
 
@@ -105,6 +107,7 @@ parse = (source, code) ->
 # wherever our markers occur.
 highlight = (source, sections, callback) ->
   language = get_language source
+  return unless language
   pygments = spawn 'pygmentize', ['-l', language.name, '-f', 'html', '-O', 'encoding=utf-8,tabsize=2']
   output   = ''
   
@@ -152,6 +155,7 @@ generate_html = (source, sections) ->
   html        = docco_template
     title: title
     styles: if inline then docco_styles else ''
+    scripts: if inline then docco_scripts else ''
     sections: sections
     sources: if structured then sources else sources.map (source)-> path.basename source
     relative_destination: relative_destination
@@ -246,10 +250,10 @@ while args.length
       console.log 'Docco v' + version
       return
     # `--structured` will match the docs directory structure to your source
-    # directory structure. This will also trigger css to render inline.
+    # directory structure. This will also trigger css and scripts to render inline.
     when '--structured', '-s' then inline = structured = true
-    # `--inline` will add the styles into a `<style>` tag inline vs externally
-    # linking to the styles.
+    # `--inline` will add the styles and scripts _inline_ intead of using external
+    # resources.
     when '--inline' then inline = true
     # `--css myStyles.css` or `-c myStyles.css` will trigger using a custom
     # stylesheet; otherwise the default docco styles will be used.
@@ -276,6 +280,15 @@ if css_file?
 if not docco_styles?
   docco_styles   = fs.readFileSync(__dirname + '/../resources/docco.css').toString()
 
+# The Javascript we'd like to apply to the documentation.
+# Use a custom css file if specified
+if js_file?
+  docco_scripts  = fs.readFileSync(js_file).toString()
+
+# Did we load custom scripts? If not, use the default set.
+if not docco_scripts?
+  docco_scripts   = fs.readFileSync(__dirname + '/../resources/docco.js').toString()
+
 # The start of each Pygments highlight block.
 highlight_start  = '<div class="highlight"><pre>'
 
@@ -287,6 +300,7 @@ highlight_end    = '</pre></div>'
 if sources.length
   ensure_directory 'docs', ->
     fs.writeFile 'docs/docco.css', docco_styles if not inline
+    fs.writeFile 'docs/docco.js', docco_scripts if not inline
     files = sources.slice()
     next_file = -> generate_documentation files.shift(), next_file if files.length
     next_file()
