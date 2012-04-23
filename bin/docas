@@ -4,11 +4,11 @@
 
 # ### Step 0: Preparations
 
-# 1. Stop execution on error.
+# Stop execution on error.
 
 set -e
 
-# 2. Ensure correct invocation pattern.
+# Ensure correct invocation pattern.
 #
 #   * When no argument is given, working directory is used to extract user and
 #   repo name which are used to fetch (or clone) from GitHub. Local files are
@@ -43,7 +43,7 @@ else
 
 fi
 
-# 3. Prepare required directories. Total 4 folders are used to accomplish the
+# Prepare required directories. Total 4 folders are used to accomplish the
 # whole task:
 #
 #   * `storage` directory, which should be a local non-volatile folder. All
