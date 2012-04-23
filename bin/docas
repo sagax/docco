@@ -195,7 +195,7 @@ fi
 
 # ### Step 3: Language Analysis, List Touched Sources
 
-# Get language statustics, all and touched sources from `Linguist HTTP` server
+# Get language statistics, all and touched sources from `Linguist HTTP` server
 # listening local port 4567.
 
 echo > "$working_dir/.all_sources"
