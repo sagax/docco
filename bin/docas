@@ -35,7 +35,7 @@ if [ $# -eq 0 ]; then
 
   fi
 
-#   * Else, provided argument should be of <user>/<repo> pattern and will be
+#   * Else, provided argument should be of `&lt;user&gt;/&lt;repo&gt;` pattern and will be
 #   used to fetch (or clone) from GitHub.
 
 else
