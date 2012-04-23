@@ -5,16 +5,23 @@
 # **Docas** is a shell script used by **[Docas.io]** to generate and update
 # documentation for GitHub repositories. Docas relies on:
 #
-# 1. **Git**, ofcourse!
+# 1. **Git**, of course!
 # 2. **[Docco]**, (tweaked slightly), a quick-and-dirty, hundred-line-long,
 # literate-programming-style documentation generator by [Jeremy Ashkenas].
 # 3. **[Linguist HTTP]**, a HTTP wrapper for [Linguist].
+#
+# To use docas as a stand-alone program on your development machine, invoke
+# docas in your git controlled version.
+#
+#     
 #
 #   [Docas.io]:        http://docas.io
 #   [Docco]:           http://jashkenas.github.com/docco
 #   [Jeremy Ashkenas]: http://jashkenas.github.com
 #   [Linguist]:        http://github.com/github/linguist
 #   [Linguist HTTP]:   http://github.com/baoshan/linguist_http
+#
+#
 
 # ## Scripting Procedure
 
