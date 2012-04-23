@@ -25,9 +25,15 @@
           <div id="jump_sources" class="jump_page">
             <% for (var i=0, l=sources.length; i<l; i++) { %>
               <% var source = sources[i]; %>
-              <a class="source" href="<%= relative_destination(source) %>">
-                <%= source %>
-              </a>
+              <% if (languages['.'+source.split('.')[1]]) { %>
+                <% var segments = source.split('/'); %>
+                <% var path = segments.slice(0, segments.length - 1).join('/'); %>
+                <% var file = segments[segments.length - 1]; %>
+                <a class="source" href="<%= relative_destination(source) %>">
+                  <span><%= path %>/</span>
+                  <%= file %>
+                </a>
+              <% } %>
             <% } %>
           </div>
           <div id="jump_results" class="jump_page"></div>

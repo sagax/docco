@@ -107,7 +107,10 @@ parse = (source, code) ->
 # wherever our markers occur.
 highlight = (source, sections, callback) ->
   language = get_language source
-  return unless language
+  unless language
+    callback()
+    return
+
   pygments = spawn 'pygmentize', ['-l', language.name, '-f', 'html', '-O', 'encoding=utf-8,tabsize=2']
   output   = ''
   
@@ -137,6 +140,8 @@ highlight = (source, sections, callback) ->
 # and write out the documentation. Pass the completed sections into the template
 # found in `resources/docco.jst`
 generate_html = (source, sections) ->
+  return unless get_language source
+
   title       = path.basename source
   dest        = destination source
   
@@ -157,6 +162,7 @@ generate_html = (source, sections) ->
     styles: if inline then docco_styles else ''
     scripts: if inline then docco_scripts else ''
     sections: sections
+    languages: languages
     sources: if structured then sources else sources.map (source)-> path.basename source
     relative_destination: relative_destination
   console.log "docco: #{source} -> #{dest}"
