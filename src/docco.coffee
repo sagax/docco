@@ -81,6 +81,8 @@ parse = (source, code) ->
   language = get_language source
   has_code = docs_text = code_text = ''
 
+  return unless language
+
   save = (docs, code) ->
     sections.push docs_text: docs, code_text: code
 
@@ -105,6 +107,7 @@ parse = (source, code) ->
 # wherever our markers occur.
 highlight = (source, sections, callback) ->
   language = get_language source
+  return unless language
   pygments = spawn 'pygmentize', ['-l', language.name, '-f', 'html', '-O', 'encoding=utf-8,tabsize=2']
   output   = ''
   
