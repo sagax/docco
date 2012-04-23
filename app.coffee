@@ -23,7 +23,7 @@ docas_repo = (repo, callback) ->
       console.log "err", err, stdout, stderr
       callback {please: 'retry'}, null
     else
-      console.log 'done', repo, new Date
+      console.log 'done', repo, new Date, err, stdout, stderr
       callback null, null
 
 # ## Phases of Synchronization
