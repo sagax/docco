@@ -2,8 +2,8 @@
 
 # ## Introduction
 #
-# `docas` is a shell script used by **[Docas.io] to generate and update
-# documentation for GitHub repos. It relies on:
+# `Docas` is a shell script used by **[Docas.io]** to generate and update
+# documentation for GitHub repos. Docas relies on:
 #
 # 1. Git, ofcourse!
 # 2. **[Docco]**, a literate-programming style document generator by [Jeremey]
