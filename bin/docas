@@ -49,7 +49,7 @@ fi
 #   * `storage` directory, which should be a local non-volatile folder. All
 #   fetched (or cloned) repositories are persisted on this location to
 #   accelerate following fetches from GitHub. `storage` directory locates at
-#   `~/docas-repos/`
+#   `(home directory)/docas-repos/`
 #   * `sources` directory, holding files of the master branch. `source`
 #   directory locates at `user/repo` inside `storage` directory.
 #   * `working` directory, holding docas required language statistics, list of
