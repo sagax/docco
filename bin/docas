@@ -13,8 +13,6 @@ set -e
 #   * When no argument is given, working directory is used to extract user and
 #   repo name which are used to fetch (or clone) from GitHub. Local files are
 #   not used to guarantee consistency.
-#   * Else, provided argument should be of <user>/<repo> pattern and will be
-#   used to fetch (or clone) from GitHub.
 
 if [ $# -eq 0 ]; then
 
@@ -36,6 +34,9 @@ if [ $# -eq 0 ]; then
     exit
 
   fi
+
+#   * Else, provided argument should be of <user>/<repo> pattern and will be
+#   used to fetch (or clone) from GitHub.
 
 else
 
