@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+# ## Introduction
+#
+# `docas` is a shell script used by Docas.io(http://docas.io) to generate
+# and update documentation for GitHub repos. It relies on:
+#
+# 1. Git (ofcourse!)
+# 2. Docco (http://jashkenas.github.com/docco)
+# 3. Linguist HTTP(http://github.com/baoshan/linguist_http)
+
 # ## Scripting Procedure
 
 # ### Step 0: Preparations
