@@ -1,6 +1,6 @@
 # **Docco** is a quick-and-dirty, hundred-line-long, literate-programming-style
-# documentation generator. It produces HTML that displays your comments
-# alongside your code. Comments are passed through
+# documentation generator. It produces HTML
+# that displays your comments alongside your code. Comments are passed through
 # [Markdown](http://daringfireball.net/projects/markdown/syntax), and code is
 # passed through [Pygments](http://pygments.org/) syntax highlighting.
 # This page is the result of running Docco against its own source file.
@@ -20,7 +20,10 @@
 # from [its Mercurial repo](http://dev.pocoo.org/hg/pygments-main)), and
 # [CoffeeScript](http://coffeescript.org/). Then, with NPM:
 #
-#     sudo npm install docco
+#     sudo npm install -g docco
+#
+# Docco can be used to process CoffeeScript, JavaScript, Ruby, Python, or TeX files.
+# Only single-line comments are processed -- block comments are ignored.
 #
 #### Partners in Crime:
 #
@@ -178,6 +181,14 @@ languages =
     name: 'ruby', symbol: '#'
   '.py':
     name: 'python', symbol: '#'
+  '.tex':
+    name: 'tex', symbol: '%'
+  '.latex':
+    name: 'tex', symbol: '%'
+  '.c':
+    name: 'c', symbol: '//'
+  '.h':
+    name: 'c', symbol: '//'
 
 # Build out the appropriate matchers and delimiters for each language.
 for ext, l of languages
@@ -185,7 +196,7 @@ for ext, l of languages
   # Does the line begin with a comment?
   l.comment_matcher = new RegExp('^\\s*' + l.symbol + '\\s?')
 
-  # Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_(Unix))
+  # Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_(Unix\))
   # and interpolations...
   l.comment_filter = new RegExp('(^#![/]|^\\s*#\\{)')
 
