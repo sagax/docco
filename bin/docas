@@ -183,7 +183,7 @@ else
   # branch since last sync, output unique directories into dirty_directories file.
   else
 
-    echo "Docas comitted gh-pages found, synced with $synced_sources_hash"
+    echo "Docas previously comitted gh-pages found, synced with $synced_sources_hash"
     cd "$sources_dir"
     git diff --name-status $synced_sources_hash..HEAD > "$working_dir/.git-diff"
     egrep "^(A|M)" "$working_dir/.git-diff" | cut -c 3- > "$working_dir/.touched"
