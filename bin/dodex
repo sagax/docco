@@ -1,32 +1,33 @@
 #!/usr/bin/env bash
 
-# Options:
+# ## Parsing Arguments
 #
-#   1. `-w`: working directory
-#   2. `-s`: sources directory
+#   1. `-w`: working directory, with `.touched` file containing a list of all
+#   touched files and a `ghpages` subfolder storing generated documents.
+#   2. `-s`: sources directory, containing sources from `master` branch.
 
 while [ $# -gt 0 ]
 do
-    case $1 in
-    -w)    working_dir=$2
-           shift
-	   ;;
-    -s)    sources_dir=$2
-           shift
-	   ;;
-    esac
+  case $1 in
+  -w)    working_dir=$2
+	 shift
+	 ;;
+  -s)    sources_dir=$2
+	 shift
+	 ;;
+  esac
 
-    shift
+  shift
 done
 
-echo $working_dir $sources_dir
-
-# Input:
-# 
-#   1. `.touched`
-#   2. `.touched_sources` (in courtesy of Linguist)
+# ## Find Dirty Directories
 #
-# Output: `.docas/tree` folder, generate `docas.index` in each subfolders. E.g.
+# First, we sort out dirty directories, into `.touched_folders`
+
+cat "$working_dir/.touched" | while read file; do dirname $file; done | sort -u > "$working_dir/.touched_folders"
+
+# For each dirty directories, mirror the folder structore in the `.docas/tree`
+# directorie, and generate a `docas.index` there. E.g.,
 #
 # * .docas
 #   * tree
@@ -35,17 +36,8 @@ echo $working_dir $sources_dir
 #       * docas.index
 #     * dir2
 #       * docas.index
-
-# ## Step 1:
 #
-# Output `.touched_folders`
-
-cd "$working_dir"
-cat .touched | while read file; do dirname $file; done | sort -u > .touched_folders
-
-# ## Step 2:
-#
-# Output `docas.index` for each touched folders with following information:
+# Each `docas.index` contains following information:
 #
 #   1. Type: `d` for folders, `-` for files.
 #   2. Size (in bytes).
@@ -67,7 +59,7 @@ cat "$working_dir/.touched_folders" | while read folder; do
 
     file=$(echo $file | cut -c 3-)
 
-    if [ "$file" != "./.git" ]; then
+    if [ "$file" != ".git" ]; then
 
       base="${file%.[^.]*}"
       ext="${filename:${#base} + 1}"
@@ -75,7 +67,16 @@ cat "$working_dir/.touched_folders" | while read folder; do
 	base=".$ext"
       fi
 
-      if [ -f "$working_dir/ghpages/$folder/$base.html" ]; then echo "exists";documentable="1 $(LANG=C grep -cv "^\s*$" "$file")"; else documentable="0 -"; fi
+      if [ -f "$working_dir/ghpages/$folder/$base.html" ]; then
+	
+	echo "exists"
+	documentable="1 $(LANG=C grep -cv "^\s*$" "$file")"
+      
+      else
+	
+	documentable="0 -"
+      
+      fi
 
       echo $(ls -dl "$file" | awk '{{$1 = substr($1, 0, 1)} print $1" "$5}')\
  $(git log -1 --format="\"%aD\" \"%an\"" -- "$file")\
@@ -87,24 +88,7 @@ cat "$working_dir/.touched_folders" | while read folder; do
 
 done
 
-# ## Step 3:
-#
-# Adjust each `docas.index` using a Ruby command-line program. Following
-# information will be supplied or adjusted:
-#
-#   1. Type (adjustment):
-#
-#     + `d` for folders (keep unchanged)
-#     + `s` for documentable sources
-#     + `-` for undocumentable sources
-#
-#   2. SLOC (for documentable sources).
-#
-# All touched folders are passed into the Ruby program, generating all
-# `docas.index` files in a single call.
-
-
-# ## Step 4:
+# ## Post Processing
 #
 # Miscellaneous patches including:
 # 
