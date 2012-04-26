@@ -59,15 +59,27 @@ cat "$working_dir/.touched_folders" | while read folder; do
 
   mkdir -p "$working_dir/ghpages/.docas/tree/$folder"
   
-  rm "$working_dir/ghpages/.docas/tree/$folder/docas.index"
+  rm -f "$working_dir/ghpages/.docas/tree/$folder/docas.index"
 
-  find "$folder" -mindepth 1 -maxdepth 1 | while read file; do
+  cd "$sources_dir/$folder"
 
-    if [ "$folder" == "." ]; then file=$(echo $file | cut -c 3-); fi
+  find . -mindepth 1 -maxdepth 1 | while read file; do
+
+    file=$(echo $file | cut -c 3-)
 
     if [ "$file" != "./.git" ]; then
 
-      echo $(ls -dl "$file" | awk '{{$1 = substr($1, 0, 1)} print $1" "$5}') $(git log -1 --format="\"%aD\" \"%an\"" "$file") "\"$file\"" >> "$working_dir/ghpages/.docas/tree/$folder/docas.index"
+      base="${file%.[^.]*}"
+      ext="${filename:${#base} + 1}"
+      if [[ -z "$base" && -n "$ext" ]]; then
+	base=".$ext"
+      fi
+
+      if [ -f "$working_dir/ghpages/$folder/$base.html" ]; then echo "exists";documentable="1 $(LANG=C grep -cv "^\s*$" "$file")"; else documentable="0 -"; fi
+
+      echo $(ls -dl "$file" | awk '{{$1 = substr($1, 0, 1)} print $1" "$5}')\
+ $(git log -1 --format="\"%aD\" \"%an\"" -- "$file")\
+ "\"$file\"" "$documentable" >> "$working_dir/ghpages/.docas/tree/$folder/docas.index"
 
     fi
 

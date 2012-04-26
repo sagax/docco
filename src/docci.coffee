@@ -31,16 +31,17 @@ generate_index = (dirname, dest) ->
     statistics = data
     generate_log dirname, (err, data) ->
       log = data
-      generate_tree dirname, (err, data) ->
-        tree = data
-        readme = dirname + '/README.md'
-        readme = if path.existsSync(readme) and fs.statSync(readme).isFile() then showdown.makeHtml fs.readFileSync(readme).toString() else ''
-        html = index_template {
-          title: "title", subtitle: "subtitle", statistics: statistics, log: log, readme: readme, tree: tree, opts: process.OPTS
-        }
-        fs.writeFile dest, html, (err) ->
-          throw err if err
-          console.log "docci: #{dest} generated."
+      # generate_tree dirname, (err, data) ->
+      #  tree = data
+      tree = []
+      readme = dirname + '/README.md'
+      readme = if path.existsSync(readme) and fs.statSync(readme).isFile() then showdown.makeHtml fs.readFileSync(readme).toString() else ''
+      html = index_template {
+        title: "title", subtitle: "subtitle", statistics: statistics, log: log, readme: readme, tree: tree, opts: process.OPTS
+      }
+      fs.writeFile dest, html, (err) ->
+        throw err if err
+        console.log "docci: #{dest} generated."
 
 # Get the current language we're documenting, based on the extension.
 get_language = (source) -> languages[path.extname(source)]

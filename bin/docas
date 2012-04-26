@@ -229,35 +229,7 @@ curl --silent --output "$working_dir/.statist"         "http://127.0.0.1:4567/st
 curl --silent --output "$working_dir/.all_sources"     "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.all"
 curl --silent --output "$working_dir/.touched_sources" "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.touched"
 
-# ### Step 4: Generate Cover Page (using Docci)
-
-echo "Generating cover page..."
-
-echo "Generating Indexes..."
-dodex -s $sources_dir -w $working_dir
-echo "Indexes Generated"
-
-# Upon this phase, following materials were all ready:
-#
-#   1. a language statistics named `.statist`, and,
-#   2. a list of all recognized sources named `.all_sources`.
-#
-# Make sure a stylesheet for `index.html` exists. (User modification will be
-# honored.)
-# 
-# Invoke the **docci** command-line program to generate `index.html`.
-
-cd $ghpages_dir
-if ! [ -f "stylesheets/index.css" ]; then
- 
-  mkdir -p "stylesheets"
-  cp "/usr/local/lib/docas/resources/index.css" "stylesheets/index.css"
-
-fi
-
-docci -o "$ghpages_dir" "$sources_dir"
-
-# ### Step 5: Synchronize Documents (using Docco)
+# ### Step 4: Synchronize Documents (using Docco)
 
 echo "Generating documents..."
 
@@ -287,7 +259,37 @@ fi
 cd "$sources_dir"
 cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages_dir"
 
-# ### Step 5: Push to Upstream
+# ### Step 5: Generate Cover Page (using Docci)
+
+echo -n "Generating Indexes..."
+
+dodex -s $sources_dir -w $working_dir
+
+echo "Done" && echo -n "Generating cover page..."
+
+# Upon this phase, following materials were all ready:
+#
+#   1. a language statistics named `.statist`, and,
+#   2. a list of all recognized sources named `.all_sources`.
+#
+# Make sure a stylesheet for `index.html` exists. (User modification will be
+# honored.)
+# 
+# Invoke the **docci** command-line program to generate `index.html`.
+
+cd $ghpages_dir
+if ! [ -f "stylesheets/index.css" ]; then
+ 
+  mkdir -p "stylesheets"
+  cp "/usr/local/lib/docas/resources/index.css" "stylesheets/index.css"
+
+fi
+
+docci -o "$ghpages_dir" "$sources_dir"
+
+echo "Done"
+
+# ### Step 6: Push to Upstream
 
 # Upon this phase, updated cover page (always) and documentations (probably) are
 # all ready. It's time to push back to `gh-pages` branch on GitHub.
@@ -317,7 +319,7 @@ git commit --all --quiet --message "Docas.io synced with $head_hash"
 git push         --quiet           origin gh-pages
 echo "Branch gh-pages synced with master. Crowd applauds."
 
-# ### Step 6: Coda
+# ### Step 7: Coda
 
 # Update `sources` directory again to make following synchronizations quicker
 # for no need to fetch (just pushed) documentations again.
