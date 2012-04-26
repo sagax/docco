@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+
+# Options:
+#
+#   1. `-w`: working directory
+#   2. `-s`: sources directory
+
+while [ $# -gt 0 ]
+do
+    case $1 in
+    -w)    working_dir=$2
+           shift
+	   ;;
+    -s)    sources_dir=$2
+           shift
+	   ;;
+    esac
+
+    shift
+done
+
+echo $working_dir $sources_dir
+
+# Input:
+# 
+#   1. `.touched`
+#   2. `.touched_sources` (in courtesy of Linguist)
+#
+# Output: `.docas/tree` folder, generate `docas.index` in each subfolders. E.g.
+#
+# * .docas
+#   * tree
+#     * docas.index
+#     * dir1
+#       * docas.index
+#     * dir2
+#       * docas.index
+
+# ## Step 1:
+#
+# Output `.touched_folders`
+
+cd "$working_dir"
+cat .touched | while read file; do dirname $file; done | sort -u > .touched_folders
+
+# ## Step 2:
+#
+# Output `docas.index` for each touched folders with following information:
+#
+#   1. Type: `d` for folders, `-` for files.
+#   2. Size (in bytes).
+#   3. Modified date (using git log).
+#   4. Last Author (using git log).
+#   5. Name (file name or folder name).
+
+cd "$sources_dir"
+
+cat "$working_dir/.touched_folders" | while read folder; do
+
+  mkdir -p "$working_dir/ghpages/.docas/tree/$folder"
+  
+  rm "$working_dir/ghpages/.docas/tree/$folder/docas.index"
+
+  find "$folder" -mindepth 1 -maxdepth 1 | while read file; do
+
+    if [ "$folder" == "." ]; then file=$(echo $file | cut -c 3-); fi
+
+    if [ "$file" != "./.git" ]; then
+
+      echo $(ls -dl "$file" | awk '{{$1 = substr($1, 0, 1)} print $1" "$5}') $(git log -1 --format="\"%aD\" \"%an\"" "$file") "\"$file\"" >> "$working_dir/ghpages/.docas/tree/$folder/docas.index"
+
+    fi
+
+  done
+
+done
+
+# ## Step 3:
+#
+# Adjust each `docas.index` using a Ruby command-line program. Following
+# information will be supplied or adjusted:
+#
+#   1. Type (adjustment):
+#
+#     + `d` for folders (keep unchanged)
+#     + `s` for documentable sources
+#     + `-` for undocumentable sources
+#
+#   2. SLOC (for documentable sources).
+#
+# All touched folders are passed into the Ruby program, generating all
+# `docas.index` files in a single call.
+
+
+# ## Step 4:
+#
+# Miscellaneous patches including:
+# 
+#   + Submodules
+#   + ...

@@ -233,6 +233,10 @@ curl --silent --output "$working_dir/.touched_sources" "http://127.0.0.1:4567/so
 
 echo "Generating cover page..."
 
+echo "Generating Indexes..."
+dodex -s $sources_dir -w $working_dir
+echo "Indexes Generated"
+
 # Upon this phase, following materials were all ready:
 #
 #   1. a language statistics named `.statist`, and,

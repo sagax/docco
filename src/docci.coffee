@@ -72,6 +72,7 @@ generate_log = (path, callback) ->
       data[i] = {date: date, author: author, subject: subject}
     callback null, data
 
+# ## List Tree for Rendering File Navigator
 generate_tree = (path, callback) ->
   result = []
   fs.readdir path, (err, files) ->
@@ -81,25 +82,23 @@ generate_tree = (path, callback) ->
       file = files[i++]
       return callback null, result if not file
       fullpath = "#{path}/#{file}"
-      if /\/\.git($|\/)/.exec fullpath
-        do next
-      else
-        fs.stat fullpath, (err, stats) ->
-          return callback err, result if err
-          if stats.isDirectory()
-            generate_tree fullpath, (err, files) ->
-              result.push {n: file, c: files}
-              do next
-          else
-            exec 'git log -1 --format="%aD" ' + file, {cwd: path}, (err, data) ->
-              item = {n: file, s: stats.size, m: data.trim()}
-              if not(get_language fullpath)
+      do next if /\/\.git($|\/)/.exec fullpath
+      fs.stat fullpath, (err, stats) ->
+        return callback err, result if err
+        if stats.isDirectory()
+          generate_tree fullpath, (err, files) ->
+            result.push {n: file, c: files}
+            do next
+        else
+          exec 'git log -1 --format="%aD" ' + file, {cwd: path}, (err, data) ->
+            item = {n: file, s: stats.size, m: data.trim()}
+            if not(get_language fullpath)
+              result.push item
+            else
+              exec 'grep -Fx "' + fullpath + '" ../source', (err, data) ->
+                item.d = 1 if data.toString().trim()
                 result.push item
-              else
-                exec 'grep -Fx "' + fullpath + '" ../source', (err, data) ->
-                  item.d = 1 if data.toString().trim()
-                  result.push item
-              do next
+            do next
     do next
 
 #### Helpers & Setup
