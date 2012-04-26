@@ -24,7 +24,15 @@ done
 #
 # First, we sort out dirty directories, into `.touched_folders`
 
-cat "$working_dir/.touched" | while read file; do dirname $file; done | sort -u > "$working_dir/.touched_folders"
+cd $working_dir
+cat .touched | while read file; do dirname $file; done | sort -u > .touched_folders_with_duplications
+cat .touched_folders_with_duplications | while read folder; do dirname $folder; done | sort -u > .tmp_folders_1
+while [ $(cat .tmp_folders_1 | wc -l) -ne 0 ] && [ "$(cat .tmp_folders_1)" != "." ]; do
+  cat .tmp_folders_1 >> .touched_folders_with_duplications
+  mv .tmp_folders_1 .tmp_folders_2
+  cat .tmp_folders_2 | while read folder; do dirname $folder; done | sort -u > .tmp_folders_1
+done
+cat .touched_folders_with_duplications | sort -u > .touched_folders
 
 # For each dirty directories, mirror the folder structore in the `.docas/tree`
 # directorie, and generate a `docas.index` there. E.g.,
@@ -49,6 +57,7 @@ cd "$sources_dir"
 
 cat "$working_dir/.touched_folders" | while read folder; do
 
+  echo FOLDER $folder
   mkdir -p "$working_dir/ghpages/.docas/tree/$folder"
   
   rm -f "$working_dir/ghpages/.docas/tree/$folder/docas.index"
@@ -93,4 +102,37 @@ done
 # Miscellaneous patches including:
 # 
 #   + Submodules
-#   + ...
+#   + To be defined
+
+cp "$sources_dir/.gitmodules" "$working_dir/ghpages/.docas/.gitmodules"
+#  cd "$sources_dir"
+#  git submodule init
+#  git submodule | while read line; do
+#  
+#    submodule=$(echo $line | awk '{{$0 = substr($0, 43)} print $0}')
+#    submodule_folder=$(dirname $submodule)
+#    submodule_base=$(basename $submodule) 
+#  
+#    cat "$working_dir/ghpages/.docas/tree/$submodule_folder/docas.index" | while read entry; do
+#  
+#      if ! [ -z "$(echo $entry | grep "\"$submodule_base\"")" ]; then
+#  
+#        echo -n "s"
+#        echo -n $entry | cut -c 2- | tr -d "\n"
+#        cd "$sources_dir/$submodule"
+#        addr="$(git remote -v | egrep -m 1 "origin")"
+#        echo "addr" $addr
+#        repo="$(echo $addr | grep -P "(?<=\:).*(?= )" -o)"
+#        echo " \"$repo\""
+#  
+#      else
+#  
+#        echo $entry
+#  
+#      fi
+#    
+#    done # > "$working_dir/.temp_submodule.index"
+#   
+#    mv "$working_dir/.temp_submodule.index" "$working_dir/ghpages/.docas/tree/$submodule_folder/docas.index"
+#  
+#  done
