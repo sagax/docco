@@ -22,14 +22,14 @@ done
 
 # ## Find Dirty Directories
 #
-# First, sort out dirty directories, into `.touched_folders`
+# First, (recursively) sort out dirty directories into `.touched_folders`.
 
-cd $working_dir
+cd "$working_dir"
 cat .touched | while read file; do dirname $file; done | sort -u > .touched_folders_with_duplications
 cat .touched_folders_with_duplications | while read folder; do dirname $folder; done | sort -u > .tmp_folders_1
 while [ "$(cat .tmp_folders_1)" != "." ]; do
   cat .tmp_folders_1 >> .touched_folders_with_duplications
-  mv .tmp_folders_1 .tmp_folders_2
+  mv  .tmp_folders_1    .tmp_folders_2
   cat .tmp_folders_2 | while read folder; do dirname $folder; done | sort -u > .tmp_folders_1
 done
 cat .tmp_folders_1 >> .touched_folders_with_duplications
@@ -58,7 +58,7 @@ cat .touched_folders_with_duplications | sort -u > .touched_folders
 #   6. If the source is documented:
 #      + `0` for undocumented
 #      + `1` for documented
-#   7. If the source is documented, the SOLC of the source, or `-` for
+#   7. The SOLC of the source if the source is documented, or `-` for
 #   undocumented files.
 #
 # E.g.:
@@ -67,7 +67,7 @@ cat .touched_folders_with_duplications | sort -u > .touched_folders
 #
 # The regular expression used to parse the entry should be:
 #
-#     /"(d|-)","(\d+)","([^"]+)","(.+)","(.+)","(0|1)","(\d+)"/
+#     /"(d|-)","(\d+)","([^"]+)","(.+)","(.+)","(0|1)","(\d+|-)"/
 
 cd "$sources_dir"
 cat "$working_dir/.touched_folders" | while read folder; do
@@ -88,7 +88,7 @@ cat "$working_dir/.touched_folders" | while read folder; do
         documentable="\"0\",\"-\""
       fi
       echo $(ls -dl "$file" | awk '{{$1 = substr($1, 0, 1)} print "\""$1"\",\""$5"\""}')\
-,$(git log -1 --format="\"%aD\",\"%an\"" -- "$file")\
+,$(git log -1 --format="\"%aD\",\"%an\",\"%s\"" -- "$file")\
 ,"\"$file\"","$documentable" >> "$working_dir/ghpages/.docas/tree/$folder/docas.index"
     fi
   done
@@ -104,4 +104,3 @@ done
 # submodules in repo navigator correctly.
 
 cp "$sources_dir/.gitmodules" "$working_dir/ghpages/.docas/.gitmodules"
-
