@@ -89,7 +89,7 @@ cat "$working_dir/.touched_folders" | while read folder; do
       fi
       echo $(ls -dl "$file" | awk '{{$1 = substr($1, 0, 1)} print "\""$1"\",\""$5"\""}')\
 ,$(git log -1 --format="\"%aD\",\"%an\",\"%s\"" -- "$file")\
-,"\"$file\"","$documentable" >> "$working_dir/ghpages/.docas/tree/$folder/docas.index"
+,"\"<$file>\"","$documentable" >> "$working_dir/ghpages/.docas/tree/$folder/docas.index"
     fi
   done
 done

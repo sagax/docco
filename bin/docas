@@ -181,6 +181,7 @@ else
   cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir"
   rm -rf *
   git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
+  git reset --quiet --hard  origin/gh-pages
 
   synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]+$")
   synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)
@@ -327,4 +328,6 @@ echo "Branch gh-pages synced with master. Crowd applauds."
 
 cd "$sources_dir"
 git fetch --quiet --force
-git reset --quiet --hard  origin/master
+git checkout gh-pages
+git reset --quiet --hard  origin/gh-pages
+git checkout master
