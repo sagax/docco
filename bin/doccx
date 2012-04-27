@@ -2,7 +2,7 @@
 
 # ## Parsing Arguments
 #
-#   1. `-w`: working directory, with `.touched` file containing a list of all
+#   1. `-w`: working directory, with a `.touched` file containing a list of all
 #   touched files and a `ghpages` subfolder storing generated documents.
 #   2. `-s`: sources directory, containing sources from `master` branch.
 
@@ -22,17 +22,17 @@ done
 
 # ## Find Dirty Directories
 #
-# First, we sort out dirty directories, into `.touched_folders`
+# First, sort out dirty directories, into `.touched_folders`
 
 cd $working_dir
 cat .touched | while read file; do dirname $file; done | sort -u > .touched_folders_with_duplications
 cat .touched_folders_with_duplications | while read folder; do dirname $folder; done | sort -u > .tmp_folders_1
-cat .tmp_folders_1 >> .touched_folders_with_duplications
-while [ $(cat .tmp_folders_1 | wc -l) -ne 0 ] && [ "$(cat .tmp_folders_1)" != "." ]; do
+while [ "$(cat .tmp_folders_1)" != "." ]; do
+  cat .tmp_folders_1 >> .touched_folders_with_duplications
   mv .tmp_folders_1 .tmp_folders_2
   cat .tmp_folders_2 | while read folder; do dirname $folder; done | sort -u > .tmp_folders_1
 done
-
+cat .tmp_folders_1 >> .touched_folders_with_duplications
 cat .touched_folders_with_duplications | sort -u > .touched_folders
 
 # For each dirty directories, mirror the folder structure in the `.docas/tree`
@@ -48,54 +48,50 @@ cat .touched_folders_with_duplications | sort -u > .touched_folders
 #
 # Each `docas.index` contains following information:
 #
-#   1. Type: `d` for folders, `-` for files.
+#   1. Type:
+#     + `d` for folders
+#     + `-` for files
 #   2. Size (in bytes).
 #   3. Modified date (using git log).
 #   4. Last Author (using git log).
 #   5. Name (file name or folder name).
+#   6. If the source is documented:
+#      + `0` for undocumented
+#      + `1` for documented
+#   7. If the source is documented, the SOLC of the source, or `-` for
+#   undocumented files.
+#
+# E.g.:
+#
+#     "d","189","Mon, 23 Apr 2012 15:40:04 +0800","Baoshan Sheng","README","0","-"
+#
+# The regular expression used to parse the entry should be:
+#
+#     /"(d|-)","(\d+)","([^"]+)","(.+)","(.+)","(0|1)","(\d+)"/
 
 cd "$sources_dir"
-
 cat "$working_dir/.touched_folders" | while read folder; do
-
-  echo FOLDER $folder
-  mkdir -p "$working_dir/ghpages/.docas/tree/$folder"
-  
+  mkdir -p "$working_dir/ghpages/.docas/tree/$folder"  
   rm -f "$working_dir/ghpages/.docas/tree/$folder/docas.index"
-
   cd "$sources_dir/$folder"
-
   find . -mindepth 1 -maxdepth 1 | while read file; do
-
     file=$(echo $file | cut -c 3-)
-
     if [ "$file" != ".git" ]; then
-
       base="${file%.[^.]*}"
       ext="${filename:${#base} + 1}"
       if [[ -z "$base" && -n "$ext" ]]; then
-	base=".$ext"
+        base=".$ext"
       fi
-
       if [ -f "$working_dir/ghpages/$folder/$base.html" ]; then
-	
-	echo "exists"
-	documentable="1 $(LANG=C grep -cv "^\s*$" "$file")"
-      
-      else
-	
-	documentable="0 -"
-      
+        documentable="\"1\",\"$(LANG=C grep -cv "^\s*$" "$file")\""      
+      else	
+        documentable="\"0\",\"-\""
       fi
-
-      echo $(ls -dl "$file" | awk '{{$1 = substr($1, 0, 1)} print $1" "$5}')\
- $(git log -1 --format="\"%aD\" \"%an\"" -- "$file")\
- "\"$file\"" "$documentable" >> "$working_dir/ghpages/.docas/tree/$folder/docas.index"
-
+      echo $(ls -dl "$file" | awk '{{$1 = substr($1, 0, 1)} print "\""$1"\",\""$5"\""}')\
+,$(git log -1 --format="\"%aD\",\"%an\"" -- "$file")\
+,"\"$file\"","$documentable" >> "$working_dir/ghpages/.docas/tree/$folder/docas.index"
     fi
-
   done
-
 done
 
 # ## Post Processing
