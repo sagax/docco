@@ -35,16 +35,16 @@ done
 
 cat .touched_folders_with_duplications | sort -u > .touched_folders
 
-# For each dirty directories, mirror the folder structore in the `.docas/tree`
-# directorie, and generate a `docas.index` there. E.g.,
+# For each dirty directories, mirror the folder structure in the `.docas/tree`
+# directory, and generate a `docas.index` for each directory separately. E.g.,
 #
-# * .docas
-#   * tree
-#     * docas.index
-#     * dir1
-#       * docas.index
-#     * dir2
-#       * docas.index
+#     .docas
+#       tree
+#         docas.index
+#         dir1
+#           docas.index
+#         dir2
+#           docas.index
 #
 # Each `docas.index` contains following information:
 #
@@ -99,10 +99,13 @@ cat "$working_dir/.touched_folders" | while read folder; do
 done
 
 # ## Post Processing
-#
+
 # Miscellaneous patches including:
 # 
 #   + Submodules
-#   + To be defined
+#
+# Copy the `.gitmodules` files into `.docas` folder to recognize the git
+# submodules in repo navigator correctly.
 
 cp "$sources_dir/.gitmodules" "$working_dir/ghpages/.docas/.gitmodules"
+

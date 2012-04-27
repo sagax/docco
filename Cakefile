@@ -8,7 +8,7 @@ task 'build', 'build the docco library', (options) ->
   coffee.stdout.on 'data', (data) -> console.log data.toString()
   coffee.stderr.on 'data', (data) -> console.error data.toString()
 
-task 'install', 'install the `docco`, `docci`, and `docas` command into /usr/local (or --prefix)', (options) ->
+task 'install', 'install the `docco`, `docci`, `doccx`, and `docas` command into /usr/local (or --prefix)', (options) ->
   base = options.prefix or '/usr/local'
   lib  = base + '/lib/docas'
   exec([
@@ -16,7 +16,7 @@ task 'install', 'install the `docco`, `docci`, and `docas` command into /usr/loc
     'cp -rf bin README resources vendor lib ' + lib
     'ln -sf ' + lib + '/bin/docco ' + base + '/bin/docco'
     'ln -sf ' + lib + '/bin/docci ' + base + '/bin/docci'
-    'ln -sf ' + lib + '/bin/dodex ' + base + '/bin/dodex'
+    'ln -sf ' + lib + '/bin/doccx ' + base + '/bin/doccx'
     'ln -sf ' + lib + '/bin/docas ' + base + '/bin/docas'
   ].join(' && '), (err, stdout, stderr) ->
     console.error stderr if err
