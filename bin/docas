@@ -182,6 +182,7 @@ else
   cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir"
   rm -rf *
   echo "checkouting"
+  pwd
   git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
   echo "reseting"
   git reset --quiet --hard origin/gh-pages
