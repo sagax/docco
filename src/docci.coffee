@@ -33,11 +33,11 @@ generate_index = (dirname, dest) ->
       log = data
       # generate_tree dirname, (err, data) ->
       #  tree = data
-      get_user_and_repo dirname, (repo) ->
+      get_user_and_repo dirname, (user, repo) ->
         readme = dirname + '/README.md'
         readme = if path.existsSync(readme) and fs.statSync(readme).isFile() then showdown.makeHtml fs.readFileSync(readme).toString() else ''
         html = index_template {
-          title: "title", subtitle: "subtitle", statistics: statistics, log: log, readme: readme, user: "toberemoved", repo: repo, opts: process.OPTS
+          title: "title", subtitle: "subtitle", statistics: statistics, log: log, readme: readme, user: user, repo: repo, opts: process.OPTS
         }
         fs.writeFile dest, html, (err) ->
           throw err if err
@@ -50,7 +50,7 @@ get_user_and_repo = (path, callback) ->
   exec 'git remote -v | egrep -m 1 "origin" | grep -P "(?<=:).*(?=\\.)" -o', {cwd: path}, (err, data) ->
     console.log "repo", data
     callback() if err
-    callback data.trim()
+    callback data.trim().split('/')...
 
 generate_statistics = (dir, callback) ->
   data = fs.readFileSync(destdir + '/../.statist').toString()
