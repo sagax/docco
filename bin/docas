@@ -239,9 +239,8 @@ echo "Generating documents..."
 
 cd "$ghpages_dir"
 cat "$working_dir/.deleted" | while read file; do
-
+  # TODO: Hidden file without extension.
   rm -f "${file%.*}.html"
-
 done
 
 # 2. Make sure a stylesheet for documents exists.
@@ -249,13 +248,18 @@ done
 # honored. In case of the stylesheet doesn't exists, copy the default stylesheet
 # to the `stylesheets` folder.
 
-cd $ghpages_dir
+cd "$ghpages_dir"
 if ! [ -f "stylesheets/docco.css" ]; then
-
   mkdir -p "stylesheets"
   cp "/usr/local/lib/docas/resources/docco.css" "stylesheets/docco.css"
-
 fi
+
+mkdir -p javascript
+cp "/usr/local/lib/docas/vendor/jquery.min.js" "javascript/jquery.min.js"
+cp "/usr/local/lib/docas/vendor/filesize.js" "javascript/filesize.js"
+cp "/usr/local/lib/docas/vendor/moment.min.js" "javascript/moment.min.js"
+cp "/usr/local/lib/docas/vendor/underscore-min.js" "javascript/underscore-min.js"
+cp "/usr/local/lib/docas/lib/file_browser.js" "javascript/file_browser.js"
  
 # 3. Generate documents using docco.
 cd "$sources_dir"

@@ -33,18 +33,23 @@ generate_index = (dirname, dest) ->
       log = data
       # generate_tree dirname, (err, data) ->
       #  tree = data
-      tree = []
-      readme = dirname + '/README.md'
-      readme = if path.existsSync(readme) and fs.statSync(readme).isFile() then showdown.makeHtml fs.readFileSync(readme).toString() else ''
-      html = index_template {
-        title: "title", subtitle: "subtitle", statistics: statistics, log: log, readme: readme, tree: tree, opts: process.OPTS
-      }
-      fs.writeFile dest, html, (err) ->
-        throw err if err
-        console.log "docci: #{dest} generated."
+      get_user_and_repo dirname, (repo) ->
+        readme = dirname + '/README.md'
+        readme = if path.existsSync(readme) and fs.statSync(readme).isFile() then showdown.makeHtml fs.readFileSync(readme).toString() else ''
+        html = index_template {
+          title: "title", subtitle: "subtitle", statistics: statistics, log: log, readme: readme, user: "toberemoved", repo: repo, opts: process.OPTS
+        }
+        fs.writeFile dest, html, (err) ->
+          throw err if err
+          console.log "docci: #{dest} generated."
 
 # Get the current language we're documenting, based on the extension.
 get_language = (source) -> languages[path.extname(source)]
+
+get_user_and_repo = (path, callback) ->
+  exec 'git remote -v | egrep -m 1 "origin" | grep -P "(?<=\:).*(?= )" -o', {cwd: path}, (err, data) ->
+    callback() if err
+    callback data
 
 generate_statistics = (dir, callback) ->
   data = fs.readFileSync(destdir + '/../.statist').toString()
