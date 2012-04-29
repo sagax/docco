@@ -98,11 +98,12 @@ ghpages_dir="$working_dir/ghpages"
 sources_git="$sources_dir/.git"
 if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-inside-work-tree)" == "true" ]; then
 
-  echo "Fetching from GitHub"
+  echo -n "Fetching from GitHub..."
   cd "$sources_dir"
   git fetch --quiet --force
   git reset --quiet --hard  origin/master
   git remote prune origin
+  echo "Done"
 
 # Else, before clone the repository, clear the content of `storage_dir`. Shallow
 # clone is used to save bandwidth and improve speed.
@@ -180,8 +181,10 @@ else
 
   cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir"
   rm -rf *
+  echo "checkouting"
   git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
-  git reset --quiet --hard  origin/gh-pages
+  echo "reseting"
+  git reset --quiet --hard origin/gh-pages
 
   synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]+$")
   synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)

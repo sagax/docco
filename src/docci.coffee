@@ -47,9 +47,9 @@ generate_index = (dirname, dest) ->
 get_language = (source) -> languages[path.extname(source)]
 
 get_user_and_repo = (path, callback) ->
-  exec 'git remote -v | egrep -m 1 "origin" | grep -P "(?<=\:).*(?= )" -o', {cwd: path}, (err, data) ->
+  exec 'git remote -v | egrep -m 1 "origin" | grep -P "(?<=\:).*(?=.)" -o', {cwd: path}, (err, data) ->
     callback() if err
-    callback data
+    callback data.trim()
 
 generate_statistics = (dir, callback) ->
   data = fs.readFileSync(destdir + '/../.statist').toString()
