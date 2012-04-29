@@ -334,7 +334,9 @@ echo "Branch gh-pages synced with master. Crowd applauds."
 # for no need to fetch (just pushed) documentations again.
 
 cd "$sources_dir"
-git fetch --quiet --force
-git checkout gh-pages
-git reset --quiet --hard  origin/gh-pages
-git checkout master
+git pull
+
+# git fetch --quiet --force
+# git checkout gh-pages
+# git reset --quiet --hard  origin/gh-pages
+# git checkout master
