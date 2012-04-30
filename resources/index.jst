@@ -9,32 +9,36 @@
 <body>
   <div id="container">
     <div id="background"></div>
-
-    <ol>
-    <% for (var i = 0, l = statistics.length; i < l; i++) { %>
-    <li><%= statistics[i] %></li>
-    <% } %>
-    </ol>
-    
-    <hr/>
-
-    <ol>
-      <% for (var i = 0, l = log.length; i < l; i++) { %>
-      <% var entry = log[i]; %>
-      <li><%= entry.date %>, <%= entry.author %>, <%= entry.subject %></li>
+    <!--readme-->
+		<div class="readme"></div>
+    <!--content-->
+		<div class="content">
+      <ol>
+      <% for (var i = 0, l = statistics.length; i < l; i++) { %>
+      <li><%= statistics[i] %></li>
       <% } %>
-    </ol>
-    <hr/>
-
-    <%= readme %>
-
-    <hr/>
-
-  <div id="filebrowser">
-    <div id="breadcrumb"></div>
-    <div id="filelist"></div>
-  </div>
-
+      </ol>
+      
+      <hr/>
+  
+      <ol>
+        <% for (var i = 0, l = log.length; i < l; i++) { %>
+        <% var entry = log[i]; %>
+        <li><%= entry.date %>, <%= entry.author %>, <%= entry.subject %></li>
+        <% } %>
+      </ol>
+      <hr/>
+  
+      <%= readme %>
+  
+      <hr/>
+  
+    <div id="filebrowser">
+      <div id="breadcrumb"></div>
+      <div id="filelist"></div>
+    </div>
+  
+    </div>
   </div>
   <script src="javascript/jquery.min.js" type="text/javascript"></script>
   <script src="javascript/underscore-min.js" type="text/javascript"></script>
