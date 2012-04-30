@@ -17,7 +17,7 @@ breadcrumb_template = _.template [
 # ## (Underscore) Template for Content Table
 list_template = _.template [
   '<table depth="<%= index_depth %>">'
-  '<thead><tr><td></td><td>name</td><td>size</td><td></td><td>age</td><td>author</td><td>message</td></tr></thead>'
+  '<thead><tr><th></th><th>name</th><th>size</th><th>age</th><th>author</th><th>message</th></tr></thead>'
   '<tbody>'
   '<% if(index_depth) { %>'
   '<tr class="directory"><td></td><td><a backward>..</a></td></tr>'
@@ -29,8 +29,7 @@ list_template = _.template [
   "<%= entry.type == 'directory' ? 'forward' :
     'href=\"' + (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name) + '\"' %>"
   '><%- entry.name %></a></td>'
-  '<td><%- entry.type == "file" ? entry.size : "-" %></td>'
-  '<td><%- isNaN(entry.sloc) ? "" : ("(" + entry.sloc + " lines)") %></td>'
+  '<td><%- entry.type == "file" ? entry.size : "-" %><%- isNaN(entry.sloc) ? "" : (", " + entry.sloc + " lines") %></td>'
   '<td><%- entry.modified %></td>'
   '<td><%- entry.author   %></td>'
   '<td><%- entry.subject  %></td>'
