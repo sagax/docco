@@ -10,7 +10,7 @@
   <div id="container">
     <div id="background"></div>
     <!--readme-->
-		<div class="readme"></div>
+		<div class="readme"><%= readme %></div>
     <!--content-->
 		<div class="content">
       <ol>
@@ -27,11 +27,7 @@
         <li><%= entry.date %>, <%= entry.author %>, <%= entry.subject %></li>
         <% } %>
       </ol>
-      <hr/>
-  
-      <%= readme %>
-  
-      <hr/>
+
   
     <div id="filebrowser">
       <div id="breadcrumb"></div>

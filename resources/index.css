@@ -252,6 +252,21 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 
 
 /*liuzhengming*/
+.readme{
+  width:450px;
+	min-height:5px;
+	float:left;
+	padding:35px;
+	text-align:left;
+}
+/*content*/
+.content{
+  width:745px;
+	min-height:5px;
+	float:left;
+	padding-left:25px;
+	padding-top:25px;
+}
 /*table*/
 #filelist{
 	background: none repeat scroll 0 0 #EEEEEE;
@@ -279,7 +294,13 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 	text-align: left;
 	text-shadow: 0 1px 0 #FFFFFF;
 }
-
+#filelist table thead tr td{
+	background: none repeat scroll 0 0 #F8F8F8;
+	border-bottom: 1px solid #EEEEEE;
+	color: #484848;
+	padding: 7px 3px;
+	vertical-align: middle;
+}
 
 
 
