@@ -86,7 +86,7 @@ fi
 
 storage_dir="$(echo $HOME)/docas-repos" && mkdir -p "$storage_dir" # && cd "$storage_dir" && storage_dir=$(pwd -P)
 sources_dir="$storage_dir/$repo"
-working_dir="$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)" && trap "rm -rf "$working_dir"; exit;" 0 SIGINT SIGTERM
+working_dir="$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)" # && trap "rm -rf "$working_dir"; exit;" 0 SIGINT SIGTERM
 ghpages_dir="$working_dir/ghpages"
 
 # ### Step 1: Fetch (or Clone) from GitHub
@@ -100,8 +100,9 @@ if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-insid
 
   echo -n "Fetching from GitHub..."
   cd "$sources_dir"
-  git fetch --quiet --force
-  git reset --quiet --hard  origin/master
+  git pull
+  # git fetch --quiet --force
+  # git reset --quiet --hard  origin/master
   git remote prune origin
   echo "Done"
 
@@ -184,17 +185,19 @@ else
   echo "checkouting"
   pwd
   git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
-  echo "reseting"
+  echo -n "reseting..."
   git reset --quiet --hard origin/gh-pages
+  echo "DONE"
 
-  synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]+$")
+  echo -n "Find hashes"
+  synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]+$" | xargs echo)
   synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)
+  echo "DONE"
   synced_sources_hash=$(echo "$synced_docas_commit" | tail -c 8 | head -c 7)
-
-  cd $sources_dir
+  cd "$sources_dir"
   synced_sources_hash=$(git log --pretty=oneline | egrep -m 1 "^$synced_sources_hash" | head -c 7 | xargs echo)
 
-  echo "$synced_sources_hash | $synced_ghpages_hash"
+  echo "synced:" "$synced_sources_hash | $synced_ghpages_hash"
 
   if [ "$synced_sources_hash" == "$head_hash" ]; then
 
@@ -229,11 +232,13 @@ fi
 # Get language statistics, all and touched sources from `Linguist HTTP` server
 # listening local port 4567.
 
+echo -n "Calling Linguist HTTP..."
 echo > "$working_dir/.all_sources"
 echo > "$working_dir/.touched_sources"
 curl --silent --output "$working_dir/.statist"         "http://127.0.0.1:4567/statist?path=$sources_dir"
 curl --silent --output "$working_dir/.all_sources"     "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.all"
 curl --silent --output "$working_dir/.touched_sources" "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.touched"
+echo "DONE"
 
 # ### Step 4: Synchronize Documents (using Docco)
 
