@@ -247,5 +247,38 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 #filelist > table td.icon{
 width: 18px;
 height: 16px;
-	background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;
+background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;
 }
+
+
+/*liuzhengming*/
+/*table*/
+#filelist{
+	background: none repeat scroll 0 0 #EEEEEE;
+	border-radius: 3px 3px 3px 3px;
+	padding: 3px;
+}
+
+#filelist table{
+	border-collapse:collapse;
+	border-spacing:0;
+	border: 1px solid #CACACA;
+	border-radius: 3px 3px 3px 3px;
+	margin: 0;
+	width: 100%;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
