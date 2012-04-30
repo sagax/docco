@@ -23,13 +23,13 @@ list_template = _.template [
   '<tr class="directory"><td></td><td><a backward>..</a></td></tr>'
   '<% } %>'
   '<% _.each(entries, function(entry) { %>'
-  '<tr class="<%= entry.type %>">'
+  '<tr class="<%= entry.documented ? "document" : entry.type %>">'
   '<td class="icon"></td>'
   '<td><a '
   "<%= entry.type == 'directory' ? 'forward' :
     'href=\"' + (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name) + '\"' %>"
   '><%- entry.name %></a></td>'
-  '<td><%- entry.type == "file" ? entry.size : "-" %><%- isNaN(entry.sloc) ? "" : (", " + entry.sloc + " sloc") %></td>'
+  '<td><span><%- entry.type == "file" ? entry.size : "-" %></span><span><%- isNaN(entry.sloc) ? "" : (entry.sloc + " sloc") %></span></td>'
   '<td><%- entry.modified %></td>'
   '<td><%- entry.author   %></td>'
   '<td><%- entry.subject  %></td>'
