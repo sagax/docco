@@ -252,6 +252,9 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 
 
 /*liuzhengming*/
+#container>h1,#container>p{
+  padding:10px 25px 1px 50px;
+}
 /*readme*/
 .readme{
   width:450px;
