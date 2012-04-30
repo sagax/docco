@@ -23,7 +23,7 @@ list_template = _.template [
   '<tr class="directory"><td></td><td><a backward>..</a></td></tr>'
   '<% } %>'
   '<% _.each(entries, function(entry) { %>'
-  '<tr class="<%= entry.type %>">'
+  '<tr class="<%= entry.documented ? "document" : entry.type %>">'
   '<td class="icon"></td>'
   '<td><a '
   "<%= entry.type == 'directory' ? 'forward' :
