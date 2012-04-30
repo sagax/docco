@@ -191,3 +191,61 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
   position: absolute;
   width: 680px;
 }
+
+#filelist > table {
+	border-radius: 3px;
+	border: 1px solid #CACACA;
+	border-collapse:collapse;
+	margin:0;
+	font-size: 13px;
+	line-height: 30px;
+}
+
+#filelist > table thead td{
+	line-height: 30px;
+	padding-right:5px;
+	text-shadow: 0 1px 0 white;
+	border-bottom: 1px solid #D8D8D8;
+	background: #FAFAFA;
+	background: -moz-linear-gradient(#FAFAFA,#EAEAEA);
+	background: -webkit-linear-gradient(#FAFAFA,#EAEAEA);
+}
+
+#filelist > table thead td:first-child{
+	padding-right: 0;
+}
+
+#filelist > table thead td:first-child+td{
+	width: 95px;
+}
+
+#filelist > table thead td:first-child+td+td{
+	width: 40px;
+}
+
+#filelist > table thead td:first-child+td+td+td{
+	width: 65px;
+}
+
+#filelist > table thead td:first-child+td+td+td+td{
+	width: 100px;
+}
+
+#filelist > table thead td:first-child+td+td+td+td+td{
+	width: 120px;
+}
+#filelist > table tbody td{
+	border-bottom: 1px solid #CACACA;
+	background-color:#F8F8F8;
+	margin: 0;
+}
+
+#filelist > table tbody td:last-child{
+	white-space:pre;
+}
+
+#filelist > table td.icon{
+width: 18px;
+height: 16px;
+	background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;
+}
