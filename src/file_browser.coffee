@@ -29,7 +29,7 @@ list_template = _.template [
   "<%= entry.type == 'directory' ? 'forward' :
     'href=\"' + (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name) + '\"' %>"
   '><%- entry.name %></a></td>'
-  '<td><%- entry.type == "file" ? entry.size : "-" %><%- isNaN(entry.sloc) ? "" : (", " + entry.sloc + " lines") %></td>'
+  '<td><%- entry.type == "file" ? entry.size : "-" %><%- isNaN(entry.sloc) ? "" : (", " + entry.sloc + " sloc") %></td>'
   '<td><%- entry.modified %></td>'
   '<td><%- entry.author   %></td>'
   '<td><%- entry.subject  %></td>'
