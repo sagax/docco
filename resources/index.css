@@ -187,10 +187,10 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 
 /* Docci Modules */
 #filelist { position: relative; }
-#filelist > table {
+/*#filelist > table {
   position: absolute;
   width: 680px;
-}
+}*/
 
 #filelist > table {
 	border-radius: 3px;
@@ -215,7 +215,7 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 	padding-right: 0;
 }
 
-#filelist > table thead td:first-child+td{
+/*#filelist > table thead td:first-child+td{
 	width: 95px;
 }
 
@@ -233,7 +233,7 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 
 #filelist > table thead td:first-child+td+td+td+td+td{
 	width: 120px;
-}
+}*/
 #filelist > table tbody td{
 	border-bottom: 1px solid #CACACA;
 	background-color:#F8F8F8;
@@ -252,11 +252,12 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 
 
 /*liuzhengming*/
+/*readme*/
 .readme{
   width:450px;
 	min-height:5px;
 	float:left;
-	padding:35px;
+	padding:10px 25px 1px 50px;
 	text-align:left;
 }
 /*content*/
@@ -266,6 +267,70 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 	float:left;
 	padding-left:25px;
 	padding-top:25px;
+}
+/*代码统计*/
+.content>ol{
+  border:1px solid #CACACA;
+	background:#F8F8F8;
+	box-shadow:1px 1px 1px #ccc;
+	border-radius:2px;
+}
+.content>ol li{
+	position:relative;
+	width:100%;
+	height:28px;
+	line-height:28px;
+  border-bottom:1px solid #CACACA;
+	border-left:1px solid #CACACA;
+	color: #000;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:14px;
+	text-indent:5px;
+}
+.content>ol li:last-child{
+  border-bottom:none;
+}
+.content>ol li span{
+	position:absolute;
+	/*float:right;*/
+	display:inline-block;
+	width :120px;
+	height:100%; 
+  border-right:1px solid #CACACA;
+	text-align:right;
+	padding-right:10px;
+}
+.content>ol li span:nth-child(1){
+	top:0px;
+	left:0px;
+}
+.content>ol li span:nth-child(2){
+	top:0px;
+	left:130px;
+}
+.content>ol li span:last-child{
+	top:0px;
+	left:260px;
+	width :430px;
+  border-right:none;
+}
+/*table上方导航连接*/
+#breadcrumb{
+  color:#999;
+}
+#breadcrumb span{
+	color: #000;
+	font-size: 18px;
+	margin: 5px 0;
+	font:18px/1.4 Helvetica,arial,freesans,clean,sans-serif;
+	font-weight:bold;
+}
+#breadcrumb a,#breadcrumb>span:nth-child(1){
+	font:18px/1.4 Helvetica,arial,freesans,clean,sans-serif;
+	font-weight:bold;
+	color: #4183C4;
+	text-decoration: none;
+	cursor:pointer;
 }
 /*table*/
 #filelist{
@@ -281,14 +346,17 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 	border-radius: 3px 3px 3px 3px;
 	margin: 0;
 	width: 100%;
+	font-family:Arial, Helvetica, sans-serif;
 }
 #filelist table thead tr{
-	background: -moz-linear-gradient(#FAFAFA, #EAEAEA) repeat scroll 0 0 transparent;
+	background:-webkit-linear-gradient(#FAFAFA,#EAEAEA);
+	background: -moz-linear-gradient(#FAFAFA, #EAEAEA);
   background: -ms-linear-gradient(#FAFAFA, #EAEAEA);
   background: -o-linear-gradient(#FAFAFA, #EAEAEA);
   background: linear-gradient(#FAFAFA, #EAEAEA);
 	border-bottom: 1px solid #D8D8D8;
 	color: #555555;
+	font-family:Arial, Helvetica, sans-serif;
 	font-weight: bold;
 	padding: 6px 3px;
 	text-align: left;
@@ -301,15 +369,45 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 	padding: 7px 3px;
 	vertical-align: middle;
 }
-
-
-
-
-
-
-
-
-
-
-
-
+#filelist table tbody tr .icon{
+	padding-left: 10px;
+	padding-right: 2px;
+	width: 17px;
+}
+#filelist .directory .icon{
+  background: url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 10px 50% #F8F8F8;
+}
+#filelist .file .icon{
+  background: url(https://a248.e.akamai.net/assets.github.com/images/icons/txt.png) no-repeat 10px 50% #F8F8F8;
+}
+#filelist .document .icon{
+  background: url(https://a248.e.akamai.net/assets.github.com/images/icons/sub.png) no-repeat 10px 50% #F8F8F8;
+}
+#filelist table tbody a{
+  color: #4183C4;
+	cursor:pointer;
+	text-decoration:none;
+}
+#filelist table tbody a:hover{
+	text-decoration:underline;
+}
+#filelist table tbody tr td:nth-child(2){
+  width:110px
+}
+#filelist table tbody tr td:nth-child(3){
+  width:120px
+}
+#filelist table tbody tr td:nth-child(3) span{
+  width:55px;
+	display:inline-block;
+	text-align:right;
+}
+#filelist table tbody tr td:nth-child(4){
+  width:105px
+}
+#filelist table tbody tr td:nth-child(5){
+  width:110px
+}
+#filelist table tbody tr td:nth-child(6){
+  width:auto
+}
