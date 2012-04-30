@@ -398,7 +398,7 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
   width:120px
 }
 #filelist table tbody tr td:nth-child(3) span{
-  width:55px;
+  width:50px;
 	display:inline-block;
 	text-align:right;
 }
