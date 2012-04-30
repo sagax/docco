@@ -41,7 +41,7 @@ generate_index = (dirname, dest) ->
           readme = showdown.makeHtml fs.readFileSync(source).toString() if not readme and path.existsSync(source) and fs.statSync(source).isFile()
         console.log 'readme', readme
         html = index_template {
-          title: repo, subtitle: "subtitle", statistics: statistics, log: log, readme: readme, user: user, repo: repo, opts: process.OPTS
+          title: repo, description: "Literate Programming can be Quick and Dirty.", statistics: statistics, log: log, readme: readme, user: user, repo: repo, opts: process.OPTS
         }
         fs.writeFile dest, html, (err) ->
           throw err if err
