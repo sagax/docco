@@ -247,5 +247,48 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 #filelist > table td.icon{
 width: 18px;
 height: 16px;
-	background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;
+background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;
 }
+
+
+/*liuzhengming*/
+/*table*/
+#filelist{
+	background: none repeat scroll 0 0 #EEEEEE;
+	border-radius: 3px 3px 3px 3px;
+	padding: 3px;
+}
+
+#filelist table{
+	border-collapse:collapse;
+	border-spacing:0;
+	border: 1px solid #CACACA;
+	border-radius: 3px 3px 3px 3px;
+	margin: 0;
+	width: 100%;
+}
+#filelist table thead tr{
+	background: -moz-linear-gradient(#FAFAFA, #EAEAEA) repeat scroll 0 0 transparent;
+  background: -ms-linear-gradient(#FAFAFA, #EAEAEA);
+  background: -o-linear-gradient(#FAFAFA, #EAEAEA);
+  background: linear-gradient(#FAFAFA, #EAEAEA);
+	border-bottom: 1px solid #D8D8D8;
+	color: #555555;
+	font-weight: bold;
+	padding: 6px 3px;
+	text-align: left;
+	text-shadow: 0 1px 0 #FFFFFF;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
