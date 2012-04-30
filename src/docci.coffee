@@ -36,7 +36,7 @@ generate_index = (dirname, dest) ->
       get_user_and_repo dirname, (user, repo) ->
         readme = ''
         readme_sources = ['README.md', 'README']
-        readme_sources.each (source) ->
+        readme_sources.forEach (source) ->
           readme = showdown.makeHtml fs.readFileSync(readme).toString() if not readme and path.existsSync(readme) and fs.statSync(readme).isFile()
         html = index_template {
           title: "title", subtitle: "subtitle", statistics: statistics, log: log, readme: readme, user: user, repo: repo, opts: process.OPTS

@@ -189,20 +189,21 @@ else
   git reset --quiet --hard origin/gh-pages
   echo "DONE"
 
-  echo -n "Find hashes"
+  echo -n "Finding Commit Hashes..."
   synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]+$" | xargs echo)
   synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)
-  echo "DONE"
   synced_sources_hash=$(echo "$synced_docas_commit" | tail -c 8 | head -c 7)
   cd "$sources_dir"
   synced_sources_hash=$(git log --pretty=oneline | egrep -m 1 "^$synced_sources_hash" | head -c 7 | xargs echo)
+  echo "Done"
 
   echo "synced:" "$synced_sources_hash | $synced_ghpages_hash"
 
-  if [ "$synced_sources_hash" == "$head_hash" ]; then
+  # In case of $synced_ghpages_hash is an empty string, synced_sources_hash equals head_hash
+  if [ "$synced_ghpages_hash" ] && [ "$synced_sources_hash" == "$head_hash" ]; then
 
-    echo "Already synchronized with latest commit."
-    exit 0
+   echo "Already synchronized with latest commit."
+   exit 0
 
   fi
 
