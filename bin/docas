@@ -185,11 +185,11 @@ else
   echo "checkouting"
   pwd
   git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
-  echo -n "reseting..."
+  echo -n "Resetting... "
   git reset --quiet --hard origin/gh-pages
-  echo "DONE"
+  echo "Done"
 
-  echo -n "Finding Commit Hashes..."
+  echo -n "Finding Docas Commits Hashes... "
   synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]+$" | xargs echo)
   synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)
   synced_sources_hash=$(echo "$synced_docas_commit" | tail -c 8 | head -c 7)
@@ -199,7 +199,7 @@ else
 
   echo "synced:" "$synced_sources_hash | $synced_ghpages_hash"
 
-  # In case of $synced_ghpages_hash is an empty string, synced_sources_hash equals head_hash
+  # In case of `synced_ghpages_hash` is an empty string, `synced_sources_hash` equals head_hash.
   if [ "$synced_ghpages_hash" ] && [ "$synced_sources_hash" == "$head_hash" ]; then
 
    echo "Already synchronized with latest commit."
