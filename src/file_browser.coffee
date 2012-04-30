@@ -67,7 +67,7 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
     $('#breadcrumb a').click ->
       new_depth = $(@).attr('depth') * 1
       new_path = index_path.split '/'
-      new_path.splice index_path.length - index_depth + new_depth - 1, index_depth - new_depth
+      new_path.splice index_path.length - index_depth + new_depth - 2, index_depth - new_depth
       new file_browser user, repo, new_path.join('/'), new_depth, current_depth
 
     # ## Content Table
