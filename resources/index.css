@@ -253,9 +253,14 @@ height: 16px;
 
 
 /*liuzhengming*/
-#container>h1,#container>p{
+#container>h1{
   padding:10px 25px 1px 50px;
 }
+#container>p{
+  padding:10px 25px 1px 50px;
+	font-family:Helvetica,arial,freesans,clean,sans-serif;
+}
+
 /*readme*/
 .readme{
   width:450px;
@@ -404,7 +409,7 @@ height: 16px;
 	overflow:hidden;
 }
 .filelist table tbody tr td:nth-child(3){
-  width:80px;
+  width:60px;
 	text-overflow:ellipsis;
 	overflow:hidden;
 }
@@ -419,7 +424,7 @@ height: 16px;
   color:#666;
 	font-size:10px;
 	font-family:Menlo,Monaco,Consolas,"Lucida Console",monospace;
-	width:58px;
+	width:25px;
 }
 .filelist table tbody tr td:nth-child(3) span:nth-child(2) div{
   width:25px;
@@ -443,5 +448,4 @@ height: 16px;
 	width:100%;
 	display:inline-block;
 	text-overflow:ellipsis;
-	overflow:hidden;
 }
