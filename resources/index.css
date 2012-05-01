@@ -409,6 +409,10 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 	display:inline-block;
 	text-align:right;
 }
+#filelist table tbody tr td:nth-child(3) span:nth-child(2){
+  color:#ccc;
+	font-size:10pc;
+}
 #filelist table tbody tr td:nth-child(4){
   width:105px;
 	text-overflow:ellipsis;
