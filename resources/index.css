@@ -187,10 +187,10 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 
 /* Docci Modules */
 #filelist { position: relative; }
-/*#filelist > table {
+#filelist > table {
   position: absolute;
-  width: 680px;
-}*/
+  /*width: 680px;*/
+}
 
 #filelist > table {
 	border-radius: 3px;
@@ -247,7 +247,7 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 #filelist > table td.icon{
 width: 18px;
 height: 16px;
-background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;
+/*background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;*/
 }
 
 
@@ -263,6 +263,10 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 	padding:10px 25px 1px 50px;
 	text-align:left;
 }
+.readme pre{
+  margin:15px 0 15px;
+	padding-left:15px;
+}
 /*content*/
 .content{
   width:745px;
@@ -272,6 +276,35 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 	padding-top:25px;
 }
 /*代码统计*/
+.content>ol li{
+	position:relative;
+	height:32px;
+	line-height:32px;
+	color: #000;
+	font-size:14px;
+	text-indent:5px;
+}
+.content>ol li span:nth-child(1){
+	position:absolute;
+	display:inline-block;
+	width:50px;
+	text-align:right;
+}
+.content>ol li span:nth-child(2){
+	position:absolute;
+	left:50px;
+	display:inline-block;
+	width:50px;
+	text-align:right;
+}
+.content>ol li span:last-child{
+	position:absolute;
+	left:100px;
+	display:inline-block;
+	width:150px;
+	text-align:right;
+}
+/*
 .content>ol{
   border:1px solid #CACACA;
 	background:#F8F8F8;
@@ -295,7 +328,6 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 }
 .content>ol li span{
 	position:absolute;
-	/*float:right;*/
 	display:inline-block;
 	width :120px;
 	height:100%; 
@@ -316,7 +348,7 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 	left:260px;
 	width :430px;
   border-right:none;
-}
+}*/
 /*table上方导航连接*/
 #breadcrumb{
   color:#999;
@@ -384,6 +416,9 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
   background: url(https://a248.e.akamai.net/assets.github.com/images/icons/txt.png) no-repeat 10px 50% #F8F8F8;
 }
 #filelist .document .icon{
+  background: url(../images/document_icon.png) no-repeat 10px 50% #F8F8F8;
+}
+#filelist .submodule .icon{
   background: url(https://a248.e.akamai.net/assets.github.com/images/icons/sub.png) no-repeat 10px 50% #F8F8F8;
 }
 #filelist table tbody a{
@@ -410,8 +445,8 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 	text-align:right;
 }
 #filelist table tbody tr td:nth-child(3) span:nth-child(2){
-  color:#ccc;
-	font-size:10pc;
+  color:#666;
+	font-size:10px;
 }
 #filelist table tbody tr td:nth-child(4){
   width:105px;
