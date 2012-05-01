@@ -14,7 +14,7 @@ breadcrumb_template = _.template [
   '<% }) %>'
 ].join ''
 
-# ## (Underscore) Template for Content Table
+# ## (Underscore) Template for File Browser
 list_template = _.template [
   '<table depth="<%= index_depth %>">'
   '<thead><tr><th></th><th>name</th><th>size</th><th>age</th><th>author</th><th>message</th></tr></thead>'
