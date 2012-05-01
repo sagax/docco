@@ -125,7 +125,7 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
         $(current_table).css 'margin-left', -width if direction is -1
         $($('#filelists').children()[0]).animate
           'margin-left': (if direction is -1 then '+' else '-') + '=' + width
-        , -> $(current_table).remove()
+        , 10000 # , -> $(current_table).remove()
       else
         $('#filelists').append table
 
