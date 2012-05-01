@@ -57,20 +57,10 @@ get_repo = (user, repo, callback) ->
     return callback '' if res.statusCode isnt 200
     json = ''
     res.on 'data', (data) -> json += data.toString()
-    res.on 'end', callback (eval(json)).description
+    res.on 'end', -> callback JSON.parse(json).description
   req.end()
   req.on 'error', -> callback ''
 
-  callback ''
-  return
-
-  request "https://api.github.com/repos/#{user}/#{repo}", (err, res, body) ->
-    console.log body
-    try
-
-      callback "Literate Programming can be Quick and Dirty."
-    catch e
-      callback null
 # Get the current language we're documenting, based on the extension.
 get_language = (source) -> languages[path.extname(source)]
 
