@@ -23,7 +23,7 @@ list_template = _.template [
   '<tr class="directory"><td></td><td><a backward>..</a></td><td></td<td></td<td></td>>><td></td></tr>'
   '<% } %>'
   '<% _.each(entries, function(entry) { %>'
-  '<tr class="<%= entry.documented ? "document" : entry.type %>">'
+  '<tr class="<%= entry.submodule ? "submodule" : entry.documented ? "document" : entry.type %>">'
   '<td class="icon"></td>'
   '<td><a '
   "<%= entry.type == 'directory' ? 'forward' :
@@ -117,7 +117,7 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
         index_depth   : index_depth
         absolute_base : absolute_base
         relative_base : relative_base
-        entries       : process_index index
+        entries       : process_index index, absolute_base
 
       # ### Handling Folder Navigation
       $(table).find('a[backward]').click ->
@@ -142,7 +142,7 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
       else
         $('#filelist').append table
 
-process_index = (index) ->
+process_index = (index, base) ->
   lines = index.split('\n').filter((line) -> line)
   entries = []
   _.each lines, (line) ->
@@ -162,6 +162,7 @@ process_index = (index) ->
       name       : match[6]
       documented : match[7] is '1'
       sloc       : parseInt match[8], 10
+      submodule  : gitmodules_cache[user + '/' + repo][base + '/' + match[6]]
     # Replace source extension for `.html` to get document file name.
     entry.document = entry.name.replace(/\.[^/.]+$/, '') + '.html' if entry.documented
     # For hidden file without extension.
