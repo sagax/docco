@@ -100,10 +100,10 @@ if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-insid
 
   echo -n "Fetching from GitHub..."
   cd "$sources_dir"
+  git remote prune origin
   git pull
   # git fetch --quiet --force
   # git reset --quiet --hard  origin/master
-  git remote prune origin
   echo "Done"
 
 # Else, before clone the repository, clear the content of `storage_dir`. Shallow

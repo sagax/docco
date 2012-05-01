@@ -16,6 +16,7 @@ breadcrumb_template = _.template [
 
 # ## (Underscore) Template for File Browser
 list_template = _.template [
+  '<div class="file_list">'
   '<table depth="<%= index_depth %>">'
   '<thead><tr><th></th><th>name</th><th>size</th><th>age</th><th>author</th><th>message</th></tr></thead>'
   '<tbody>'
@@ -37,6 +38,7 @@ list_template = _.template [
   '<% }); %>'
   '</tbody>'
   '</table>'
+  '</div>'
 ].join ''
 
 gitmodules_cache = {}
@@ -115,14 +117,14 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
         new file_browser user, repo, new_path.join('/'), index_depth + 1, current_depth
 
       # ### Pushing / Poping the Table
-      current_table = $('#filelist table:first-child')[0]
+      current_table = $('#filelists div:first-child')[0]
       if current_table
         direction = if index_depth > parseInt $(current_table).attr('depth') then 1 else -1
-        width = $('#filelist table').width()
-        table.css 'left', direction * width
-        $('#filelist')[if direction < 0 then 'prepend' else 'append'] table
-        $('#filelist').children().animate
-          left: (if direction is -1 then '+' else '-') + '=' + width
+        width = $(current_table).width() + parseInt $(current_table).css('margin-right')
+        $('#filelists')[if direction < 0 then 'prepend' else 'append'] table
+        $(current_table).css 'margin-left', -width if direction is -1
+        $(('#filelists').children()[0]).animate
+          'margin-left': (if direction is -1 then '+' else '-') + '=' + width
         , -> $(current_table).remove()
       else
         $('#filelist').append table
