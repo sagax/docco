@@ -7,9 +7,9 @@
 breadcrumb_template = _.template [
   '<% _.each(path, function(dir, i) { %>'
   '<%   if (i < path.length - 1) { %>'
-  '<a depth=<%= i %>><%- dir %></a>&nbsp;/'
+  '<a depth=<%= i %>><%- dir %></a>&nbsp;/&nbsp;'
   '<%   } else { %>'
-  '&nbsp;<span><%- dir %></span>'
+  '<span><%- dir %></span>'
   '<%   } %>'
   '<% }) %>'
 ].join ''
