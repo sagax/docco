@@ -23,7 +23,7 @@
 
 #### Main Documentation Generation Functions
 
-# request = require 'request'
+https = require 'https'
 
 # Once all of the code is finished highlighting, we can generate the HTML file
 # and write out the documentation. Pass the completed sections into the template
@@ -41,7 +41,6 @@ generate_index = (dirname, dest) ->
         readme_sources.forEach (source) ->
           source = dirname + '/' + source
           readme = showdown.makeHtml fs.readFileSync(source).toString() if not readme and path.existsSync(source) and fs.statSync(source).isFile()
-        console.log 'readme', readme
         get_repo user, repo, (description) ->
           html = index_template {
             title: repo, description: description, statistics: statistics, log: log, readme: readme, user: user, repo: repo, opts: process.OPTS
