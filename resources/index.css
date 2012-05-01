@@ -188,8 +188,8 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 /* Docci Modules */
 #filelist { position: relative; }
 #filelist > table {
-  position: absolute;
-  /*width: 680px;*/
+  /*position: absolute;*/
+  width: 680px;
 }
 
 #filelist > table {
@@ -215,7 +215,7 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 	padding-right: 0;
 }
 
-/*#filelist > table thead td:first-child+td{
+#filelist > table thead td:first-child+td{
 	width: 95px;
 }
 
@@ -231,9 +231,10 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 	width: 100px;
 }
 
+
 #filelist > table thead td:first-child+td+td+td+td+td{
 	width: 120px;
-}*/
+}
 #filelist > table tbody td{
 	border-bottom: 1px solid #CACACA;
 	background-color:#F8F8F8;
@@ -247,7 +248,7 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 #filelist > table td.icon{
 width: 18px;
 height: 16px;
-/*background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;*/
+background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;
 }
 
 
@@ -274,6 +275,7 @@ height: 16px;
 	float:left;
 	padding-left:25px;
 	padding-top:25px;
+	overflow:hidden;
 }
 /*代码统计*/
 .content>ol li{
@@ -304,51 +306,7 @@ height: 16px;
 	width:150px;
 	text-align:right;
 }
-/*
-.content>ol{
-  border:1px solid #CACACA;
-	background:#F8F8F8;
-	box-shadow:1px 1px 1px #ccc;
-	border-radius:2px;
-}
-.content>ol li{
-	position:relative;
-	width:100%;
-	height:32px;
-	line-height:32px;
-  border-bottom:1px solid #CACACA;
-	border-left:1px solid #CACACA;
-	color: #000;
-	font-family:Arial, Helvetica, sans-serif;
-	font-size:14px;
-	text-indent:5px;
-}
-.content>ol li:last-child{
-  border-bottom:none;
-}
-.content>ol li span{
-	position:absolute;
-	display:inline-block;
-	width :120px;
-	height:100%; 
-  border-right:1px solid #CACACA;
-	text-align:right;
-	padding-right:10px;
-}
-.content>ol li span:nth-child(1){
-	top:0px;
-	left:0px;
-}
-.content>ol li span:nth-child(2){
-	top:0px;
-	left:130px;
-}
-.content>ol li span:last-child{
-	top:0px;
-	left:260px;
-	width :430px;
-  border-right:none;
-}*/
+
 /*table上方导航连接*/
 #breadcrumb{
   color:#999;
@@ -368,22 +326,29 @@ height: 16px;
 	cursor:pointer;
 }
 /*table*/
-#filelist{
+#filelists{
+  width:10000px;
+}
+.filelist{
+	float:left;
 	background: none repeat scroll 0 0 #EEEEEE;
 	border-radius: 3px 3px 3px 3px;
 	padding: 3px;
+	width:740px;
+	margin-right:50px;
 }
 
-#filelist table{
+.filelist table{
 	border-collapse:collapse;
 	border-spacing:0;
 	border: 1px solid #CACACA;
 	border-radius: 3px 3px 3px 3px;
 	margin: 0;
-	width: 100%;
+	/*width: 100%;*/
+	width:100%;
 	font-family:Arial, Helvetica, sans-serif;
 }
-#filelist table thead tr{
+.filelist table thead tr{
 	background:-webkit-linear-gradient(#FAFAFA,#EAEAEA);
 	background: -moz-linear-gradient(#FAFAFA, #EAEAEA);
   background: -ms-linear-gradient(#FAFAFA, #EAEAEA);
@@ -397,68 +362,68 @@ height: 16px;
 	text-align: left;
 	text-shadow: 0 1px 0 #FFFFFF;
 }
-#filelist table thead tr td{
+.filelist table thead tr td{
 	background: none repeat scroll 0 0 #F8F8F8;
 	border-bottom: 1px solid #EEEEEE;
 	color: #484848;
 	padding: 7px 3px;
 	vertical-align: middle;
 }
-#filelist table tbody tr .icon{
+.filelist table tbody tr .icon{
 	padding-left: 10px;
 	padding-right: 2px;
 	width: 17px;
 }
-#filelist .directory .icon{
+.filelist .directory .icon{
   background: url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 10px 50% #F8F8F8;
 }
-#filelist .file .icon{
+.filelist .file .icon{
   background: url(https://a248.e.akamai.net/assets.github.com/images/icons/txt.png) no-repeat 10px 50% #F8F8F8;
 }
-#filelist .document .icon{
-  background: url(../images/document_icon.png) no-repeat 10px 50% #F8F8F8;
+.filelist .document .icon{
+  background: url(images/document_icon.png) no-repeat 10px 50% #F8F8F8;
 }
-#filelist .submodule .icon{
+.filelist .submodule .icon{
   background: url(https://a248.e.akamai.net/assets.github.com/images/icons/sub.png) no-repeat 10px 50% #F8F8F8;
 }
-#filelist table tbody a{
+.filelist table tbody a{
   color: #4183C4;
 	cursor:pointer;
 	text-decoration:none;
 }
-#filelist table tbody a:hover{
+.filelist table tbody a:hover{
 	text-decoration:underline;
 }
-#filelist table tbody tr td:nth-child(2){
+.filelist table tbody tr td:nth-child(2){
   width:110px;
 	text-overflow:ellipsis;
 	overflow:hidden;
 }
-#filelist table tbody tr td:nth-child(3){
+.filelist table tbody tr td:nth-child(3){
   width:120px;
 	text-overflow:ellipsis;
 	overflow:hidden;
 }
-#filelist table tbody tr td:nth-child(3) span{
+.filelist table tbody tr td:nth-child(3) span{
   width:50px;
 	display:inline-block;
 	text-align:right;
 }
-#filelist table tbody tr td:nth-child(3) span:nth-child(2){
+.filelist table tbody tr td:nth-child(3) span:nth-child(2){
   color:#666;
 	font-size:10px;
 }
-#filelist table tbody tr td:nth-child(4){
+.filelist table tbody tr td:nth-child(4){
   width:105px;
 	text-overflow:ellipsis;
 	overflow:hidden;
 }
-#filelist table tbody tr td:nth-child(5){
+.filelist table tbody tr td:nth-child(5){
   width:110px;
 	text-overflow:ellipsis;
 	overflow:hidden;
 }
-#filelist table tbody tr td:nth-child(6){
+.filelist table tbody tr td:nth-child(6){
   width:260px;
 	text-overflow:ellipsis;
 	overflow:hidden;
