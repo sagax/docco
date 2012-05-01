@@ -30,10 +30,10 @@ list_template = _.template [
   "<%= entry.type == 'directory' ? 'forward' :
     'href=\"' + (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name) + '\"' %>"
   '><%- entry.name %></a></td>'
-  '<td><span><%- entry.type == "file" ? entry.size : "-" %></span><span><%- isNaN(entry.sloc) ? "" : (entry.sloc + " sloc") %></span></td>'
+  '<td><span><%- entry.type == "file" ? entry.size : "-" %></span><span><%- isNaN(entry.sloc) ? "" : (entry.sloc + "SLOC") %></span></td>'
   '<td><%- entry.modified %></td>'
   '<td><%- entry.author   %></td>'
-  '<td><%- entry.subject  %></td>'
+  '<td><span><%- entry.subject  %></span></td>'
   '</tr>'
   '<% }); %>'
   '</tbody>'

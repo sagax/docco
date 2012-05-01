@@ -270,7 +270,7 @@ height: 16px;
 }
 /*content*/
 .content{
-  width:745px;
+  width:775px;
 	min-height:5px;
 	float:left;
 	padding-left:25px;
@@ -335,7 +335,7 @@ height: 16px;
 	background: none repeat scroll 0 0 #EEEEEE;
 	border-radius: 3px 3px 3px 3px;
 	padding: 3px;
-	width:740px;
+	width:770px;
 	margin-right:50px;
 }
 
@@ -362,6 +362,9 @@ height: 16px;
 	padding: 6px 3px;
 	text-align: left;
 	text-shadow: 0 1px 0 #FFFFFF;
+}
+.filelist table thead tr th:nth-child(3){
+  text-indent:25px;
 }
 .filelist table thead tr td{
 	background: none repeat scroll 0 0 #F8F8F8;
@@ -396,23 +399,32 @@ height: 16px;
 	text-decoration:underline;
 }
 .filelist table tbody tr td:nth-child(2){
-  width:110px;
+  width:150px;
 	text-overflow:ellipsis;
 	overflow:hidden;
 }
 .filelist table tbody tr td:nth-child(3){
-  width:120px;
+  width:80px;
 	text-overflow:ellipsis;
 	overflow:hidden;
 }
-.filelist table tbody tr td:nth-child(3) span{
-  width:50px;
+.filelist table tbody tr td:nth-child(3) span:nth-child(1){
+  width:35px;
 	display:inline-block;
 	text-align:right;
 }
 .filelist table tbody tr td:nth-child(3) span:nth-child(2){
+	display:inline-block;
+	text-align:right;
   color:#666;
 	font-size:10px;
+	font-family:Menlo,Monaco,Consolas,"Lucida Console",monospace;
+	width:58px;
+}
+.filelist table tbody tr td:nth-child(3) span:nth-child(2) div{
+  width:25px;
+	height:12px;
+	text-align:right;
 }
 .filelist table tbody tr td:nth-child(4){
   width:105px;
@@ -425,7 +437,11 @@ height: 16px;
 	overflow:hidden;
 }
 .filelist table tbody tr td:nth-child(6){
-  width:260px;
+  width:250px;
+}
+.filelist table tbody tr td:nth-child(6) span{
+	width:100%;
+	display:inline-block;
 	text-overflow:ellipsis;
 	overflow:hidden;
 }
