@@ -39,6 +39,17 @@ list_template = _.template [
   '</table>'
 ].join ''
 
+gitmodules_cache = {}
+
+process_gitmodules = (gitmodules) ->
+  gitmodules = gitmodules.split /\[[^\]]*\]/
+  gitmodules = gitmodules[1..]
+  gitmodules.reduce (hash, submodule) ->
+    match = submodule.match /path = (.*)\n.*url = git@github\.com:(.*)\.git/
+    hash[match[1]] = match[2]
+    hash
+  , {}
+
 # ## Constructor Arguments
 #
 # 1. `user`, used to generate correct link for undocumented sources. E.g.,
@@ -49,70 +60,87 @@ list_template = _.template [
 # 5. `current_depth`, optional, the depth of the current page, defaults to
 # `index_depth`.
 file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_depth) ->
+  
+  if gitmodules_cache.hasOwnProperty user + '/' + repo
+    get_index()
+  else
+    gitmodules = index_path.split '/'
+    gitmodules = gitmodules[0 .. gitmodules.length - index_depth - 3]
+    gitmodules.push 'gitmodules'
+    gitmodules = gitmodules.join '/'
+    $.get gitmodules, (data) ->
+      gitmodules_cache[user + '/' + repo] = process_gitmodules data
+      console.log 'gitmodules', gitmodules_cache
+      get_index()
+    .error ->
+      gitmodules_cache[user + '/' + repo] = {}
+      get_index()
 
-  # ### Ajax Call to Get Index
-  $.get index_path, (index) ->
+  get_index = ->
 
-    # ## Breadcrumb Navigation
-    breadcrumb_path  = index_path.split '/'
-    breadcrumb_end   = breadcrumb_path.length - 2
-    breadcrumb_start = breadcrumb_end - index_depth + 1
-    breadcrumb_path  = breadcrumb_path[breadcrumb_start..breadcrumb_end]
+    # ### Ajax Call to Get Index
+    $.get index_path, (index) ->
 
-    # ### Render Breadcrumb Navigator
-    $('#breadcrumb').html breadcrumb_template
-      path: [repo, breadcrumb_path...]
+      # ## Breadcrumb Navigation
+      breadcrumb_path  = index_path.split '/'
+      breadcrumb_end   = breadcrumb_path.length - 2
+      breadcrumb_start = breadcrumb_end - index_depth + 1
+      breadcrumb_path  = breadcrumb_path[breadcrumb_start..breadcrumb_end]
 
-    # ### Handling Breadcrumb Navigation
-    $('#breadcrumb a').click ->
-      new_depth = $(@).attr('depth') * 1
-      new_path = index_path.split '/'
-      new_path.splice new_path.length - index_depth + new_depth - 1, index_depth - new_depth
-      new file_browser user, repo, new_path.join('/'), new_depth, current_depth
+      # ### Render Breadcrumb Navigator
+      $('#breadcrumb').html breadcrumb_template
+        path: [repo, breadcrumb_path...]
 
-    # ## Content Table
+      # ### Handling Breadcrumb Navigation
+      $('#breadcrumb a').click ->
+        new_depth = $(@).attr('depth') * 1
+        new_path = index_path.split '/'
+        new_path.splice new_path.length - index_depth + new_depth - 1, index_depth - new_depth
+        new file_browser user, repo, new_path.join('/'), new_depth, current_depth
 
-    # `absolute_base` is used to generate github.com links for undocumented sources.
-    absolute_base = breadcrumb_path.join '/'
+      # ## Content Table
 
-    # `relative_base` is used to generate links for documented sources.
-    depth_offset  = index_depth - current_depth
-    if depth_offset > 0
-      relative_base = breadcrumb_path[breadcrumb_path.length - depth_offset..].join '/'
-    else
-      relative_base = new Array(-depth_offset + 1).join '../'
+      # `absolute_base` is used to generate github.com links for undocumented sources.
+      absolute_base = breadcrumb_path.join '/'
 
-    # ### Render Content Table
-    table = $ list_template
-      user          : user
-      repo          : repo
-      index_depth   : index_depth
-      absolute_base : absolute_base
-      relative_base : relative_base
-      entries       : process_index index
+      # `relative_base` is used to generate links for documented sources.
+      depth_offset  = index_depth - current_depth
+      if depth_offset > 0
+        relative_base = breadcrumb_path[breadcrumb_path.length - depth_offset..].join '/'
+      else
+        relative_base = new Array(-depth_offset + 1).join '../'
 
-    # ### Handling Folder Navigation
-    $(table).find('a[backward]').click ->
-      new_path = index_path.split '/'
-      new_path.splice new_path.length - 2, 1
-      new file_browser user, repo, new_path.join('/'), index_depth - 1, current_depth
-    $(table).find('a[forward]').click ->
-      new_path = index_path.split '/'
-      new_path.splice new_path.length - 1, 0, $(@).html()
-      new file_browser user, repo, new_path.join('/'), index_depth + 1, current_depth
+      # ### Render Content Table
+      table = $ list_template
+        user          : user
+        repo          : repo
+        index_depth   : index_depth
+        absolute_base : absolute_base
+        relative_base : relative_base
+        entries       : process_index index
 
-    # ### Pushing / Poping the Table
-    current_table = $('#filelist table:first-child')[0]
-    if current_table
-      direction = if index_depth > parseInt $(current_table).attr('depth') then 1 else -1
-      width = $('#filelist table').width()
-      table.css 'left', direction * width
-      $('#filelist')[if direction < 0 then 'prepend' else 'append'] table
-      $('#filelist').children().animate
-        left: (if direction is -1 then '+' else '-') + '=' + width
-      , -> $(current_table).remove()
-    else
-      $('#filelist').append table
+      # ### Handling Folder Navigation
+      $(table).find('a[backward]').click ->
+        new_path = index_path.split '/'
+        new_path.splice new_path.length - 2, 1
+        new file_browser user, repo, new_path.join('/'), index_depth - 1, current_depth
+      $(table).find('a[forward]').click ->
+        new_path = index_path.split '/'
+        new_path.splice new_path.length - 1, 0, $(@).html()
+        new file_browser user, repo, new_path.join('/'), index_depth + 1, current_depth
+
+      # ### Pushing / Poping the Table
+      current_table = $('#filelist table:first-child')[0]
+      if current_table
+        direction = if index_depth > parseInt $(current_table).attr('depth') then 1 else -1
+        width = $('#filelist table').width()
+        table.css 'left', direction * width
+        $('#filelist')[if direction < 0 then 'prepend' else 'append'] table
+        $('#filelist').children().animate
+          left: (if direction is -1 then '+' else '-') + '=' + width
+        , -> $(current_table).remove()
+      else
+        $('#filelist').append table
 
 process_index = (index) ->
   lines = index.split('\n').filter((line) -> line)
