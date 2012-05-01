@@ -123,11 +123,11 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
         width = $(current_table).width() + parseInt $(current_table).css('margin-right')
         $('#filelists')[if direction < 0 then 'prepend' else 'append'] table
         $(current_table).css 'margin-left', -width if direction is -1
-        $(('#filelists').children()[0]).animate
+        $($('#filelists').children()[0]).animate
           'margin-left': (if direction is -1 then '+' else '-') + '=' + width
         , -> $(current_table).remove()
       else
-        $('#filelist').append table
+        $('#filelists').append table
 
   if gitmodules_cache.hasOwnProperty user + '/' + repo
     get_index()

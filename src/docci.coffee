@@ -23,7 +23,7 @@
 
 #### Main Documentation Generation Functions
 
-request = require 'request'
+# request = require 'request'
 
 # Once all of the code is finished highlighting, we can generate the HTML file
 # and write out the documentation. Pass the completed sections into the template
@@ -51,9 +51,12 @@ generate_index = (dirname, dest) ->
             console.log "docci: #{dest} generated."
 
 get_repo = (user, repo, callback) ->
+  callback ''
+  return
   request "https://api.github.com/repos/#{user}/#{repo}", (err, res, body) ->
     console.log body
     try
+
       callback "Literate Programming can be Quick and Dirty."
     catch e
       callback null
