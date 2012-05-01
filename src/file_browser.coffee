@@ -16,8 +16,8 @@ breadcrumb_template = _.template [
 
 # ## (Underscore) Template for File Browser
 list_template = _.template [
-  '<div class="file_list">'
-  '<table depth="<%= index_depth %>">'
+  '<div depth="<%= index_depth %>" class="file_list">'
+  '<table>'
   '<thead><tr><th></th><th>name</th><th>size</th><th>age</th><th>author</th><th>message</th></tr></thead>'
   '<tbody>'
   '<% if(index_depth) { %>'
