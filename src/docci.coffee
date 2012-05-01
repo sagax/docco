@@ -50,15 +50,17 @@ generate_index = (dirname, dest) ->
             console.log "docci: #{dest} generated."
 
 get_repo = (user, repo, callback) ->
-  callback ''
-  return
-  request "https://api.github.com/repos/#{user}/#{repo}", (err, res, body) ->
-    console.log body
-    try
+  options = 
+    host: 'api.github.com'
+    path: "/repos/#{user}/#{repo}"
+  req = https.get options, (res) ->
+    return callback '' if res.statusCode isnt 200
+    json = ''
+    res.on 'data', (data) -> json += data.toString()
+    res.on 'end', -> callback JSON.parse(json).description
+  req.end()
+  req.on 'error', -> callback ''
 
-      callback "Literate Programming can be Quick and Dirty."
-    catch e
-      callback null
 # Get the current language we're documenting, based on the extension.
 get_language = (source) -> languages[path.extname(source)]
 
