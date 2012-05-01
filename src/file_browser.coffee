@@ -61,21 +61,6 @@ process_gitmodules = (gitmodules) ->
 # `index_depth`.
 file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_depth) ->
   
-  if gitmodules_cache.hasOwnProperty user + '/' + repo
-    get_index()
-  else
-    gitmodules = index_path.split '/'
-    gitmodules = gitmodules[0 .. gitmodules.length - index_depth - 3]
-    gitmodules.push 'gitmodules'
-    gitmodules = gitmodules.join '/'
-    $.get gitmodules, (data) ->
-      gitmodules_cache[user + '/' + repo] = process_gitmodules data
-      console.log 'gitmodules', gitmodules_cache
-      get_index()
-    .error ->
-      gitmodules_cache[user + '/' + repo] = {}
-      get_index()
-
   get_index = ->
 
     # ### Ajax Call to Get Index
@@ -141,6 +126,21 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
         , -> $(current_table).remove()
       else
         $('#filelist').append table
+
+  if gitmodules_cache.hasOwnProperty user + '/' + repo
+    get_index()
+  else
+    gitmodules = index_path.split '/'
+    gitmodules = gitmodules[0 .. gitmodules.length - index_depth - 3]
+    gitmodules.push 'gitmodules'
+    gitmodules = gitmodules.join '/'
+    $.get gitmodules, (data) ->
+      gitmodules_cache[user + '/' + repo] = process_gitmodules data
+      console.log 'gitmodules', gitmodules_cache
+      get_index()
+    .error ->
+      gitmodules_cache[user + '/' + repo] = {}
+      get_index()
 
 process_index = (index, gitmodules, base) ->
   lines = index.split('\n').filter((line) -> line)
