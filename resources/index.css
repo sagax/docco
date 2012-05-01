@@ -240,9 +240,9 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 	margin: 0;
 }
 
-#filelist > table tbody td:last-child{
+/*#filelist > table tbody td:last-child{
 	white-space:pre;
-}
+}*/
 
 #filelist > table td.icon{
 width: 18px;
@@ -281,8 +281,8 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 .content>ol li{
 	position:relative;
 	width:100%;
-	height:28px;
-	line-height:28px;
+	height:32px;
+	line-height:32px;
   border-bottom:1px solid #CACACA;
 	border-left:1px solid #CACACA;
 	color: #000;
@@ -395,10 +395,14 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 	text-decoration:underline;
 }
 #filelist table tbody tr td:nth-child(2){
-  width:110px
+  width:110px;
+	text-overflow:ellipsis;
+	overflow:hidden;
 }
 #filelist table tbody tr td:nth-child(3){
-  width:120px
+  width:120px;
+	text-overflow:ellipsis;
+	overflow:hidden;
 }
 #filelist table tbody tr td:nth-child(3) span{
   width:50px;
@@ -406,11 +410,17 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 	text-align:right;
 }
 #filelist table tbody tr td:nth-child(4){
-  width:105px
+  width:105px;
+	text-overflow:ellipsis;
+	overflow:hidden;
 }
 #filelist table tbody tr td:nth-child(5){
-  width:110px
+  width:110px;
+	text-overflow:ellipsis;
+	overflow:hidden;
 }
 #filelist table tbody tr td:nth-child(6){
-  width:auto
+  width:260px;
+	text-overflow:ellipsis;
+	overflow:hidden;
 }
