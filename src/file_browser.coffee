@@ -120,9 +120,9 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
       current_table = $('#filelists div:first-child')[0]
       if current_table
         direction = if index_depth > parseInt $(current_table).attr('depth') then 1 else -1
-        width = $(current_table).width() + parseInt $(current_table).css('margin-right')
+        width = $(current_table).width() + parseInt $(current_table).css 'margin-right'
         $('#filelists')[if direction < 0 then 'prepend' else 'append'] table
-        $(current_table).css 'margin-left', -width if direction is -1
+        $(table).css 'margin-left', -width if direction is -1
         $($('#filelists').children()[0]).animate
           'margin-left': (if direction is -1 then '+' else '-') + '=' + width
         , -> $(current_table).remove()
