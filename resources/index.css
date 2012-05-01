@@ -188,8 +188,8 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 /* Docci Modules */
 #filelists { position: relative; }
 #filelists table {
-  /*position: absolute;*/
-  width: 680px;
+  /*position: absolute;
+  width: 680px;*/
 }
 
 #filelists table {
@@ -248,7 +248,7 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 #filelists table td.icon{
 width: 18px;
 height: 16px;
-background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;
+/*background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;*/
 }
 
 
@@ -310,6 +310,7 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 /*table上方导航连接*/
 #breadcrumb{
   color:#999;
+	margin:5px 0px 5px 0px;
 }
 #breadcrumb span{
 	color: #000;
