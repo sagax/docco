@@ -264,7 +264,10 @@ if ! [ -f "stylesheets/docco.css" ]; then
   cp "/usr/local/lib/docas/resources/docco.css" "stylesheets/docco.css"
 fi
 
-mkdir -p javascript
+mkdir -p "stylesheets/images"
+cp "/usr/local/lib/docas/resources/images/document_icon.png" "stylesheets/images/document_icon.png"
+
+mkdir -p "javascript"
 cp "/usr/local/lib/docas/vendor/jquery.min.js" "javascript/jquery.min.js"
 cp "/usr/local/lib/docas/vendor/filesize.js" "javascript/filesize.js"
 cp "/usr/local/lib/docas/vendor/moment.min.js" "javascript/moment.min.js"
