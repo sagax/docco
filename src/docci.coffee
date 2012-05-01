@@ -23,6 +23,8 @@
 
 #### Main Documentation Generation Functions
 
+# request = require 'request'
+
 # Once all of the code is finished highlighting, we can generate the HTML file
 # and write out the documentation. Pass the completed sections into the template
 # found in `resources/docci.jst`
@@ -40,13 +42,24 @@ generate_index = (dirname, dest) ->
           source = dirname + '/' + source
           readme = showdown.makeHtml fs.readFileSync(source).toString() if not readme and path.existsSync(source) and fs.statSync(source).isFile()
         console.log 'readme', readme
-        html = index_template {
-          title: repo, description: "Literate Programming can be Quick and Dirty.", statistics: statistics, log: log, readme: readme, user: user, repo: repo, opts: process.OPTS
-        }
-        fs.writeFile dest, html, (err) ->
-          throw err if err
-          console.log "docci: #{dest} generated."
+        get_repo user, repo, (description) ->
+          html = index_template {
+            title: repo, description: description, statistics: statistics, log: log, readme: readme, user: user, repo: repo, opts: process.OPTS
+          }
+          fs.writeFile dest, html, (err) ->
+            throw err if err
+            console.log "docci: #{dest} generated."
 
+get_repo = (user, repo, callback) ->
+  callback ''
+  return
+  request "https://api.github.com/repos/#{user}/#{repo}", (err, res, body) ->
+    console.log body
+    try
+
+      callback "Literate Programming can be Quick and Dirty."
+    catch e
+      callback null
 # Get the current language we're documenting, based on the extension.
 get_language = (source) -> languages[path.extname(source)]
 

@@ -100,10 +100,10 @@ if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-insid
 
   echo -n "Fetching from GitHub..."
   cd "$sources_dir"
+  git remote prune origin
   git pull
   # git fetch --quiet --force
   # git reset --quiet --hard  origin/master
-  git remote prune origin
   echo "Done"
 
 # Else, before clone the repository, clear the content of `storage_dir`. Shallow
@@ -264,7 +264,10 @@ if ! [ -f "stylesheets/docco.css" ]; then
   cp "/usr/local/lib/docas/resources/docco.css" "stylesheets/docco.css"
 fi
 
-mkdir -p javascript
+mkdir -p "stylesheets/images"
+cp "/usr/local/lib/docas/resources/images/document_icon.png" "stylesheets/images/document_icon.png"
+
+mkdir -p "javascript"
 cp "/usr/local/lib/docas/vendor/jquery.min.js" "javascript/jquery.min.js"
 cp "/usr/local/lib/docas/vendor/filesize.js" "javascript/filesize.js"
 cp "/usr/local/lib/docas/vendor/moment.min.js" "javascript/moment.min.js"
