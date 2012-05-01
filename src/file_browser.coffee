@@ -20,7 +20,7 @@ list_template = _.template [
   '<thead><tr><th></th><th>name</th><th>size</th><th>age</th><th>author</th><th>message</th></tr></thead>'
   '<tbody>'
   '<% if(index_depth) { %>'
-  '<tr class="directory"><td></td><td><a backward>..</a></td></tr>'
+  '<tr class="directory"><td></td><td><a backward>..</a></td><td></td<td></td<td></td>>><td></td></tr>'
   '<% } %>'
   '<% _.each(entries, function(entry) { %>'
   '<tr class="<%= entry.documented ? "document" : entry.type %>">'
