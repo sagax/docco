@@ -107,12 +107,14 @@ if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-insid
   echo "Done"
 
 # Else, before clone the repository, clear the content of `storage_dir`. Shallow
-# clone is used to save bandwidth and improve speed.
+# clone is not used to save bandwidth and improve speed. Because a file browser
+# needs deep log to correctly show modification history. Otherwise, we could use
+# `--depth 1` shallow clone.
 
 else
 
   rm -rf "$storage_dir"
-  git clone --depth 1 --quiet "git@github.com:$repo.git" "$sources_dir"
+  git clone --quiet "git@github.com:$repo.git" "$sources_dir"
 
 fi
 
