@@ -18,7 +18,7 @@ breadcrumb_template = _.template [
 list_template = _.template [
   '<div depth="<%= index_depth %>" class="filelist">'
   '<table>'
-  '<thead><tr><th></th><th>name</th><th>size</th><th>sloc</th><th>age</th><th>message</th></tr></thead>'
+  '<thead><tr><th></th><th>name</th><th>size</th><th>sloc</th><th>age</th><th>message<div class="history"><a target="_blank" href="https://github.com/<%= user %>/<%= repo %>/commits/master">history</a></div></th></tr></thead>'
   '<tbody>'
   '<% if(index_depth) { %>'
   '<tr class="directory"><td></td><td><a backward>..</a></td><td></td><td></td><td></td><td></td></tr>'
@@ -27,8 +27,8 @@ list_template = _.template [
   '<tr class="<%= entry.submodule ? "submodule" : entry.documented ? "document" : entry.type %>">'
   '<td class="icon"></td>'
   '<td><a '
-  "<%= entry.type == 'directory' ? 'forward' :
-    'href=\"' + entry.submodule ? 'https://github.com/' + entry.submodule : (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name) + '\"' %>"
+  "<%= entry.type == 'directory' && !entry.submodule ? 'forward' :
+    'href=\"' + (entry.submodule ? 'https://github.com/' + entry.submodule : (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name)) + '\"' %>"
   '><%- entry.name %></a></td>'
   '<td><span><%- entry.type == "file" ? entry.size : "—" %></span></td>'
   '<td><span><%= isNaN(entry.sloc) ? "—" : (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) %></span></td>'
@@ -168,6 +168,7 @@ process_index = (index, gitmodules, base) ->
       documented : match[8] is '1'
       sloc       : parseInt match[9], 10
       submodule  : gitmodules[base + '/' + match[7]]
+
     # Replace source extension for `.html` to get document file name.
     entry.document = entry.name.replace(/\.[^/.]+$/, '') + '.html' if entry.documented
     # For hidden file without extension.
