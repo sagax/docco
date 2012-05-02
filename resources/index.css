@@ -253,6 +253,7 @@ height: 16px;
 
 
 /*liuzhengming*/
+body{ width:1366px;}
 #container>h1{
   padding:10px 25px 1px 50px;
 }
