@@ -396,6 +396,24 @@ body{ width:1366px; color:#484848;}
 .filelist table thead tr th:nth-child(6){
   padding:7px 3px;
 }
+.history{
+  float:right;
+	padding-right:5px;
+	text-decoration:none;
+	color:
+}
+.history a{
+  text-decoration:none;
+	color:#4183C4;
+}
+.history a:hover{
+  text-decoration:underline;
+	color:#4183C4;
+}
+.history a:visited{
+  text-decoration:none;
+	color:#4183C4;
+}
 .filelist table thead tr td{
 	background: none repeat scroll 0 0 #F8F8F8;
 	border-bottom: 1px solid #EEEEEE;
@@ -448,7 +466,25 @@ body{ width:1366px; color:#484848;}
 	padding:7px 3px;
   min-width:250px;
 }
+.filelist table tbody tr td:nth-child(6)>span{
+	display: inline-block;
+	position: relative;
+	width: 100%;
+}
 .file_browser_author{
-  color:#999;
+	display:none;
+	height:21px;
+	line-height:21px;
+	background: none repeat scroll 0 0 #999999;
+	border: 1px solid #CCCCCC;
+	border-radius: 3px 3px 3px 3px;
 	font-size:12px;
+	color: #FFFFFF;
+	padding-left: 5px;
+	padding-right: 5px;
+	position: absolute;
+	right: 5px;
+}
+.filelist table tbody tr td:nth-child(6)>span:hover .file_browser_author{
+  display:inline-block;
 }
