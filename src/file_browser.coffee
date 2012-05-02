@@ -18,7 +18,7 @@ breadcrumb_template = _.template [
 list_template = _.template [
   '<div depth="<%= index_depth %>" class="filelist">'
   '<table>'
-  '<thead><tr><th></th><th>name</th><th>size</th><th>age</th><th>author</th><th>message</th></tr></thead>'
+  '<thead><tr><th></th><th>name</th><th>size</th><th>age</th><th>message</th></tr></thead>'
   '<tbody>'
   '<% if(index_depth) { %>'
   '<tr class="directory"><td></td><td><a backward>..</a></td><td></td><td></td><td></td><td></td></tr>'
@@ -32,8 +32,7 @@ list_template = _.template [
   '><%- entry.name %></a></td>'
   '<td><span><%- entry.type == "file" ? entry.size : "-" %></span><%= isNaN(entry.sloc) ? "" : "<span>" + (entry.sloc + "SLOC") + "</span>" %></td>'
   '<td><%- entry.modified %></td>'
-  '<td><%- entry.author   %></td>'
-  '<td><span><%- entry.subject  %></span></td>'
+  '<td><span><%- entry.subject  %><span class="file_browser_author">[<%- entry.author   %>]</span></span></td>'
   '</tr>'
   '<% }); %>'
   '</tbody>'
