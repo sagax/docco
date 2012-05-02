@@ -30,8 +30,8 @@ list_template = _.template [
   "<%= entry.type == 'directory' ? 'forward' :
     'href=\"' + (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name) + '\"' %>"
   '><%- entry.name %></a></td>'
-  '<td><span><%- entry.type == "file" ? entry.size : "-" %></span></td>'
-  '<td><span><%= isNaN(entry.sloc) ? "-" : (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) %></span></td>'
+  '<td><span><%- entry.type == "file" ? entry.size : "—" %></span></td>'
+  '<td><span><%= isNaN(entry.sloc) ? "—" : (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) %></span></td>'
   '<td><%- entry.modified %></td>'
   '<td><span><%- entry.subject  %><span class="file_browser_author" email="<%- entry.email %>"> [<%- entry.author %>]</span></span></td>'
   '</tr>'
@@ -159,7 +159,7 @@ process_index = (index, gitmodules, base) ->
     return unless match
     entry =
       type       : if match[1] is 'd' then 'directory' else 'file'
-      size       : filesize (parseInt match[2], 10), 0
+      size       : filesize((parseInt match[2], 10), on)
       modified   : moment(new Date match[3]).fromNow()
       email      : match[4]
       author     : match[5]
