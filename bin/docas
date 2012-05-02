@@ -130,11 +130,9 @@ fi
 #   caused by shallow clone.
 
 all_files_are_touched () {
-
   cp "$working_dir/.all" "$working_dir/.touched"
   echo > "$working_dir/.deleted"
   return
-
 }
 
 # Get `HEAD` commit hash, and list all git versioned files.
