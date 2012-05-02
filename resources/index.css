@@ -260,6 +260,9 @@ body{ width:1366px;}
 #container>p{
   padding:10px 25px 1px 50px;
 	font-family:Helvetica,arial,freesans,clean,sans-serif;
+	font-weight:300;
+	color:#666;
+	font-size:13px;
 }
 
 /*readme*/
