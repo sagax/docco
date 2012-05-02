@@ -519,6 +519,8 @@ body{ width:1366px; color:#484848;}
 }
 /*代码统计*/
 .code_stats{
+	float:right;
+	margin-bottom:10px;
 	border-collapse:collapse;
 	font:13px/1.4 Helvetica,arial,freesans,clean,sans-serif;
 }
@@ -573,9 +575,15 @@ body{ width:1366px; color:#484848;}
 	width:auto;
 }
 
+.content>ol{
+  clear:both;
+	margin:0px auto auto -20px;
+}
+
 .content>ol li{
-	font-size:13px; 
+	font-size:14px; 
 	color:#333;
+	font-family:Helvetica,arial,freesans,clean,sans-serif;
 }
 
 /*table上方导航连接*/
