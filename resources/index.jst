@@ -15,12 +15,18 @@
 		<div class="readme"><%= readme %></div>
     <!--content-->
 		<div class="content">
-      <ol>
-      <% for (var i = 0, l = statistics.length; i < l; i++) { %>
-      <li><%= statistics[i] %></li>
-      <% } %>
-      </ol>
-  
+
+      <table class="code_stats">
+        <% statistics.each(function(entry) { %>
+        <tr>
+          <td><div><span><%= entry[1] %></span><span data-lang="<%= entry[2] %>" style="width:<%= entry[0] %>;"></span></div></td>
+          <td><span data-lang="<%= entry[2] %>"></span></td>
+          <td><%= entry[2] %></td>
+          <td><%= entry[0] %></td>
+        </tr>
+        <% }); %>
+      </table>
+     
       <ol>
         <% for (var i = 0, l = log.length; i < l; i++) { %>
         <% var entry = log[i]; %>

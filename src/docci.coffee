@@ -79,8 +79,7 @@ generate_statistics = (dir, callback) ->
   for line, i in data
     data[i] = []
     for item in line.split ' '
-      data[i].push "<span>#{item}</span>" if item
-      data[i].push "&nbsp;"
+      data[i].push item if item
     data[i] = data[i].join ''
   callback null, data
 
