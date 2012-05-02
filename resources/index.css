@@ -253,6 +253,237 @@ background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png)
 
 
 /*liuzhengming*/
+/*--------------------------------------github_data_lang--------start-----------------------------------------*/
+span[data-lang="Other"] {
+    background-color: #CCCCCC;
+}
+span[data-lang="ActionScript"] {
+    background-color: #E3491A;
+}
+span[data-lang="Ada"] {
+    background-color: #02F88C;
+}
+span[data-lang="Arc"] {
+    background-color: #CA2AFE;
+}
+span[data-lang="Arduino"] {
+    background-color: #BD79D1;
+}
+span[data-lang="ASP"] {
+    background-color: #6A40FD;
+}
+span[data-lang="Assembly"] {
+    background-color: #A67219;
+}
+span[data-lang="AutoHotkey"] {
+    background-color: #6594B9;
+}
+span[data-lang="Boo"] {
+    background-color: #D4BEC1;
+}
+span[data-lang="C"] {
+    background-color: #555555;
+}
+span[data-lang="C#"] {
+    background-color: #5A25A2;
+}
+span[data-lang="C++"] {
+    background-color: #F34B7D;
+}
+span[data-lang="Clojure"] {
+    background-color: #DB5855;
+}
+span[data-lang="CoffeeScript"] {
+    background-color: #244776;
+}
+span[data-lang="ColdFusion"] {
+    background-color: #ED2CD6;
+}
+span[data-lang="Common Lisp"] {
+    background-color: #3FB68B;
+}
+span[data-lang="D"] {
+    background-color: #FCD46D;
+}
+span[data-lang="Delphi"] {
+    background-color: #B0CE4E;
+}
+span[data-lang="Dylan"] {
+    background-color: #3EBC27;
+}
+span[data-lang="Eiffel"] {
+    background-color: #946D57;
+}
+span[data-lang="Elixir"] {
+    background-color: #6E4A7E;
+}
+span[data-lang="Emacs Lisp"] {
+    background-color: #C065DB;
+}
+span[data-lang="Erlang"] {
+    background-color: #949E0E;
+}
+span[data-lang="F#"] {
+    background-color: #B845FC;
+}
+span[data-lang="Factor"] {
+    background-color: #636746;
+}
+span[data-lang="Fancy"] {
+    background-color: #7B9DB4;
+}
+span[data-lang="Fantom"] {
+    background-color: #DBDED5;
+}
+span[data-lang="FORTRAN"] {
+    background-color: #4D41B1;
+}
+span[data-lang="Go"] {
+    background-color: #8D04EB;
+}
+span[data-lang="Gosu"] {
+    background-color: #82937F;
+}
+span[data-lang="Groovy"] {
+    background-color: #E69F56;
+}
+span[data-lang="Haskell"] {
+    background-color: #29B544;
+}
+span[data-lang="HaXe"] {
+    background-color: #346D51;
+}
+span[data-lang="Io"] {
+    background-color: #A9188D;
+}
+span[data-lang="Ioke"] {
+    background-color: #078193;
+}
+span[data-lang="Java"] {
+    background-color: #B07219;
+}
+span[data-lang="JavaScript"] {
+    background-color: #F15501;
+}
+span[data-lang="Lua"] {
+    background-color: #FA1FA1;
+}
+span[data-lang="Matlab"] {
+    background-color: #BB92AC;
+}
+span[data-lang="Max/MSP"] {
+    background-color: #CE279C;
+}
+span[data-lang="Mirah"] {
+    background-color: #C7A938;
+}
+span[data-lang="Nemerle"] {
+    background-color: #0D3C6E;
+}
+span[data-lang="Nimrod"] {
+    background-color: #37775B;
+}
+span[data-lang="Nu"] {
+    background-color: #C9DF40;
+}
+span[data-lang="Objective-C"] {
+    background-color: #438EFF;
+}
+span[data-lang="Objective-J"] {
+    background-color: #FF0C5A;
+}
+span[data-lang="OCaml"] {
+    background-color: #3BE133;
+}
+span[data-lang="ooc"] {
+    background-color: #B0B77E;
+}
+span[data-lang="Parrot"] {
+    background-color: #F3CA0A;
+}
+span[data-lang="Perl"] {
+    background-color: #0298C3;
+}
+span[data-lang="PHP"] {
+    background-color: #6E03C1;
+}
+span[data-lang="Prolog"] {
+    background-color: #74283C;
+}
+span[data-lang="Puppet"] {
+    background-color: #CC5555;
+}
+span[data-lang="Pure Data"] {
+    background-color: #91DE79;
+}
+span[data-lang="Python"] {
+    background-color: #3581BA;
+}
+span[data-lang="R"] {
+    background-color: #198CE7;
+}
+span[data-lang="Racket"] {
+    background-color: #AE17FF;
+}
+span[data-lang="Rebol"] {
+    background-color: #358A5B;
+}
+span[data-lang="Ruby"] {
+    background-color: #701516;
+}
+span[data-lang="Rust"] {
+    background-color: #DEA584;
+}
+span[data-lang="Scala"] {
+    background-color: #7DD3B0;
+}
+span[data-lang="Scheme"] {
+    background-color: #1E4AEC;
+}
+span[data-lang="Self"] {
+    background-color: #0579AA;
+}
+span[data-lang="Shell"] {
+    background-color: #5861CE;
+}
+span[data-lang="Smalltalk"] {
+    background-color: #596706;
+}
+span[data-lang="Standard ML"] {
+    background-color: #DC566D;
+}
+span[data-lang="SuperCollider"] {
+    background-color: #46390B;
+}
+span[data-lang="Tcl"] {
+    background-color: #E4CC98;
+}
+span[data-lang="Turing"] {
+    background-color: #45F715;
+}
+span[data-lang="Vala"] {
+    background-color: #EE7D06;
+}
+span[data-lang="Verilog"] {
+    background-color: #848BF3;
+}
+span[data-lang="VHDL"] {
+    background-color: #543978;
+}
+span[data-lang="VimL"] {
+    background-color: #199C4B;
+}
+span[data-lang="Visual Basic"] {
+    background-color: #945DB7;
+}
+span[data-lang="XQuery"] {
+    background-color: #2700E2;
+}
+
+/*--------------------------------------github_data_lang----end---------------------------------------------*/
+
+
+
 body{ width:1366px; color:#484848;}
 #container>h1{
   padding:10px 25px 1px 50px;
