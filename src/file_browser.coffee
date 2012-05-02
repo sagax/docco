@@ -28,7 +28,7 @@ list_template = _.template [
   '<td class="icon"></td>'
   '<td><a '
   "<%= entry.type == 'directory' ? 'forward' :
-    'href=\"' + (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name) + '\"' %>"
+    'href=\"' + entry.submodule ? 'https://github.com/' + entry.submodule : (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name) + '\"' %>"
   '><%- entry.name %></a></td>'
   '<td><span><%- entry.type == "file" ? entry.size : "—" %></span></td>'
   '<td><span><%= isNaN(entry.sloc) ? "—" : (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) %></span></td>'
