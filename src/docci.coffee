@@ -80,7 +80,6 @@ generate_statistics = (dir, callback) ->
     data[i] = []
     for item in line.split ' '
       data[i].push item if item
-    data[i] = data[i].join ''
   callback null, data
 
 generate_log = (path, callback) ->
