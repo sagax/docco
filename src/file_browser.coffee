@@ -18,7 +18,7 @@ breadcrumb_template = _.template [
 list_template = _.template [
   '<div depth="<%= index_depth %>" class="filelist">'
   '<table>'
-  '<thead><tr><th></th><th>name</th><th>size</th><th>age</th><th>message</th></tr></thead>'
+  '<thead><tr><th></th><th>name</th><th>size</th><th>sloc</th><th>age</th><th>message</th></tr></thead>'
   '<tbody>'
   '<% if(index_depth) { %>'
   '<tr class="directory"><td></td><td><a backward>..</a></td><td></td><td></td><td></td><td></td></tr>'
@@ -30,9 +30,10 @@ list_template = _.template [
   "<%= entry.type == 'directory' ? 'forward' :
     'href=\"' + (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name) + '\"' %>"
   '><%- entry.name %></a></td>'
-  '<td><span><%- entry.type == "file" ? entry.size : "-" %></span><%= isNaN(entry.sloc) ? "" : "<span>" + (entry.sloc + "SLOC") + "</span>" %></td>'
+  '<td><span><%- entry.type == "file" ? entry.size : "-" %></span></td>'
+  '<td><span><%= isNaN(entry.sloc) ? "-" : (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) %></span></td>'
   '<td><%- entry.modified %></td>'
-  '<td><span><%- entry.subject  %><span class="file_browser_author">[<%- entry.author   %>]</span></span></td>'
+  '<td><span><%- entry.subject  %><span class="file_browser_author" email="<%- entry.email %>">[<%- entry.author %>]</span></span></td>'
   '</tr>'
   '<% }); %>'
   '</tbody>'
@@ -152,18 +153,19 @@ process_index = (index, gitmodules, base) ->
     #   "-","57","Mon, 23 Apr 2012 15:40:04 +0800","Me","Initial Commit","<.gitignore>","0","-"
     #   "-","0","Mon, 23 Apr 2012 15:40:04 +0800","Me","Bootstrap","<app.js>","1","0"
     #   "d","204","Fri, 27 Apr 2012 19:50:34 +0800","Me","First Build","<bin>","0","-"
-    match = line.match /"(d|-)","(\d+)","([^"]+)","(.+)","(.+)","<(.+)>","(0|1)","(\d+|-)"/
+    match = line.match /"(d|-)","(\d+)","([^"]+)","(.+)","(.+)","(.+)","<(.+)>","(0|1)","(\d+|-)"/
     return unless match
     entry =
       type       : if match[1] is 'd' then 'directory' else 'file'
       size       : filesize (parseInt match[2], 10), 0
       modified   : moment(new Date match[3]).fromNow()
       author     : match[4]
-      subject    : match[5]
-      name       : match[6]
-      documented : match[7] is '1'
-      sloc       : parseInt match[8], 10
-      submodule  : gitmodules[base + '/' + match[6]]
+      email      : match[5]
+      subject    : match[6]
+      name       : match[7]
+      documented : match[8] is '1'
+      sloc       : parseInt match[9], 10
+      submodule  : gitmodules[base + '/' + match[7]]
     # Replace source extension for `.html` to get document file name.
     entry.document = entry.name.replace(/\.[^/.]+$/, '') + '.html' if entry.documented
     # For hidden file without extension.
