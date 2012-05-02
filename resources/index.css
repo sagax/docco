@@ -198,11 +198,11 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 	border-collapse:collapse;
 	margin:0;
 	font-size: 13px;
-	line-height: 30px;
+	/*line-height: 30px;*/
 }
 
 #filelists table thead td{
-	line-height: 30px;
+	/*line-height: 30px;*/
 	padding-right:5px;
 	text-shadow: 0 1px 0 white;
 	border-bottom: 1px solid #D8D8D8;
@@ -462,8 +462,8 @@ body{ width:1366px;}
 	padding:7px 3px;
   min-width:250px;
 }
-.filelist table tbody tr td:nth-child(6) span{
+/*.filelist table tbody tr td:nth-child(6) span{
 	width:100%;
 	display:inline-block;
 	text-overflow:ellipsis;
-}
+}*/
