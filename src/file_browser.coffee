@@ -33,7 +33,7 @@ list_template = _.template [
   '<td><span><%- entry.type == "file" ? entry.size : "-" %></span></td>'
   '<td><span><%= isNaN(entry.sloc) ? "-" : (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) %></span></td>'
   '<td><%- entry.modified %></td>'
-  '<td><span><%- entry.subject  %><span class="file_browser_author" email="<%- entry.email %>">[<%- entry.author %>]</span></span></td>'
+  '<td><span><%- entry.subject  %><span class="file_browser_author" email="<%- entry.email %>"> [<%- entry.author %>]</span></span></td>'
   '</tr>'
   '<% }); %>'
   '</tbody>'
@@ -106,6 +106,8 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
         relative_base : relative_base
         entries       : process_index index, gitmodules_cache[user + '/' + repo], absolute_base
 
+      # update_usernames table
+
       # ### Handling Folder Navigation
       $(table).find('a[backward]').click ->
         new_path = index_path.split '/'
@@ -159,8 +161,8 @@ process_index = (index, gitmodules, base) ->
       type       : if match[1] is 'd' then 'directory' else 'file'
       size       : filesize (parseInt match[2], 10), 0
       modified   : moment(new Date match[3]).fromNow()
-      author     : match[4]
-      email      : match[5]
+      email      : match[4]
+      author     : match[5]
       subject    : match[6]
       name       : match[7]
       documented : match[8] is '1'
@@ -172,6 +174,26 @@ process_index = (index, gitmodules, base) ->
     entry.document = entry.name + '.html' if entry.document is '.html'
     entries.push entry
   _.sortBy entries, (entry) -> [entry.type, entry.name]
+
+usernames = {}
+
+update_usernames = (table) ->
+  _.chain($(table).find('span[email]'))
+  .map((span) -> $(span).attr('email'))
+  .union()
+  .each (email) ->
+    console.log email
+    if usernames.hasOwnProperty email
+      username = usernames[email]
+      $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
+    else
+      $.get "https://github.com/api/v2/yaml/user/email/#{email}", (data) ->
+        username = data.match /^  login: (.*)/
+        username = username[1] if username
+        if username
+          usernames[email] = username
+          $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
+          
 
 # Expose the constructor globally.
 @file_browser = file_browser
