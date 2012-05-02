@@ -246,9 +246,9 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 }*/
 
 #filelists table td.icon{
-width: 18px;
+/*width: 18px;
 height: 16px;
-/*background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;*/
+background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;*/
 }
 
 
@@ -376,7 +376,7 @@ body{ width:1366px;}
   text-indent:25px;
 }
 .filelist table thead tr th:nth-child(1){
-  padding:7px 3px;
+  padding:7px 10px;
 }
 .filelist table thead tr th:nth-child(2){
   padding:7px 3px;
@@ -388,6 +388,7 @@ body{ width:1366px;}
 .filelist table thead tr th:nth-child(4){
 	text-align:right;
   padding:7px 3px;
+	padding-right:5px;
 }
 .filelist table thead tr th:nth-child(5){
   padding:7px 3px;
@@ -446,6 +447,7 @@ body{ width:1366px;}
 }
 .filelist table tbody tr td:nth-child(4){
 	padding:7px 3px;
+	padding-right:5px;
 	text-align:right;
   color:#666;
 	font-size:10px;
