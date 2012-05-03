@@ -19,11 +19,12 @@
       <table class="code_stats">
         <% statistics.each(function(entry) { %>
         <tr>
-          <td><div><span><%= entry[1] %> sloc</span><span data-lang="<%= entry[2] %>" style="width:<%= entry[0] %>;"></span></div></td>
-          <td><span data-lang="<%= entry[2] %>"></span></td>
-          <td><%= entry[2] %></td>
           <td><%= entry[0] %></td>
+          <td><%= entry[2] %></td>
+          <td><span data-lang="<%= entry[2] %>"></span></td>
+          <td style="width:200px;"><div><span data-lang="<%= entry[2] %>" style="width:<%= entry[0] %>;"></span><span><%= entry[1] %> sloc</span></div></td>
         </tr>
+        <tr>
         <% }); %>
       </table>
      
