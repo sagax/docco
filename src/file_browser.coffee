@@ -106,7 +106,7 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
         relative_base : relative_base
         entries       : process_index index, gitmodules_cache[user + '/' + repo], absolute_base
 
-      # update_usernames table
+      update_usernames table
 
       # ### Handling Folder Navigation
       $(table).find('a[backward]').click ->
@@ -186,13 +186,13 @@ update_usernames = (table) ->
     console.log email
     if usernames.hasOwnProperty email
       username = usernames[email]
-      $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
+      if username
+        $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
     else
-      $.get "https://github.com/api/v2/yaml/user/email/#{email}", (data) ->
-        username = data.match /^  login: (.*)/
-        username = username[1] if username
+      $.get "https://github.com/legacy/user/email/#{email}", (data) ->
+        username = if data.user then data.user.login else null
+        usernames[email] = username
         if username
-          usernames[email] = username
           $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
           
 
