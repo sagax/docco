@@ -518,7 +518,7 @@ body{ width:1366px; color:#252519;}
 	overflow:hidden;
 }
 /*代码统计*/
-.code_stats { border-collapse:collapse; font:13px/1.4 Helvetica,arial,freesans,clean,sans-serif;}
+.code_stats { border-collapse:collapse; font:13px/1.4 Helvetica,arial,freesans,clean,sans-serif; margin-bottom:20px;}
 .code_stats span{ display:inline-block;}
 .code_stats tr td:nth-child(1){text-align:right;color:#666;}
 .code_stats tr td:nth-child(2){text-align:right;color:#333;}
