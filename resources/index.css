@@ -520,14 +520,14 @@ body{ width:1366px; color:#252519;}
 /*代码统计*/
 .code_stats { border-collapse:collapse; font:13px/1.4 Helvetica,arial,freesans,clean,sans-serif; margin-bottom:20px;}
 .code_stats span{ display:inline-block;}
-.code_stats tr td:nth-child(1){text-align:right;color:#666;}
+.code_stats tr td:nth-child(1){text-align:right;color:#666; padding-right:6px;}
 .code_stats tr td:nth-child(2){text-align:right;color:#333;}
-.code_stats tr td:nth-child(3){}
+.code_stats tr td:nth-child(3){ padding-left:5px; padding-right:4px;}
 .code_stats tr td:nth-child(3) span{width:8px;height:10px;}
 .code_stats tr td:nth-child(4){ width:200px;}
 .code_stats tr td:nth-child(4) div{ position:relative; width:100%; display:inline-block;}
 .code_stats tr td:nth-child(4) span:nth-child(1){ height:10px; min-height:3px; border-radius: 0px 2px 2px 0px;}
-.code_stats tr td:nth-child(4) span:nth-child(2){ position:absolute; top:-4px; text-indent:4px; text-align:left; color:#666; width:60px; }
+.code_stats tr td:nth-child(4) span:nth-child(2){ position:absolute; top:0px; text-indent:4px; text-align:left; color:#666; width:60px; }
 
 
 .content>ol{
@@ -539,6 +539,7 @@ body{ width:1366px; color:#252519;}
 	font-size:13px; 
 	color:#666;
 	font-family:Helvetica,arial,freesans,clean,sans-serif;
+	font-weight:300;
 }
 
 /*table上方导航连接*/
