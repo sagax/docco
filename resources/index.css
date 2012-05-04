@@ -703,7 +703,7 @@ body{ width:1366px; color:#252519;}
 	display:none;
 	height:21px;
 	line-height:21px;
-	background: none repeat scroll 0 0 #999999;
+	background: none repeat scroll 0 0 #666;
 	border: 1px solid #CCCCCC;
 	border-radius: 3px 3px 3px 3px;
 	font-size:12px;
@@ -713,6 +713,10 @@ body{ width:1366px; color:#252519;}
 	position: absolute;
 	right: 5px;
 }
+.file_browser_author a:link{ color:#fff; text-decoration:none;}
+.file_browser_author a:hover{ color:#fff; text-decoration:underline;}
+.file_browser_author a:active{ color:#fff; text-decoration:none;}
+.file_browser_author a:visited{ color:#fff; text-decoration:none;}
 .filelist table tbody tr td:nth-child(6)>span:hover .file_browser_author{
   display:inline-block;
 }
