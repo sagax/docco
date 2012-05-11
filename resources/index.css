@@ -1,4 +1,11 @@
 /*--------------------- Layout and Typography ----------------------------*/
+@font-face{
+	font-family:'Octicons Regular'; 
+	src :url("images/octicons-regular-webfont.eot");
+	src:url("images/octicons-regular-webfont.eot") format("embedded-opentype"),url("images/octicons-regular-webfont.woff") format("woff"),url("images/octicons-regular-webfont.ttf") format("truetype"),url("https://a248.e.akamai.net/assets.github.com/fonts/octicons/octicons-regular-webfont.svg?v=1#newFontRegular") format("svg");
+	font-weight:normal;
+	font-style:normal;
+}
 body {
   font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
   font-size: 15px;
@@ -490,10 +497,11 @@ body{ width:1366px; color:#252519;}
 }
 #container>p{
   padding:10px 25px 1px 50px;
-	font-family:Helvetica,arial,freesans,clean,sans-serif;
+	/*font-family:Helvetica,arial,freesans,clean,sans-serif;*/
 	font-weight:300;
 	color:#666;
-	font-size:13px;
+	/*font-size:13px;*/
+	font-style:italic;
 }
 
 /*readme*/
@@ -526,7 +534,7 @@ body{ width:1366px; color:#252519;}
 .code_stats tr td:nth-child(3) span{width:8px;height:10px;}
 .code_stats tr td:nth-child(4){ width:200px;}
 .code_stats tr td:nth-child(4) div{ position:relative; width:100%; display:inline-block;}
-.code_stats tr td:nth-child(4) span:nth-child(1){ height:10px; min-height:3px; border-radius: 0px 2px 2px 0px;}
+.code_stats tr td:nth-child(4) span:nth-child(1){ height:10px; min-width:3px; border-radius: 0px 2px 2px 0px;}
 .code_stats tr td:nth-child(4) span:nth-child(2){ position:absolute; top:0px; text-indent:4px; text-align:left; color:#666; width:60px; }
 
 
@@ -649,18 +657,32 @@ body{ width:1366px; color:#252519;}
 	padding: 7px 3px;
 	vertical-align: middle;
 }
-.filelist .directory .icon{
-  background: url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 10px 50% #F8F8F8;
+.filelist .directory .icon:after{
+  font-size:16px;
+  font-family:'Octicons Regular';
+  color:#80A6CD;
+  content:"";
 }
-.filelist .file .icon{
-  background: url(https://a248.e.akamai.net/assets.github.com/images/icons/txt.png) no-repeat 10px 50% #F8F8F8;
+.filelist .file .icon:after{
+  font-size:16px;
+  font-family:'Octicons Regular';
+  color:#777777;
+  content:"";
 }
-.filelist .document .icon{
-  background: url(images/document_icon.png) no-repeat 10px 50% #F8F8F8;
+.filelist .document .icon:after{
+  font-size:16px;
+  font-family:'Octicons Regular';
+  color:blue;
+  content:"";
 }
-.filelist .submodule .icon{
-  background: url(https://a248.e.akamai.net/assets.github.com/images/icons/sub.png) no-repeat 10px 50% #F8F8F8;
+.filelist .submodule .icon:after{
+  font-size:16px;
+  font-family:'Octicons Regular';
+  color:#3CBF5E;
+  content:"";
 }
+/*连接到外部网址的连接后边加的图标*/
+.filelist .document>td>a , .filelist .file>td>a{ padding-right:15px; background:url("data:image/gif;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAMAAwDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD0Qwy6zvnureK5vbqytGtzDbL+63GViCZA4VeDliOnABbAPFeJrO50q6tLW7+z/aFhfe6QrCJB50gRtqcDKBff1qwvi2YWtpDLpOk3HkwpGjz25dgoXjktXomj6PpbaHpzvplk8j2sbO7W6ksSoyScVtflZjuj/9k=") no-repeat scroll right center transparent;}
 .filelist table tbody a{
   color: #4183C4;
 	cursor:pointer;
@@ -671,7 +693,7 @@ body{ width:1366px; color:#252519;}
 }
 .filelist table tbody tr td:nth-child(1){
 	width:27px;
-  padding:7px 0px;
+  padding:7px 4px 7px 0px;
 }
 .filelist table tbody tr td:nth-child(2){
 	padding:7px 3px;
