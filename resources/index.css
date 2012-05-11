@@ -491,15 +491,20 @@ span[data-lang="XQuery"] {
 
 
 
-body{ width:1366px; color:#252519;}
-#container>h1{
-  padding:10px 25px 1px 50px;
+html{ height:100%;}
+body{ width:1366px;  height:100%; color:#252519;}
+#container{ height:100%;}
+#background{ left:0px;}
+.left{ background:#fff; width:525px;  min-height:100%; float:left; border:1px solid #E5E5EE;}
+.left>h1{
+  padding:50px 25px 1px 50px;
+  margin-top:0px;
 }
-#container>p{
+.left>p{
   padding:10px 25px 1px 50px;
 	/*font-family:Helvetica,arial,freesans,clean,sans-serif;*/
 	font-weight:300;
-	color:#333;
+	color:#666;
 	/*font-size:13px;*/
 	font-style:italic;
 }
@@ -508,7 +513,7 @@ body{ width:1366px; color:#252519;}
 .readme{
   width:450px;
 	min-height:5px;
-	float:left;
+	/*float:left;*/
 	padding:10px 25px 1px 50px;
 	text-align:left;
 }
@@ -524,6 +529,7 @@ body{ width:1366px; color:#252519;}
 	padding-left:25px;
 	padding-top:25px;
 	overflow:hidden;
+	margin-top:140px;
 }
 /*代码统计*/
 .code_stats { border-collapse:collapse; font:13px/1.4 Helvetica,arial,freesans,clean,sans-serif; margin-bottom:20px;}
@@ -674,7 +680,7 @@ body{ width:1366px; color:#252519;}
 .filelist .document .icon:after{
   font-size:16px;
   font-family:'Octicons Regular';
-  color:blue;
+  color:#80A6CD;
   content:"";
   float:right;
 }
