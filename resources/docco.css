@@ -202,7 +202,7 @@ body .shebang pre > span:last-child { opacity: 1 }
     margin: 15px 0;
     overflow: auto;
     padding: 6px 10px;
-    border-left-color:#E8E8FF;
+    border-left-color:#EEF;
 }
 .docs pre code{
     white-space:pre;

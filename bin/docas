@@ -270,7 +270,7 @@ if ! [ -f "stylesheets/docco.css" ]; then
 fi
 
 mkdir -p "stylesheets/fonts"
-cp "/usr/local/lib/docas/resources/fonts/*" "stylesheets/fonts"
+cp /usr/local/lib/docas/resources/fonts/* stylesheets/fonts
 
 mkdir -p "javascript"
 cp "/usr/local/lib/docas/vendor/jquery.min.js" "javascript/jquery.min.js"
