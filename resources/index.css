@@ -519,7 +519,19 @@ body{ width:1366px;  height:100%; color:#252519;}
 }
 .readme pre{
   margin:15px 0 15px;
-	padding-left:15px;
+    background-color: #F8F8F8;
+    border: 1px solid #CCCCCC;
+    border-radius: 3px 3px 3px 3px;
+    font-size: 13px;
+    line-height: 19px;
+    margin: 15px 0;
+    overflow: auto;
+    padding: 6px 10px;
+}
+.readme pre code{
+	white-space:pre;
+	margin:0;
+	padding:0;
 }
 /*content*/
 .content{
