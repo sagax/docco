@@ -1,8 +1,8 @@
 /*--------------------- Layout and Typography ----------------------------*/
 @font-face{
 	font-family:'Octicons Regular'; 
-	src :url("images/octicons-regular-webfont.eot");
-	src:url("images/octicons-regular-webfont.eot") format("embedded-opentype"),url("images/octicons-regular-webfont.woff") format("woff"),url("images/octicons-regular-webfont.ttf") format("truetype"),url("https://a248.e.akamai.net/assets.github.com/fonts/octicons/octicons-regular-webfont.svg?v=1#newFontRegular") format("svg");
+	src :url("fonts/octicons-regular-webfont.eot");
+	src:url("fonts/octicons-regular-webfont.eot") format("embedded-opentype"),url("fonts/octicons-regular-webfont.woff") format("woff"),url("fonts/octicons-regular-webfont.ttf") format("truetype"),url("https://a248.e.akamai.net/assets.github.com/fonts/octicons/octicons-regular-webfont.svg?v=1#newFontRegular") format("svg");
 	font-weight:normal;
 	font-style:normal;
 }
@@ -491,11 +491,16 @@ span[data-lang="XQuery"] {
 
 
 
-body{ width:1366px; color:#252519;}
-#container>h1{
-  padding:10px 25px 1px 50px;
+html{ height:100%;}
+body{ width:1366px;  height:100%; color:#252519;}
+#container{ height:100%;}
+#background{ left:0px;}
+.left{ background:#fff; width:525px;  min-height:100%; float:left; border:1px solid #E5E5EE;}
+.left>h1{
+  padding:50px 25px 1px 50px;
+  margin-top:0px;
 }
-#container>p{
+.left>p{
   padding:10px 25px 1px 50px;
 	/*font-family:Helvetica,arial,freesans,clean,sans-serif;*/
 	font-weight:300;
@@ -508,13 +513,25 @@ body{ width:1366px; color:#252519;}
 .readme{
   width:450px;
 	min-height:5px;
-	float:left;
+	/*float:left;*/
 	padding:10px 25px 1px 50px;
 	text-align:left;
 }
 .readme pre{
   margin:15px 0 15px;
-	padding-left:15px;
+    background-color: #F8F8F8;
+    border: 1px solid #CCCCCC;
+    border-radius: 3px 3px 3px 3px;
+    font-size: 13px;
+    line-height: 19px;
+    margin: 15px 0;
+    overflow: auto;
+    padding: 6px 10px;
+}
+.readme pre code{
+	white-space:pre;
+	margin:0;
+	padding:0;
 }
 /*content*/
 .content{
@@ -524,6 +541,7 @@ body{ width:1366px; color:#252519;}
 	padding-left:25px;
 	padding-top:25px;
 	overflow:hidden;
+	margin-top:140px;
 }
 /*代码统计*/
 .code_stats { border-collapse:collapse; font:13px/1.4 Helvetica,arial,freesans,clean,sans-serif; margin-bottom:20px;}
@@ -662,24 +680,28 @@ body{ width:1366px; color:#252519;}
   font-family:'Octicons Regular';
   color:#80A6CD;
   content:"";
+  float:right;
 }
 .filelist .file .icon:after{
   font-size:16px;
   font-family:'Octicons Regular';
   color:#777777;
   content:"";
+  float:right;
 }
 .filelist .document .icon:after{
   font-size:16px;
   font-family:'Octicons Regular';
-  color:blue;
+  color:#80A6CD;
   content:"";
+  float:right;
 }
 .filelist .submodule .icon:after{
   font-size:16px;
   font-family:'Octicons Regular';
   color:#3CBF5E;
   content:"";
+  float:right;
 }
 /*连接到外部网址的连接后边加的图标*/
 .filelist .document>td>a , .filelist .file>td>a{ padding-right:15px; background:url("data:image/gif;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAMAAwDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD0Qwy6zvnureK5vbqytGtzDbL+63GViCZA4VeDliOnABbAPFeJrO50q6tLW7+z/aFhfe6QrCJB50gRtqcDKBff1qwvi2YWtpDLpOk3HkwpGjz25dgoXjktXomj6PpbaHpzvplk8j2sbO7W6ksSoyScVtflZjuj/9k=") no-repeat scroll right center transparent;}
