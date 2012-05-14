@@ -26,11 +26,16 @@ done
 
 cd "$working_dir"
 cat .touched | while read file; do dirname $file; done | sort -u > .touched_folders_with_duplications
+cat .deleted | while read file; do dirname $file; done | sort -u >> .touched_folders_with_duplications
+rm .tmp_folders_1 && trap "rm -rf "$working_dir/.tmp_folders_1"; exit;" 0 SIGINT SIGTERM
 cat .touched_folders_with_duplications | while read folder; do dirname $folder; done | sort -u > .tmp_folders_1
+echo "x"
 while [ "$(cat .tmp_folders_1)" != "." ]; do
+  echo "s2"
   cat .tmp_folders_1 >> .touched_folders_with_duplications
   mv  .tmp_folders_1    .tmp_folders_2
   cat .tmp_folders_2 | while read folder; do dirname $folder; done | sort -u > .tmp_folders_1
+  cat .tmp_folders_1
 done
 cat .tmp_folders_1 >> .touched_folders_with_duplications
 cat .touched_folders_with_duplications | sort -u > .touched_folders
@@ -71,6 +76,7 @@ cat .touched_folders_with_duplications | sort -u > .touched_folders
 
 cd "$sources_dir"
 cat "$working_dir/.touched_folders" | while read folder; do
+  echo "s3"
   mkdir -p "$working_dir/ghpages/docas/tree/$folder"  
   rm -f "$working_dir/ghpages/docas/tree/$folder/docas.index"
   cd "$sources_dir/$folder"
@@ -103,4 +109,6 @@ done
 # Copy the `.gitmodules` files into `.docas` folder to recognize the git
 # submodules in repo navigator correctly.
 
-cp "$sources_dir/.gitmodules" "$working_dir/ghpages/docas/gitmodules"
+if [ -f "$sources_dir/.gitmodules" ]; then
+  cp "$sources_dir/.gitmodules" "$working_dir/ghpages/docas/gitmodules"
+fi

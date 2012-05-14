@@ -189,10 +189,12 @@ update_usernames = (table) ->
       if username
         $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
     else
-      $.get "https://github.com/legacy/user/email/#{email}", (data) ->
+      $.getJSON "https://api.github.com/legacy/user/email/#{email}", (data) ->
+        console.log 'wow, CORS', data
         username = if data.user then data.user.login else null
         usernames[email] = username
         if username
+          console.log $(table).find('span[email="' + email + '"]')
           $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
           
 
