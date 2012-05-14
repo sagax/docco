@@ -246,6 +246,7 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 	border-bottom: 1px solid #CACACA;
 	background-color:#F8F8F8;
 	margin: 0;
+	white-space:nowrap;
 }
 
 /*#filelists > table tbody td:last-child{
@@ -742,6 +743,10 @@ body{ width:1366px;  height:100%; color:#252519;}
 	display: inline-block;
 	position: relative;
 	width: 100%;
+	max-width:370px;
+	float:left;
+	overflow-x:hidden;
+	text-overflow:ellipsis;
 }
 .file_browser_author{
 	display:none;
