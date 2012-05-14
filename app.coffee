@@ -8,7 +8,7 @@ loggly_config =
     password: 'aBEGG-55376'
   json: true
 loggly_client = loggly.createClient loggly_config
-yamg          = require('yamg').connect()
+fairy         = require('fairy').connect()
 source_queue  = yamg.queue 'docas'
 
 # ## Step 1: Fetch (or Clone) the Repo
@@ -21,7 +21,7 @@ docas_repo = (repo, callback) ->
   exec "docas #{repo}", (err, stdout, stderr) ->
     if err
       console.log "err", err, stdout, stderr
-      callback {please: 'retry'}, null
+      callback {}, null
     else
       console.log 'done', repo, new Date, err, stdout, stderr
       callback null, null
