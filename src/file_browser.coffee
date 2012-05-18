@@ -33,7 +33,7 @@ list_template = _.template [
   '<td><span><%- entry.type == "file" ? entry.size : "—" %></span></td>'
   '<td><span><%= isNaN(entry.sloc) ? "—" : (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) %></span></td>'
   '<td><%- entry.modified %></td>'
-  '<td><span><%- entry.subject  %><span class="file_browser_author" email="<%- entry.email %>"> [<%- entry.author %>]</span></span></td>'
+  '<td><div><span><%- entry.subject  %></span><span class="file_browser_author" email="<%- entry.email %>"> [<%- entry.author %>]</span></div></td>'
   '</tr>'
   '<% }); %>'
   '</tbody>'
