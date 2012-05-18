@@ -50,6 +50,9 @@
 # aficionado, check out [Don Wilson](https://github.com/dontangg)'s 
 # [Nocco](http://dontangg.github.com/nocco/).
 
+http = require('http')
+querystring = require('querystring')
+
 #### Main Documentation Generation Functions
 
 # Generate the documentation for a source file by reading it in, splitting it
@@ -122,31 +125,37 @@ parse = (source, code) ->
 # wherever our markers occur.
 highlight = (source, sections, callback) ->
   language = get_language source
-  pygments = spawn 'pygmentize', ['-l', language.name, '-f', 'html', '-O', 'encoding=utf-8,tabsize=2']
-  output   = ''
+
+  post_data = querystring.stringify
+    lang: language.name
+    code: (section.code_text for section in sections).join(language.divider_text)
   
-  pygments.stderr.addListener 'data',  (error)  ->
-    console.error error.toString() if error
-    
-  pygments.stdin.addListener 'error',  (error)  ->
-    console.error "Could not use Pygments to highlight the source."
-    process.exit 1
-    
-  pygments.stdout.addListener 'data', (result) ->
-    output += result if result
-    
-  pygments.addListener 'exit', ->
-    output = output.replace(highlight_start, '').replace(highlight_end, '')
-    fragments = output.split language.divider_html
-    for section, i in sections
-      section.code_html = highlight_start + fragments[i] + highlight_end
-      section.docs_html = showdown.makeHtml section.docs_text
-    callback()
-    
-  if pygments.stdin.writable
-    pygments.stdin.write((section.code_text for section in sections).join(language.divider_text))
-    pygments.stdin.end()
+  options = 
+    host: '127.0.0.1'
+    path: '/pygments'
+    method: 'POST'
+    port: 5923
+    headers:
+      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Length': post_data.length
   
+  output = ''
+  
+  req = http.request options, (res) ->
+    res.setEncoding('utf8')
+    res.on 'data', (result) ->
+      output += result if result
+    res.on 'end', ->
+      output = output.replace(highlight_start, '').replace(highlight_end, '')
+      fragments = output.split language.divider_html
+      for section, i in sections
+        section.code_html = highlight_start + fragments[i] + highlight_end
+        section.docs_html = showdown.makeHtml section.docs_text
+      callback()
+  
+  req.write post_data
+  req.end()
+
 # Once all of the code is finished highlighting, we can generate the HTML file
 # and write out the documentation. Pass the completed sections into the template
 # found in `resources/docco.jst`
@@ -250,9 +259,11 @@ real_source = (source) ->
 sources = process.ARGV.filter((source) -> (get_language source) ? console.log "Unknown Type: #{source}").sort()
 destdir = process.OPTS.out ? 'docs'
 if sources.length
+  console.log Date.now()
   ensure_directory destdir, ->
     # fs.writeFile destdir + '/docco.css', docco_styles if !process.OPTS.css
     files = sources.slice(0)
     next_file = -> generate_documentation files.shift(), next_file if files.length
     next_file()
 
+process.on 'exit', -> console.log Date.now()
