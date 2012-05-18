@@ -1,11 +1,9 @@
-
 {exec}        = require 'child_process'
 loggly        = require 'loggly'
+config = require './config'
 loggly_config =
   subdomain: 'baoshan'
-  auth:
-    username: 'baoshan'
-    password: 'aBEGG-55376'
+  auth: config.auth
   json: true
 loggly_client = loggly.createClient loggly_config
 fairy         = require('fairy').connect()
