@@ -15,8 +15,6 @@ module.exports =
     name: 'java',          symbol: '//'
   '.js':
     name: 'javascript',    symbol: '//'
-  '.json':
-    name: 'json',          symbol: '//'
   '.latex':
     name: 'tex',           symbol: '%'
   '.m':
