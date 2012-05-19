@@ -27,7 +27,7 @@ done
 cd "$working_dir"
 cat .touched | while read file; do dirname $file; done | sort -u > .touched_folders_with_duplications
 cat .deleted | while read file; do dirname $file; done | sort -u >> .touched_folders_with_duplications
-rm .tmp_folders_1 && trap "rm -rf "$working_dir/.tmp_folders_1"; exit;" 0 SIGINT SIGTERM
+rm -f .tmp_folders_1 && trap "rm -rf "$working_dir/.tmp_folders_1"; exit;" 0 SIGINT SIGTERM
 cat .touched_folders_with_duplications | while read folder; do dirname $folder; done | sort -u > .tmp_folders_1
 echo "x"
 while [ "$(cat .tmp_folders_1)" != "." ]; do
