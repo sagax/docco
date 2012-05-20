@@ -93,7 +93,7 @@ cat "$working_dir/.touched_folders" | while read folder; do
       else	
         documentable="\"0\",\"-\""
       fi
-      echo $(ls -dl "$file" | awk '{{$1 = substr($1, 0, 1)} print "\""$1"\",\""$5"\""}')\
+      echo $(ls -dl "$file" | awk '{{$1 = substr($1, 1, 1)} print "\""$1"\",\""$5"\""}')\
 ,$(git log -1 --format="\"%aD\",\"%ae\",\"%an\",\"%s\"" -- "$file")\
 ,"\"<$file>\"","$documentable" >> "$working_dir/ghpages/docas/tree/$folder/docas.index"
     fi
