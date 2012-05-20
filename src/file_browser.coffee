@@ -140,7 +140,6 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
     gitmodules = gitmodules.join '/'
     $.get gitmodules, (data) ->
       gitmodules_cache[user + '/' + repo] = process_gitmodules data
-      console.log 'gitmodules', gitmodules_cache
       get_index()
     .error ->
       gitmodules_cache[user + '/' + repo] = {}
@@ -183,18 +182,15 @@ update_usernames = (table) ->
   .map((span) -> $(span).attr('email'))
   .union()
   .each (email) ->
-    console.log email
     if usernames.hasOwnProperty email
       username = usernames[email]
       if username
         $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
     else
       $.getJSON "https://api.github.com/legacy/user/email/#{email}", (data) ->
-        console.log 'wow, CORS', data
         username = if data.user then data.user.login else null
         usernames[email] = username
         if username
-          console.log $(table).find('span[email="' + email + '"]')
           $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
           
 
