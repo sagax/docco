@@ -555,7 +555,7 @@ body{ width:1366px;  height:100%; color:#252519;}
 .code_stats tr td:nth-child(4){ width:200px;}
 .code_stats tr td:nth-child(4) div{ position:relative; width:100%; display:inline-block;}
 .code_stats tr td:nth-child(4) span:nth-child(1){ height:10px; min-width:3px; border-radius: 0px 2px 2px 0px;}
-.code_stats tr td:nth-child(4) span:nth-child(2){ position:absolute; top:0px; text-indent:4px; text-align:left; color:#666; width:60px; }
+.code_stats tr td:nth-child(4) span:nth-child(2){ position:absolute; top:0px; text-indent:4px; text-align:left; color:#666; width:60px; white-space:nowrap;}
 
 
 .content>ol{
