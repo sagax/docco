@@ -47,8 +47,8 @@ process_gitmodules = (gitmodules) ->
   gitmodules = gitmodules.split /\[[^\]]*\]/
   gitmodules = gitmodules[1..]
   gitmodules.reduce (hash, submodule) ->
-    match = submodule.match /path = (.*)\n.*url = git@github\.com:(.*)\.git/
-    hash[match[1]] = match[2]
+    match = submodule.match /path = (.*)\n.*url = git(?:@|:\/\/)github\.com(?::|\/)(.*)\.git/
+    hash[match[1]] = match[4]
     hash
   , {}
 
