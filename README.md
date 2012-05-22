@@ -1,3 +1,16 @@
+Docas automatically documents your repo on GitHub pages. Every time you push
+to GitHub, docas keeps the `master` and `gh-pages` branch in sync.
+
+## Alpha Release
+
+  1. Add `docas` as your collaborator.
+  2. Add a Service Hook: `http://alpha.docas.io`
+
+That's done. Test it with any push. The initial build may takes longer than
+following pushes.
+
+Feature request and feedbacks are appreciated.
+
 **Docco** is a quick-and-dirty, hundred-line-long, literate-programming-style
 documentation generator. It produces HTML
 that displays your comments alongside your code. Comments are passed through
