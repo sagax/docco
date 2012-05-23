@@ -353,10 +353,5 @@ echo "Branch gh-pages synced with master. Crowd applauds."
 # Update `sources_dir` directory by pulling just pushed `gh-pages` branch back. to make following synchronizations quicker
 # for no need to fetch (just pushed) documentations again.
 
-# cd "$sources_dir"
-# git pull
-
-rm -rf "$sources_dir"
-cp -r "$ghpages_dir" "$sources_dir"
-cd "$sources_dir"
+rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir" && cd "$sources_dir"
 git checkout --force --quiet master > /dev/null
