@@ -184,7 +184,11 @@ else
   rm -rf *
   echo "checkouting"
   pwd
-  git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
+  if [ -z "$(git branch -a | egrep "^  gh-pages$" )" ]; then
+    git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
+  else
+    git checkout --force --quiet gh-pages > /dev/null
+  fi
   echo -n "Resetting... "
   git reset --quiet --hard origin/gh-pages
   echo "Done"
