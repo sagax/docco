@@ -352,6 +352,7 @@ echo "Branch gh-pages synced with master. Crowd applauds."
 # cd "$sources_dir"
 # git pull
 
+rm -rf "$sources_dir"
 cp -r "$ghpages_dir" "$sources_dir"
 cd "$sources_dir"
 git checkout --force --quiet -b origin/master  > /dev/null
