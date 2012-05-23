@@ -13,7 +13,7 @@ task 'install', 'install the `docco`, `docci`, `doccx`, and `docas` command into
   lib  = base + '/lib/docas'
   exec([
     'mkdir -p ' + lib
-    'cp -rf bin README resources vendor lib ' + lib
+    'cp -rf bin resources vendor lib ' + lib
     'ln -sf ' + lib + '/bin/docco ' + base + '/bin/docco'
     'ln -sf ' + lib + '/bin/docci ' + base + '/bin/docci'
     'ln -sf ' + lib + '/bin/doccx ' + base + '/bin/doccx'

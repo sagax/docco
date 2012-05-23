@@ -346,13 +346,11 @@ echo "Branch gh-pages synced with master. Crowd applauds."
 
 # ### Step 7: Coda
 
-# Update `sources` directory again to make following synchronizations quicker
+# Update `sources_dir` directory by pulling just pushed `gh-pages` branch back. to make following synchronizations quicker
 # for no need to fetch (just pushed) documentations again.
 
-cd "$sources_dir"
-git pull
+# cd "$sources_dir"
+# git pull
 
-# git fetch --quiet --force
-# git checkout gh-pages
-# git reset --quiet --hard  origin/gh-pages
-# git checkout master
+cp -r "$ghpages_dir" "$sources_dir"
+git checkout --force --quiet -b master origin/master > /dev/null
