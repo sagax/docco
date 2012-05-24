@@ -292,6 +292,12 @@ cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages
 
 # Update file and folder indexes for touched file and folder using **[doccx]**.
 #
+# Doccx will generated `docas.index` in `docas/tree` folder for all folders list
+# in the follow input:
+#
+#   1. `.touched`
+#   2. `.deleted`
+#
 # [doccx]: doccx.html
 echo -n "Generating File & Folder Indexes..."
 doccx -s "$sources_dir" -w "$working_dir"
@@ -302,10 +308,12 @@ echo "Done" && echo -n "Generating cover page..."
 #   1. a language statistics named `.statist`, and,
 #   2. a list of all recognized sources named `.all_sources`.
 #
-# Make sure a stylesheet for `index.html` exists. (User modification will be
-# honored.)
-# 
-# Invoke the **docci** command-line program to generate `index.html`.
+# Do:
+#
+#   1. Make sure a stylesheet for `index.html` exists.
+#   2. Invoke the **[docci]** command-line program to generate `index.html`.
+#
+# [docci]: docci.html
 
 cd "$ghpages_dir"
 mkdir -p stylesheets
@@ -349,10 +357,12 @@ echo "Done. Crowd applauds."
 # synchronization need to pull `gh-pages` first (before documenting, commit,
 # and push).
 #
-# Make `sources_dir` up-to-date by:
+# Ensure `sources_dir` is up-to-date by:
 # 
 #   1. Overriding it using `ghpages_dir`.
 #   2. Checkout `master` branch.
+#
+# Why not have a cup of coffee, Docas?
 
 rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir" && cd "$sources_dir"
 git checkout --force --quiet master > /dev/null
