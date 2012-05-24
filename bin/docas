@@ -317,10 +317,11 @@ cp "/usr/local/lib/docas/lib/file_browser.js" "javascript/file_browser.js"
 
 cd "$ghpages_dir"
 status="$(git status --porcelain)"
-echo "$status"
-echo "Created:$(echo "$status" | egrep "^(\?\?)" | wc -l)"
-echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
-echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
+if [ $verbose = "on" ]; then
+  echo "Created:$(echo "$status" | egrep "^(\?\?)" | wc -l)"
+  echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
+  echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
+fi
 
 # Following below steps to update gh-pages:
 # 
@@ -332,7 +333,7 @@ echo -n "Pushing to gh-pages on GitHub...      "
 git add .
 git commit --all --quiet --message "Docas.io synced with $head_hash"
 git push --quiet origin gh-pages
-echo "Done. Crowd applauds."
+echo "DONE. Crowd applauds."
 
 # ### Step 8: Coda
 
