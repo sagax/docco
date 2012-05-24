@@ -102,7 +102,6 @@ done
 # Copy the `.gitmodules` files into `.docas` folder to recognize the git
 # submodules in repo navigator correctly.
 
-echo "Doccx Post Processing"
 if [ -f "$sources_dir/.gitmodules" ]; then
   cp "$sources_dir/.gitmodules" "$working_dir/ghpages/docas/gitmodules"
 fi
