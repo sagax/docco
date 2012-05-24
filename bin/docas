@@ -268,7 +268,7 @@ cp "/usr/local/lib/docas/lib/file_browser.js" "javascript/file_browser.js"
 # * Generate documents using docco.
 
 cd "$sources_dir"
-cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages_dir"
+cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages_dir" > /dev/null
 
 # ### Step 5: Generate Cover Page using Docci
 
