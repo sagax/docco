@@ -353,3 +353,4 @@ echo "Done. Crowd applauds."
 
 rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir" && cd "$sources_dir"
 git checkout --force --quiet master > /dev/null
+git branch -D gh-pages
