@@ -354,4 +354,9 @@ cd "$ghpages_dir" && git checkout --force --quiet master && git branch -D gh-pag
 rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
 
 # <img src="https://a248.e.akamai.net/assets.github.com/images/modules/about_page/octocat.png?1334862345"></img>
+# <img id= "mug" style="display:none" src="http://origin.kaboodle.com/hi/img/b/0/0/17f/a/AAAAC-kxKTAAAAAAAX-s1A.jpg"></img>
 # <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+# <input id="coffee" type="button">YES, Please!</input>
+# <script>
+# $('#coffee").click(function(){$('#mug').css('display', 'block')})
+# </script>
