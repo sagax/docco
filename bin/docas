@@ -235,7 +235,7 @@ echo "DONE"
 
 # ### Step 4: Synchronize Documents (using Docco)
 
-echo "Generating documents..."
+echo -n "Generating Documents...               "
 
 # * Synchronize deleted sources. Delete the according documents for all deleted
 # sources. Take care of hidden file without an extension.
@@ -247,28 +247,12 @@ cat "$working_dir/.deleted" | while read file; do
   rm -f "$deleted_document.html"
 done
 
-# * Make sure front-end required stylesheet exist.
-
-cd "$ghpages_dir"
-mkdir -p stylesheets
-cp /usr/local/lib/docas/resources/docco.css stylesheets/docco.css
-mkdir -p stylesheets/fonts
-cp /usr/local/lib/docas/resources/fonts/* stylesheets/fonts
-
-# * Make sure frond-end required scripts exist.
-
-mkdir -p "javascript"
-cp "/usr/local/lib/docas/vendor/jquery.min.js" "javascript/jquery.min.js"
-cp "/usr/local/lib/docas/vendor/filesize.js" "javascript/filesize.js"
-cp "/usr/local/lib/docas/vendor/moment.min.js" "javascript/moment.min.js"
-cp "/usr/local/lib/docas/vendor/underscore-min.js" "javascript/underscore-min.js"
-cp "/usr/local/lib/docas/lib/langstats.js" "javascript/langstats.js"
-cp "/usr/local/lib/docas/lib/file_browser.js" "javascript/file_browser.js"
  
 # * Generate documents using docco.
 
 cd "$sources_dir"
 cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages_dir" > /dev/null
+echo "DONE"
 
 # ### Step 5: Generate Cover Page using Docci
 
@@ -304,7 +288,27 @@ cp /usr/local/lib/docas/resources/index.css stylesheets/index.css
 docci -o "$ghpages_dir" "$sources_dir"
 echo "Done"
 
-# ### Step 6: Push to Upstream
+# ### Step 6: Static File Handling
+
+# * Make sure front-end required stylesheet exist.
+
+cd "$ghpages_dir"
+mkdir -p stylesheets
+cp /usr/local/lib/docas/resources/docco.css stylesheets/docco.css
+mkdir -p stylesheets/fonts
+cp /usr/local/lib/docas/resources/fonts/* stylesheets/fonts
+
+# * Make sure frond-end required scripts exist.
+
+mkdir -p "javascript"
+cp "/usr/local/lib/docas/vendor/jquery.min.js" "javascript/jquery.min.js"
+cp "/usr/local/lib/docas/vendor/filesize.js" "javascript/filesize.js"
+cp "/usr/local/lib/docas/vendor/moment.min.js" "javascript/moment.min.js"
+cp "/usr/local/lib/docas/vendor/underscore-min.js" "javascript/underscore-min.js"
+cp "/usr/local/lib/docas/lib/langstats.js" "javascript/langstats.js"
+cp "/usr/local/lib/docas/lib/file_browser.js" "javascript/file_browser.js"
+
+# ### Step 7: Push to Upstream
 
 # Upon this phase, updated cover page (always) and documentations (probably) are
 # all ready. It's time to push back to `gh-pages` branch on GitHub.
@@ -334,7 +338,7 @@ git commit --all --quiet --message "Docas.io synced with $head_hash"
 git push --quiet origin gh-pages
 echo "Done. Crowd applauds."
 
-# ### Step 7: Coda
+# ### Step 8: Coda
 
 # Since if the `gh-pages` branch of the `sources_dir` is not up-to-date, next
 # synchronization need to pull `gh-pages` first (before documenting, commit,
