@@ -248,7 +248,7 @@ done
 # * Generate documents using docco.
 
 cd "$sources_dir"
-cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages_dir" > /dev/null
+cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -r $(echo $repo | grep -P "(?<=/)([^\/]*)" -o) -o "$ghpages_dir" > /dev/null
 echo "DONE"
 
 # ### Step 5: Generate Cover Page using Docci
@@ -352,3 +352,6 @@ echo "DONE. Crowd applauds."
 
 cd "$ghpages_dir" && git checkout --force --quiet master && git branch -D gh-pages > /dev/null
 rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
+
+# <img src="https://a248.e.akamai.net/assets.github.com/images/modules/about_page/octocat.png?1334862345"></img>
+

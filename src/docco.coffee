@@ -160,10 +160,14 @@ highlight = (source, sections, callback) ->
 # and write out the documentation. Pass the completed sections into the template
 # found in `resources/docco.jst`
 generate_html = (source, css, sections) ->
-  title = path.basename real_source source
+  title_segments = real_source(source).split('/')
+  title_segments.shift() if title_segments[0] is '.'
+  title_segments.splice 0, 0, process.OPTS.repo
+  head_title = title_segments.join(' › ') #  path.basename real_source source
+  title = title_segments[title_segments.length - 1]
   dest  = destination source
   html  = docco_template {
-    title: title, sections: sections, css: css
+    head_title: head_title, title: title, sections: sections, css: css
   }
   console.log "docco: #{source} -> #{dest}"
   ensure_directory (path.dirname dest), ->
