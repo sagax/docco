@@ -70,7 +70,7 @@ cat .touched_folders_with_duplications | sort -u > .touched_folders
 
 cd "$sources_dir"
 cat "$working_dir/.touched_folders" | while read folder; do
-  mkdir -p "$working_dir/ghpages/docas/tree/$folder"  
+  mkdir -p "$working_dir/ghpages/docas/tree/$folder"
   rm -f "$working_dir/ghpages/docas/tree/$folder/docas.index"
   cd "$sources_dir/$folder"
   find . -mindepth 1 -maxdepth 1 | while read file; do
@@ -82,25 +82,19 @@ cat "$working_dir/.touched_folders" | while read folder; do
         base=".$ext"
       fi
       if [ -f "$working_dir/ghpages/$folder/$base.html" ]; then
-        documentable="\"1\",\"$(LANG=C grep -cv "^\s*$" "$file")\""      
-      else	
+        documentable="\"1\",\"$(LANG=C grep -cv "^\s*$" "$file")\""
+      else
         documentable="\"0\",\"-\""
       fi
-      echo $(ls -dl "$file" | awk '{{$1 = substr($1, 1, 1)} print "\""$1"\",\""$5"\""}')\
-,$(git log -1 --format="\"%aD\",\"%ae\",\"%an\",\"%s\"" -- "$file")\
-,"\"<$file>\"","$documentable" >> "$working_dir/ghpages/docas/tree/$folder/docas.index"
+      echo $(ls -dl "$file" | awk '{{$1 = substr($1, 1, 1)} print "\""$1"\",\""$5"\""}'),$(git log -1 --format="\"%aD\",\"%ae\",\"%an\",\"%s\"" -- "$file"),"\"<$file>\"","$documentable" >> "$working_dir/ghpages/docas/tree/$folder/docas.index"
     fi
   done
 done
 
 # ## Post Processing
 
-# Miscellaneous patches including:
-# 
-#   + Submodules
-#
-# Copy the `.gitmodules` files into `.docas` folder to recognize the git
-# submodules in repo navigator correctly.
+# Copy the `.gitmodules` files into `docas` folder to recognize git submodules
+# in repository navigator correctly.
 
 if [ -f "$sources_dir/.gitmodules" ]; then
   cp "$sources_dir/.gitmodules" "$working_dir/ghpages/docas/gitmodules"
