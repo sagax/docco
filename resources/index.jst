@@ -8,13 +8,24 @@
 </head>
 <body>
   <div id="container">
+   <table>
+   <tbody>
+   <tr>
+   <td>
     <div class="left">
     <div id="background"></div>
     <h1><%= title %></h1>
     <p><%= description %></p>
     <!--readme-->
+    </td>
+    <td></td>
+    </tr>
+    <tr>
+    <td>
 		<div class="readme"><%= readme %></div>
     </div>
+    </td>
+    <td>
     <!--content-->
 		<div class="content">
 
@@ -44,6 +55,10 @@
     </div>
   
     </div>
+   </td>
+   </tr>
+   </tbody>
+   </table>
   </div>
   <script src="javascript/jquery.min.js" type="text/javascript"></script>
   <script src="javascript/underscore-min.js" type="text/javascript"></script>
