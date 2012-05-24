@@ -785,3 +785,9 @@ body{ width:1366px;  height:100%; color:#252519;}
   border-right : 1px solid #E5E5EE;
   background:#fff;
 }
+code{
+    background:#F8F8FF;
+    border: 1px solid #DEDEDE;
+    font-size: 12px;
+    padding: 0 0.2em;
+}
