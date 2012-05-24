@@ -194,7 +194,7 @@ else
   # In case of `synced_ghpages_hash` is an empty string, `synced_sources_hash` equals head_hash.
   if [ "$synced_ghpages_hash" ] && [ "$synced_sources_hash" == "$head_hash" ]; then
 
-    echo "Already synchronized with latest commit."
+    echo "Already synched with latest commit."
     exit 0
 
   fi
@@ -203,14 +203,14 @@ else
   # touched.
   if [ -z "$synced_ghpages_hash" ] || [ -z "$synced_sources_hash" ]; then
 
-    echo "gh-pages branch out-of-sync for a long time, rebuilding..."
+    echo "Out-of-sync for a long time, rebuilding..."
     all_files_are_touched
     
   # If we can securely list all touched files in the `master` and `gh-pages`
   # branch since last sync, output unique directories into dirty_directories file.
   else
 
-    echo "Docas previously comitted gh-pages found, synced with $synced_sources_hash"
+    echo "Previously synced with $synced_sources_hash"
     cd "$sources_dir"
     git diff --name-status $synced_sources_hash..HEAD > "$working_dir/.git-diff"
     egrep "^(A|M)" "$working_dir/.git-diff" | cut -c 3- > "$working_dir/.touched"
@@ -268,7 +268,7 @@ echo "DONE"
 
 echo -n "Generating File & Folder Indexes...   "
 doccx -s "$sources_dir" -w "$working_dir"
-echo "Done"
+echo "DONE"
 
 # Upon this phase, following materials were all ready:
 #
@@ -286,7 +286,7 @@ echo -n "Generating Repository Cover Page...   "
 cd "$ghpages_dir" && mkdir -p stylesheets
 cp /usr/local/lib/docas/resources/index.css stylesheets/index.css
 docci -o "$ghpages_dir" "$sources_dir"
-echo "Done"
+echo "DONE"
 
 # ### Step 6: Static File Handling
 
