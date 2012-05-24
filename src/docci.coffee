@@ -47,7 +47,6 @@ generate_index = (dirname, dest) ->
           }
           fs.writeFile dest, html, (err) ->
             throw err if err
-            console.log "docci: #{dest} generated."
             process.exit()
 
 get_repo = (user, repo, callback) ->
