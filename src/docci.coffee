@@ -66,7 +66,6 @@ get_language = (source) -> languages[path.extname(source)]
 
 get_user_and_repo = (path, callback) ->
   exec 'git remote -v | egrep -m 1 "origin" | grep -P "(?<=:).*(?=\\.)" -o', {cwd: path}, (err, data) ->
-    console.log "repo", data
     callback() if err
     callback data.trim().split('/')...
 
