@@ -98,7 +98,7 @@ ghpages_dir="$working_dir/ghpages"
 sources_git="$sources_dir/.git"
 if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-inside-work-tree)" == "true" ]; then
 
-  echo -n "Fetching from GitHub..."
+  echo -n "Fetching from GitHub...               "
   cd "$sources_dir"
   git remote prune origin
   git pull --quiet --force
@@ -159,7 +159,6 @@ if [ "$(git branch -a | grep origin\/gh-pages | wc -l)" -eq 0 ]; then
   git symbolic-ref HEAD refs/heads/gh-pages
   rm -f .git/index
   git clean --quiet -fdx
-
   all_files_are_touched
 
 # If there exists a `gh-pages` branch, which means the branch *may* contain docas
@@ -179,11 +178,8 @@ if [ "$(git branch -a | grep origin\/gh-pages | wc -l)" -eq 0 ]; then
 else
 
   cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir" && rm -rf *
-  echo "checkouting"
-  pwd
-  # if [ -z "$(git branch -a | egrep "^  gh-pages$" )" ]; then git branch -D gh-pages fi
   git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
-  echo -n "Finding Docas Commits Hashes... "
+  echo -n "Finding Docas Commits Hashes...       "
   synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]+$" | xargs echo)
   synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)
   synced_sources_hash=$(echo "$synced_docas_commit" | tail -c 8 | head -c 7)
