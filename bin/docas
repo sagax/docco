@@ -354,4 +354,4 @@ cd "$ghpages_dir" && git checkout --force --quiet master && git branch -D gh-pag
 rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
 
 # <img src="https://a248.e.akamai.net/assets.github.com/images/modules/about_page/octocat.png?1334862345"></img>
-
+# <script src="http://documentcloud.github.com/backbone/backbone.js"></script>
