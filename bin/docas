@@ -102,8 +102,6 @@ if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-insid
   cd "$sources_dir"
   git remote prune origin
   git pull --force
-  # git fetch --quiet --force
-  # git reset --quiet --hard  origin/master
   echo "Done"
 
 # Else, before clone the repository, clear the content of `storage_dir`. Shallow
@@ -180,8 +178,7 @@ if [ "$(git branch -a | grep origin\/gh-pages | wc -l)" -eq 0 ]; then
 
 else
 
-  cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir"
-  rm -rf *
+  cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir" && rm -rf *
   echo "checkouting"
   pwd
   if [ -z "$(git branch -a | egrep "^  gh-pages$" )" ]; then
@@ -189,9 +186,6 @@ else
   else
     git checkout --force --quiet gh-pages > /dev/null
   fi
-  echo -n "Resetting... "
-  git reset --quiet --hard origin/gh-pages
-  echo "Done"
 
   echo -n "Finding Docas Commits Hashes... "
   synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]+$" | xargs echo)
@@ -201,13 +195,11 @@ else
   synced_sources_hash=$(git log --pretty=oneline | egrep -m 1 "^$synced_sources_hash" | head -c 7 | xargs echo)
   echo "Done"
 
-  echo "synced:" "$synced_sources_hash | $synced_ghpages_hash"
-
   # In case of `synced_ghpages_hash` is an empty string, `synced_sources_hash` equals head_hash.
   if [ "$synced_ghpages_hash" ] && [ "$synced_sources_hash" == "$head_hash" ]; then
 
-   echo "Already synchronized with latest commit."
-   exit 0
+    echo "Already synchronized with latest commit."
+    exit 0
 
   fi
 
@@ -225,12 +217,7 @@ else
     echo "Docas previously comitted gh-pages found, synced with $synced_sources_hash"
     cd "$sources_dir"
     git diff --name-status $synced_sources_hash..HEAD > "$working_dir/.git-diff"
-    echo "diff"
-    cat "$working_dir/.git-diff"
-    echo "diffend"
     egrep "^(A|M)" "$working_dir/.git-diff" | cut -c 3- > "$working_dir/.touched"
-    cat "$working_dir/.touched"
-    echo "touchedend"
     egrep "^D"     "$working_dir/.git-diff" | cut -c 3- > "$working_dir/.deleted"
 
   fi
@@ -242,9 +229,9 @@ fi
 # Get language statistics, all and touched sources from `Linguist HTTP` server
 # listening local port 4567.
 
-echo -n "Calling Linguist HTTP..."
-echo > "$working_dir/.all_sources"
-echo > "$working_dir/.touched_sources"
+echo -n "Calling Linguist HTTP @ port 4567...  "
+touch "$working_dir/.all_sources"
+touch "$working_dir/.touched_sources"
 curl --silent --output "$working_dir/.statist"         "http://127.0.0.1:4567/statist?path=$sources_dir"
 curl --silent --output "$working_dir/.all_sources"     "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.all"
 curl --silent --output "$working_dir/.touched_sources" "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.touched"
@@ -254,27 +241,25 @@ echo "DONE"
 
 echo "Generating documents..."
 
-# 1. Synchronize deleted sources
+# * Synchronize deleted sources. Delete the according documents for all deleted
+# sources. Take care of hidden file without an extension.
 
 cd "$ghpages_dir"
 cat "$working_dir/.deleted" | while read file; do
-  # TODO: Hidden file without extension.
-  rm -f "${file%.*}.html"
+  deleted_document=${file%.*}
+  if [ -z $deleted_document ]; then deleted_document=$file; fi
+  rm -f "$deleted_document.html"
 done
 
-# 2. Make sure a stylesheet for documents exists.
-# Make sure a stylesheet for documents exists. User modification will be
-# honored. In case of the stylesheet doesn't exists, copy the default stylesheet
-# to the `stylesheets` folder.
+# * Make sure front-end required stylesheet exist.
 
 cd "$ghpages_dir"
-if ! [ -f "stylesheets/docco.css" ]; then
-  mkdir -p "stylesheets"
-  cp "/usr/local/lib/docas/resources/docco.css" "stylesheets/docco.css"
-fi
-
-mkdir -p "stylesheets/fonts"
+mkdir -p stylesheets
+cp /usr/local/lib/docas/resources/docco.css stylesheets/docco.css
+mkdir -p stylesheets/fonts
 cp /usr/local/lib/docas/resources/fonts/* stylesheets/fonts
+
+# * Make sure frond-end required scripts exist.
 
 mkdir -p "javascript"
 cp "/usr/local/lib/docas/vendor/jquery.min.js" "javascript/jquery.min.js"
@@ -284,7 +269,8 @@ cp "/usr/local/lib/docas/vendor/underscore-min.js" "javascript/underscore-min.js
 cp "/usr/local/lib/docas/lib/langstats.js" "javascript/langstats.js"
 cp "/usr/local/lib/docas/lib/file_browser.js" "javascript/file_browser.js"
  
-# 3. Generate documents using docco.
+# * Generate documents using docco.
+
 cd "$sources_dir"
 cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages_dir"
 
@@ -299,6 +285,7 @@ cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages
 #   2. `.deleted`
 #
 # [doccx]: doccx.html
+
 echo -n "Generating File & Folder Indexes...   "
 doccx -s "$sources_dir" -w "$working_dir"
 echo "Done"
