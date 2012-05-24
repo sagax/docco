@@ -288,12 +288,10 @@ cp "/usr/local/lib/docas/lib/file_browser.js" "javascript/file_browser.js"
 cd "$sources_dir"
 cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages_dir"
 
-# ### Step 5: Generate Cover Page (using Docci)
+# ### Step 5: Generate Cover Page using Docci
 
-echo -n "Generating Indexes..."
-
-doccx -s $sources_dir -w $working_dir
-
+echo -n "Generating File & Folder Indexes..."
+doccx -s "$sources_dir" -w "$working_dir"
 echo "Done" && echo -n "Generating cover page..."
 
 # Upon this phase, following materials were all ready:
@@ -306,16 +304,10 @@ echo "Done" && echo -n "Generating cover page..."
 # 
 # Invoke the **docci** command-line program to generate `index.html`.
 
-cd $ghpages_dir
-if ! [ -f "stylesheets/index.css" ]; then
- 
-  mkdir -p "stylesheets"
-  cp "/usr/local/lib/docas/resources/index.css" "stylesheets/index.css"
-
-fi
-
+cd "$ghpages_dir"
+mkdir -p stylesheets
+cp /usr/local/lib/docas/resources/index.css stylesheets/index.css
 docci -o "$ghpages_dir" "$sources_dir"
-
 echo "Done"
 
 # ### Step 6: Push to Upstream
@@ -331,6 +323,7 @@ echo "Done"
 
 cd "$ghpages_dir"
 status="$(git status --porcelain)"
+echo "$status"
 echo "Created:$(echo "$status" | egrep "^(\?\?)" | wc -l)"
 echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
 echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
@@ -341,17 +334,22 @@ echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
 #   2. Commit the `gh-pages` branch, and,
 #   3. Synchronize the `gh-pages` branch with GitHub remotely.
 
-echo "$status"
-echo "Pushing to gh-pages branch on GitHub..."
-git add    .
+echo -n "Pushing to gh-pages branch on GitHub..."
+git add .
 git commit --all --quiet --message "Docas.io synced with $head_hash"
-git push         --quiet           origin gh-pages
-echo "Branch gh-pages synced with master. Crowd applauds."
+git push --quiet origin gh-pages
+echo "Done. Crowd applauds."
 
 # ### Step 7: Coda
 
-# Update `sources_dir` directory by pulling just pushed `gh-pages` branch back. to make following synchronizations quicker
-# for no need to fetch (just pushed) documentations again.
+# Since if the `gh-pages` branch of the `sources_dir` is not up-to-date, next
+# synchronization need to pull `gh-pages` first (before documenting, commit,
+# and push).
+#
+# Make `sources_dir` up-to-date by:
+# 
+#   1. Overriding it using `ghpages_dir`.
+#   2. Checkout `master` branch.
 
 rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir" && cd "$sources_dir"
 git checkout --force --quiet master > /dev/null
