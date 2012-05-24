@@ -102,7 +102,7 @@ if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-insid
   cd "$sources_dir"
   git remote prune origin
   git pull --quiet --force
-  echo "Done"
+  echo "DONE"
 
 # Else, before clone the repository, clear the content of `storage_dir`. Shallow
 # clone is not used to save bandwidth and improve speed. Because a file browser
@@ -189,7 +189,7 @@ else
   synced_sources_hash=$(echo "$synced_docas_commit" | tail -c 8 | head -c 7)
   cd "$sources_dir"
   synced_sources_hash=$(git log --pretty=oneline | egrep -m 1 "^$synced_sources_hash" | head -c 7 | xargs echo)
-  echo "Done"
+  echo "DONE"
 
   # In case of `synced_ghpages_hash` is an empty string, `synced_sources_hash` equals head_hash.
   if [ "$synced_ghpages_hash" ] && [ "$synced_sources_hash" == "$head_hash" ]; then
