@@ -348,5 +348,5 @@ echo "Done. Crowd applauds."
 #
 # Why not have a cup of coffee, Docas?
 
-cd "$ghpages_dir" && git checkout --force --quiet master && git branch -D gh-pages
+cd "$ghpages_dir" && git checkout --force --quiet master && git branch -D gh-pages > /dev/null
 rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
