@@ -100,7 +100,7 @@ if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-insid
 
   echo -n "Fetching from GitHub..."
   cd "$sources_dir"
-  git remote prune --quiet origin
+  git remote prune origin
   git pull --quiet --force
   echo "Done"
 
