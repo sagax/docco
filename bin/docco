@@ -25,5 +25,9 @@ pos = process.ARGV.indexOf('-o');
 if(pos == -1) pos = process.ARGV.indexOf('--out');
 if(pos != -1) process.OPTS.out = process.ARGV.splice(pos, 2)[1];
 
+pos = process.ARGV.indexOf('-r');
+if(pos == -1) pos = process.ARGV.indexOf('--repo');
+if(pos != -1) process.OPTS.repo = process.ARGV.splice(pos, 2)[1];
+
 // Kick start the processing procedure.
 require(lib + '/docco.js');
