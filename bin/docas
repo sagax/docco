@@ -181,12 +181,8 @@ else
   cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir" && rm -rf *
   echo "checkouting"
   pwd
-  if [ -z "$(git branch -a | egrep "^  gh-pages$" )" ]; then
-    git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
-  else
-    git checkout --force --quiet gh-pages > /dev/null
-  fi
-
+  # if [ -z "$(git branch -a | egrep "^  gh-pages$" )" ]; then git branch -D gh-pages fi
+  git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
   echo -n "Finding Docas Commits Hashes... "
   synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]+$" | xargs echo)
   synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)
@@ -346,11 +342,11 @@ echo "Done. Crowd applauds."
 #
 # Ensure `sources_dir` is up-to-date by:
 # 
-#   1. Overriding it using `ghpages_dir`.
-#   2. Checkout `master` branch.
+#   1. Checkout `master` branch of `ghpages_dir`.
+#   2. Delete local gh-pages branch *(less trouble for next synchronization)*.
+#   3. Overriding `sources_dir` using `ghpages_dir`.
 #
 # Why not have a cup of coffee, Docas?
 
-rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir" && cd "$sources_dir"
-git checkout --force --quiet master > /dev/null
-git branch -D gh-pages
+cd "$ghpages_dir" && git checkout --force --quiet master && git branch -D gh-pages
+rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
