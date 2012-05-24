@@ -259,11 +259,8 @@ real_source = (source) ->
 sources = process.ARGV.filter((source) -> (get_language source) ? console.log "Unknown Type: #{source}").sort()
 destdir = process.OPTS.out ? 'docs'
 if sources.length
-  console.log Date.now()
   ensure_directory destdir, ->
     # fs.writeFile destdir + '/docco.css', docco_styles if !process.OPTS.css
     files = sources.slice(0)
     next_file = -> generate_documentation files.shift(), next_file if files.length
     next_file()
-
-process.on 'exit', -> console.log Date.now()
