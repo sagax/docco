@@ -358,5 +358,5 @@ rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
 # <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 # <input id="coffee" type="button">YES, Please!</input>
 # <script>
-# $('#coffee").click(function(){$('#mug').css('display', 'block')})
+# $('#coffee').click(function(){$('#mug').css('display', 'block')})
 # </script>
