@@ -100,7 +100,7 @@ if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-insid
 
   echo -n "Fetching from GitHub...               "
   cd "$sources_dir"
-  git remote prune origin
+  git remote prune origin > /dev/null
   git pull --quiet --force
   echo "DONE"
 
@@ -154,12 +154,13 @@ git ls-tree -r --name-only HEAD > "$working_dir/.all"
 
 if [ "$(git branch -a | grep origin\/gh-pages | wc -l)" -eq 0 ]; then
 
-  echo "Creating gh-pages branch..."
+  echo -n "Creating gh-pages branch...           "
   cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir"
   git symbolic-ref HEAD refs/heads/gh-pages
   rm -f .git/index
   git clean --quiet -fdx
   all_files_are_touched
+  echo "DONE"
 
 # If there exists a `gh-pages` branch, which means the branch *may* contain docas
 # synchronized content. So, docas will:
