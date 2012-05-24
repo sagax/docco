@@ -299,7 +299,7 @@ cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages
 #   2. `.deleted`
 #
 # [doccx]: doccx.html
-echo -n "Generating File & Folder Indexes..."
+echo -n "Generating File & Folder Indexes...   "
 doccx -s "$sources_dir" -w "$working_dir"
 echo "Done"
 
@@ -315,9 +315,8 @@ echo "Done"
 #
 # [docci]: docci.html
 
-echo -n "Generating Cover Page..."
-cd "$ghpages_dir"
-mkdir -p stylesheets
+echo -n "Generating Repository Cover Page...   "
+cd "$ghpages_dir" && mkdir -p stylesheets
 cp /usr/local/lib/docas/resources/index.css stylesheets/index.css
 docci -o "$ghpages_dir" "$sources_dir"
 echo "Done"
