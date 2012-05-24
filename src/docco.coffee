@@ -163,7 +163,7 @@ generate_html = (source, css, sections) ->
   title_segments = real_source(source).split('/')
   title_segments.shift() if title_segments[0] is '.'
   title_segments.splice 0, 0, process.OPTS.repo
-  head_title = title_segments.join(' › ') #  path.basename real_source source
+  head_title = process.OPTS.repo + ' » ' + title_segments.join(' › ') #  path.basename real_source source
   title = title_segments[title_segments.length - 1]
   dest  = destination source
   html  = docco_template {
