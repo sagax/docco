@@ -776,12 +776,12 @@ body{ width:1366px;  height:100%; color:#252519;}
      display: inline-block;
 }
 /*左侧背景修改*/
-.container>table{
+#container>table{
   border-collapse:collapse;
   border:none;
   height:100%;
 }
-.container>table>tbody>tr>td:nth-child(1){
+#container>table>tbody>tr>td:nth-child(1){
   border-right : 1px solid #E5E5EE;
   background:#fff;
 }
