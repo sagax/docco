@@ -290,6 +290,9 @@ cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -o "$ghpages
 
 # ### Step 5: Generate Cover Page using Docci
 
+# Update file and folder indexes for touched file and folder using **[doccx]**.
+#
+# [doccx]: doccx.html
 echo -n "Generating File & Folder Indexes..."
 doccx -s "$sources_dir" -w "$working_dir"
 echo "Done" && echo -n "Generating cover page..."
