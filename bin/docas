@@ -223,6 +223,7 @@ fi
 # listening local port 4567.
 
 echo -n "Calling Linguist HTTP @ port 4567...  "
+touch "$working_dir/.statist"
 touch "$working_dir/.all_sources"
 touch "$working_dir/.touched_sources"
 curl --silent --output "$working_dir/.statist"         "http://127.0.0.1:4567/statist?path=$sources_dir"
