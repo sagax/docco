@@ -24,6 +24,11 @@
 #### Main Documentation Generation Functions
 
 https = require 'https'
+conf_parser = require "#{__dirname}/conf_parser"
+try
+    conf = conf_parser '.docas.conf'
+catch e
+    conf = {}
 
 # Once all of the code is finished highlighting, we can generate the HTML file
 # and write out the documentation. Pass the completed sections into the template
@@ -168,4 +173,4 @@ index_styles    = fs.readFileSync(__dirname + '/../resources/index.css').toStrin
 destdir = process.OPTS.out ? 'docs'
 ensure_directory destdir, ->
   # fs.writeFile destdir + '/index.css', index_styles if !process.OPTS.css
-  generate_index (process.ARGV[0]), destdir + '/index.html'
+  generate_index (process.ARGV[0]), destdir + '/' + (conf.project_page or 'index.html')

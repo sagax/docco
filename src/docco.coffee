@@ -50,8 +50,14 @@
 # aficionado, check out [Don Wilson](https://github.com/dontangg)'s 
 # [Nocco](http://dontangg.github.com/nocco/).
 
+fs = require 'fs'
 http = require('http')
 querystring = require('querystring')
+conf_parser = require "#{__dirname}/conf_parser"
+try
+  conf = conf_parser '.docas.conf'
+catch e
+  conf = {}
 
 #### Main Documentation Generation Functions
 
@@ -165,8 +171,16 @@ generate_html = (source, css, sections) ->
   head_title = process.OPTS.repo + ' » ' + title_segments.join(' › ') #  path.basename real_source source
   title = title_segments[title_segments.length - 1]
   dest  = destination source
+  depth = source.split('/').length - 1
+  if depth then root_dir = [0..depth-1].map(-> '..').join('/') + '/' else prefix = ''
+  javascripts = []
+  for pattern, javascript of conf.page_javascripts
+    javascripts.push root_dir + 'docas/' + javascript if source.match new RegExp "^#{pattern.replace('*', '.*')}$"
+  stylesheets = []
+  for pattern, stylesheet of conf.page_stylesheets
+    stylesheets.push root_dir + 'docas/' + stylesheet if source.match new RegExp "^#{pattern.replace('*', '.*')}$"
   html  = docco_template {
-    head_title: head_title, title: title, sections: sections, css: css
+    head_title: head_title, title: title, sections: sections, css: css, javascripts: javascripts, stylesheets: stylesheets, google_analytics: conf.google_analytics
   }
   console.log "docco: #{source} -> #{dest}"
   ensure_directory (path.dirname dest), ->
