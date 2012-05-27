@@ -494,8 +494,6 @@ span[data-lang="XQuery"] {
 
 html{ height:100%;}
 body{ width:1366px;  height:100%; color:#252519;}
-#container{ height:100%;}
-#background{ left:0px;}
 .left{/* background:#fff;  float:left; border:1px solid #E5E5EE;*/width:525px;  min-height:100%;}
 .left>h1{
   padding:50px 25px 1px 50px;
@@ -779,7 +777,9 @@ body{ width:1366px;  height:100%; color:#252519;}
 #container>table{
   border-collapse:collapse;
   border:none;
-  height:100%;
+}
+td{
+  vertical-align:top;
 }
 #container>table>tbody>tr>td:nth-child(1){
   border-right : 1px solid #E5E5EE;
