@@ -50,8 +50,14 @@
 # aficionado, check out [Don Wilson](https://github.com/dontangg)'s 
 # [Nocco](http://dontangg.github.com/nocco/).
 
+fs = require 'fs'
 http = require('http')
 querystring = require('querystring')
+conf_parser = require "#{__dirname}/conf_parser"
+try
+  conf = conf_parser '.docas.conf'
+catch e
+  conf = {}
 
 #### Main Documentation Generation Functions
 
@@ -162,12 +168,19 @@ highlight = (source, sections, callback) ->
 generate_html = (source, css, sections) ->
   title_segments = real_source(source).split('/')
   title_segments.shift() if title_segments[0] is '.'
-  title_segments.splice 0, 0, process.OPTS.repo
-  head_title = title_segments.join(' › ') #  path.basename real_source source
+  head_title = process.OPTS.repo + ' » ' + title_segments.join(' › ') #  path.basename real_source source
   title = title_segments[title_segments.length - 1]
   dest  = destination source
+  depth = source.split('/').length - 1
+  if depth then root_dir = [0..depth-1].map(-> '..').join('/') + '/' else prefix = ''
+  javascripts = []
+  for pattern, javascript of conf.page_javascripts
+    javascripts.push root_dir + 'docas/' + javascript if source.match new RegExp "^#{pattern.replace('*', '.*')}$"
+  stylesheets = []
+  for pattern, stylesheet of conf.page_stylesheets
+    stylesheets.push root_dir + 'docas/' + stylesheet if source.match new RegExp "^#{pattern.replace('*', '.*')}$"
   html  = docco_template {
-    head_title: head_title, title: title, sections: sections, css: css
+    head_title: head_title, title: title, sections: sections, css: css, javascripts: javascripts, stylesheets: stylesheets, google_analytics: conf.google_analytics
   }
   console.log "docco: #{source} -> #{dest}"
   ensure_directory (path.dirname dest), ->
@@ -264,7 +277,9 @@ sources = process.ARGV.filter((source) -> (get_language source) ? console.log "U
 destdir = process.OPTS.out ? 'docs'
 if sources.length
   ensure_directory destdir, ->
-    # fs.writeFile destdir + '/docco.css', docco_styles if !process.OPTS.css
-    files = sources.slice(0)
-    next_file = -> generate_documentation files.shift(), next_file if files.length
-    next_file()
+    next_file = ->
+      generate_documentation sources.shift(), ->
+        next_file() if sources.length
+    current_parallel = 0
+    while current_parallel++ < 2
+      next_file() if sources.length
