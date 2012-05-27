@@ -789,5 +789,10 @@ code{
     background:#F8F8FF;
     border: 1px solid #DEDEDE;
     font-size: 12px;
-    padding: 0 0.2em;
+    padding: 0 0.2em !important;
+}
+pre code{
+    background:none;
+    border: 0px solid #DEDEDE;
+    padding: 0 !important;
 }
