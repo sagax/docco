@@ -102,7 +102,7 @@ if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-insid
   cd "$sources_dir"
   git remote prune origin > /dev/null
   git pull --quiet --force
-  echo "✓"
+  echo "✓" $(date "+%H:%M:%S")
 
 # Else, before clone the repository, clear the content of `storage_dir`. Shallow
 # clone is not used to save bandwidth and improve speed. Because a file browser
@@ -111,11 +111,12 @@ if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-insid
 
 else
 
+  echo -n "Cloning from GitHub...                "
   rm -rf "$storage_dir"
   git clone --quiet "git@github.com:$repo.git" "$sources_dir"
+  echo "✓" $(date "+%H:%M:%S")
 
 fi
-
 # ### Step 2: Checkout (or Generate) gh-pages Branch, List Touched Files
 
 # Docas will only re-render documents for touched sources, in some scenarios,
@@ -160,7 +161,7 @@ if [ "$(git branch -a | grep origin\/gh-pages | wc -l)" -eq 0 ]; then
   rm -f .git/index
   git clean --quiet -fdx
   all_files_are_touched
-  echo "✓"
+  echo "✓" $(date "+%H:%M:%S")
 
 # If there exists a `gh-pages` branch, which means the branch *may* contain docas
 # synchronized content. So, docas will:
@@ -186,7 +187,7 @@ else
   synced_sources_hash=$(echo "$synced_docas_commit" | tail -c 8 | head -c 7)
   cd "$sources_dir"
   synced_sources_hash=$(git log --pretty=oneline | egrep -m 1 "^$synced_sources_hash" | head -c 7 | xargs echo)
-  echo "✓"
+  echo "✓" $(date "+%H:%M:%S")
 
   # In case of `synced_ghpages_hash` is an empty string, `synced_sources_hash` equals head_hash.
   if [ "$synced_ghpages_hash" ] && [ "$synced_sources_hash" == "$head_hash" ]; then
@@ -228,12 +229,10 @@ fi
 
 echo -n "Calling Linguist HTTP @ port 4567...  "
 touch "$working_dir/.statist"
-touch "$working_dir/.all_sources"
 touch "$working_dir/.touched_sources"
 curl --silent --output "$working_dir/.statist"         "http://127.0.0.1:4567/statist?path=$sources_dir"
-curl --silent --output "$working_dir/.all_sources"     "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.all"
 curl --silent --output "$working_dir/.touched_sources" "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.touched"
-echo "✓"
+echo "✓" $(date "+%H:%M:%S")
 
 # ### Step 4: Synchronize Documents (using Docco)
 
@@ -253,8 +252,10 @@ done
 # * Generate documents using docco.
 
 cd "$sources_dir"
+# time find . -iname "*.js" | xargs du | sort -n -r | cut -f 2 | xargs docco -r baoshan/d3 -o x > /dev/null
 cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -r $(echo $repo | grep -P "(?<=/)([^\/]*)" -o) -o "$ghpages_dir" > /dev/null
-echo "✓"
+
+echo "✓" $(date "+%H:%M:%S")
 
 # ### Step 5: Generate Cover Page using Docci
 
@@ -270,12 +271,11 @@ echo "✓"
 
 echo -n "Generating File & Folder Indexes...   "
 doccx -s "$sources_dir" -w "$working_dir"
-echo "✓"
+echo "✓" $(date "+%H:%M:%S")
 
 # Upon this phase, following materials were all ready:
 #
-#   1. a language statistics named `.statist`, and,
-#   2. a list of all recognized sources named `.all_sources`.
+#   +. a language statistics named `.statist`, and,
 #
 # Do:
 #
@@ -289,7 +289,7 @@ cd "$ghpages_dir" && mkdir -p stylesheets
 cp /usr/local/lib/docas/resources/index.css stylesheets/index.css
 cd "$sources_dir"
 docci -o "$ghpages_dir" "$sources_dir"
-echo "✓"
+echo "✓" $(date "+%H:%M:%S")
 
 # ### Step 6: Static File Handling
 
@@ -344,7 +344,8 @@ echo -n "Pushing to gh-pages on GitHub...      "
 git add .
 git commit --all --quiet --message "Docas.io synced with $head_hash"
 git push --quiet origin gh-pages
-echo "✓. Crowd applauds."
+echo "✓" $(date "+%H:%M:%S")
+echo "Crowd applauds."
 
 # ### Step 8: Coda
 

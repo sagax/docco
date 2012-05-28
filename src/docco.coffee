@@ -122,6 +122,12 @@ parse = (source, code) ->
   save docs_text, code_text
   sections
 
+pygments_http_ports = [5923, 5924, 5925, 5926]
+
+rand_port = ->
+  # pygments_http_ports.push (pygments_http_ports.splice 0, 1)...
+  pygments_http_ports.pop()
+
 # Highlights a single chunk of CoffeeScript code, using **Pygments** over stdio,
 # and runs the text of its corresponding comment through **Markdown**, using
 # [Showdown.js](http://attacklab.net/showdown/).
@@ -136,31 +142,36 @@ highlight = (source, sections, callback) ->
     lang: language.name
     code: (section.code_text for section in sections).join(language.divider_text)
   
+  current_port = rand_port()
   options = 
     host: '127.0.0.1'
     path: '/pygments'
     method: 'POST'
-    port: 5923
+    port: current_port
     headers:
       'Content-Type': 'application/x-www-form-urlencoded'
       'Content-Length': post_data.length
   
   output = ''
   
-  req = http.request options, (res) ->
-    res.setEncoding('utf8')
-    res.on 'data', (result) ->
-      output += result if result
-    res.on 'end', ->
-      output = output.replace(highlight_start, '').replace(highlight_end, '')
-      fragments = output.split language.divider_html
-      for section, i in sections
-        section.code_html = highlight_start + fragments[i] + highlight_end
-        section.docs_html = showdown.makeHtml section.docs_text
-      callback()
-  
-  req.write post_data
-  req.end()
+  do (current_port) ->
+
+    req = http.request options, (res) ->
+      res.setEncoding('utf8')
+      res.on 'data', (result) ->
+        output += result if result
+      res.on 'end', ->
+        pygments_http_ports.push current_port
+        output = output.replace(highlight_start, '').replace(highlight_end, '')
+        fragments = output.split language.divider_html
+        for section, i in sections
+          section.code_html = highlight_start + fragments[i] + highlight_end
+          section.docs_html = showdown.makeHtml section.docs_text
+        callback()
+    
+    req.write post_data
+    req.end()
+    # console.log 'pygmenting', source
 
 # Once all of the code is finished highlighting, we can generate the HTML file
 # and write out the documentation. Pass the completed sections into the template
@@ -281,5 +292,5 @@ if sources.length
       generate_documentation sources.shift(), ->
         next_file() if sources.length
     current_parallel = 0
-    while current_parallel++ < 2
+    while current_parallel++ < 4
       next_file() if sources.length
