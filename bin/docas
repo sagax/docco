@@ -211,7 +211,7 @@ else
     echo "Previously synced with $synced_sources_hash"
     cd "$sources_dir"
     git diff --name-status $synced_sources_hash..HEAD > "$working_dir/.git-diff"
-    if [ -z "$(cat "$working_dir/.git-diff" | grep "\.docas\.conf")" ]; then
+    if [ -n "$(cat "$working_dir/.git-diff" | grep "\.docas\.conf")" ]; then
       all_files_are_touched
     else
       egrep "^(A|M)" "$working_dir/.git-diff" | cut -c 3- > "$working_dir/.touched"
