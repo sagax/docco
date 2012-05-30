@@ -191,7 +191,7 @@ else
   synced_sources_hash=$(echo "$synced_docas_commit" | tail -c 8 | head -c 7)
   cd "$sources_dir"
   synced_sources_hash=$(git log --pretty=oneline | egrep -m 1 "^$synced_sources_hash" | head -c 7 | xargs echo)
-  echo "✓" $(date "+%H:%M:%S")
+  echo -n "✓" $(date "+%H:%M:%S") " "
 
   # In case of `synced_ghpages_hash` is an empty string, `synced_sources_hash` equals head_hash.
   if [ "$synced_ghpages_hash" ] && [ "$synced_sources_hash" == "$head_hash" ]; then
