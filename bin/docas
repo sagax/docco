@@ -180,7 +180,11 @@ if [ "$(git branch -a | grep origin\/gh-pages | wc -l)" -eq 0 ]; then
 else
 
   cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir" && rm -rf *
-  git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
+  if [ -n "$(git branch | grep "  gh-pages")" ]; then
+    git checkout gh-pages > /dev/null
+  else
+    git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
+  fi
   echo -n "Finding Docas Commits Hashes...       "
   synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]+$" | xargs echo)
   synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)
