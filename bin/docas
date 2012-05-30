@@ -339,7 +339,7 @@ status="$(git status --porcelain)"
 created="$(echo "$status" | egrep "^(\?\?)" | wc -l)"
 altered="$(echo "$status" | egrep "^(M| M)" | wc -l)"
 deleted="$(echo "$status" | egrep "^(D| D)" | wc -l)"
-echo -n "$created +, $altered ~, $deleted -"
+echo -n "$created+, $altered~, $deleted-"
 echo -en "\r\033[38C"
 
 # Following below steps to update gh-pages:
