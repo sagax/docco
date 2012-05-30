@@ -317,7 +317,9 @@ cp "/usr/local/lib/docas/lib/file_browser.js" "javascript/file_browser.js"
 
 # * Copy other user specified files
 
-if [ -d "$sources_dir/docas" ]; then cp "$sources_dir/docas/"* "$ghpages_dir/docas"; fi
+if [ -d "$sources_dir/docas" ]; then
+  cp "$sources_dir/docas/"* "$ghpages_dir/docas";
+fi
 
 # ### Step 7: Push to Upstream
 
@@ -330,13 +332,14 @@ if [ -d "$sources_dir/docas" ]; then cp "$sources_dir/docas/"* "$ghpages_dir/doc
 # [Porcelain Layer]:
 # http://schacon.github.com/git/git.html#_high_level_commands_porcelain
 
+echo -n "Pushing:"
+
 cd "$ghpages_dir"
 status="$(git status --porcelain)"
-if [ "$verbose" = "on" ]; then
-  echo "Created:$(echo "$status" | egrep "^(\?\?)" | wc -l)"
-  echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
-  echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
-fi
+echo -n "$(echo "$status" | egrep "^(\?\?)" | wc -l)+,"
+echo -n "$(echo "$status" | egrep "^(M| M)" | wc -l)~"
+echo -n "$(echo "$status" | egrep "^(D| D)" | wc -l)-"
+echo -en "\r\033[41C"
 
 # Following below steps to update gh-pages:
 # 
@@ -344,7 +347,6 @@ fi
 #   2. Commit the `gh-pages` branch, and,
 #   3. Synchronize the `gh-pages` branch with GitHub remotely.
 
-echo -n "Pushing to gh-pages on GitHub...      "
 git add .
 git commit --all --quiet --message "Docas.io synced with $head_hash"
 git push --quiet origin gh-pages
@@ -354,19 +356,20 @@ echo "Crowd applauds."
 # ### Step 8: Coda
 
 # If `gh-pages` branch of `sources_dir` is not up-to-date, next synchronization
-# needs to pull `gh-pages` back before documenting, commit, and push.
+# needs to pull `gh-pages` back before documenting, commit, and push. Thus takes
+# longer.
 #
 # In order to improve performance, `docas` will ensure `sources_dir` up-to-date
 # by:
 # 
 #   1. Checkout `master` branch of `ghpages_dir`.
 #   2. Overriding `sources_dir` using `ghpages_dir`.
-#
-# Why not have a cup of coffee, Docas?
 
 cd "$ghpages_dir" && git checkout --force --quiet master
 rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
 
+# Why not have a cup of coffee, Docas?
+#
 # <link href="http://nicolasgallagher.com/lab/css3-github-buttons/gh-buttons.css" rel="stylesheet">
 # <img style="float:left" src="https://a248.e.akamai.net/assets.github.com/images/modules/about_page/octocat.png?1334862345"></img>
 # <img id="mug" style="display:none;float:left;width:174px;height:174px" src="http://origin.kaboodle.com/hi/img/b/0/0/17f/a/AAAAC-kxKTAAAAAAAX-s1A.jpg"></img>
