@@ -181,7 +181,7 @@ else
 
   cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir" && rm -rf *
   if [ -n "$(git branch | grep "  gh-pages")" ]; then
-    git checkout gh-pages > /dev/null
+    git checkout --force --quiet gh-pages
   else
     git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
   fi
