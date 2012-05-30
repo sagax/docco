@@ -364,9 +364,10 @@ echo "Crowd applauds."
 cd "$ghpages_dir" && git checkout --force --quiet master && git branch -D gh-pages > /dev/null
 rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
 
+# <link href="http://nicolasgallagher.com/lab/css3-github-buttons/gh-buttons.css" rel="stylesheet">
 # <img style="float:left" src="https://a248.e.akamai.net/assets.github.com/images/modules/about_page/octocat.png?1334862345"></img>
 # <img id="mug" style="display:none;float:left;width:174px;height:174px" src="http://origin.kaboodle.com/hi/img/b/0/0/17f/a/AAAAC-kxKTAAAAAAAX-s1A.jpg"></img>
-# <input id="coffee" style="float:left" type="button" value="YES, PLEASE!"></input>
+# <input id="coffee" class="button" style="float:left; margin-top:125px;" type="button" value="YES, PLEASE!"></input>
 # <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 # <script>
 # $('#coffee').click(function(){$('#mug').css('display', 'block'); $(this).remove();})
