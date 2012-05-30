@@ -332,14 +332,15 @@ fi
 # [Porcelain Layer]:
 # http://schacon.github.com/git/git.html#_high_level_commands_porcelain
 
-echo -n "Pushing:"
+echo -n "Pushing: "
 
 cd "$ghpages_dir"
 status="$(git status --porcelain)"
-echo -n "$(echo "$status" | egrep "^(\?\?)" | wc -l)+,"
-echo -n "$(echo "$status" | egrep "^(M| M)" | wc -l)~"
-echo -n "$(echo "$status" | egrep "^(D| D)" | wc -l)-"
-echo -en "\r\033[41C"
+created="$(echo "$status" | egrep "^(\?\?)" | wc -l)"
+altered="$(echo "$status" | egrep "^(M| M)" | wc -l)"
+deleted="$(echo "$status" | egrep "^(D| D)" | wc -l)"
+echo -n "$created +, $altered ~, $deleted -"
+echo -en "\r\033[38C"
 
 # Following below steps to update gh-pages:
 # 
