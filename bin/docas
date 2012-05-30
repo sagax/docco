@@ -356,13 +356,11 @@ echo "Crowd applauds."
 # by:
 # 
 #   1. Checkout `master` branch of `ghpages_dir`.
-#   2. Delete local gh-pages branch *(less trouble for next synchronization)*.
-#   3. Overriding `sources_dir` using `ghpages_dir`.
+#   2. Overriding `sources_dir` using `ghpages_dir`.
 #
 # Why not have a cup of coffee, Docas?
 
 cd "$ghpages_dir" && git checkout --force --quiet master
-# && git branch -D gh-pages > /dev/null
 rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
 
 # <link href="http://nicolasgallagher.com/lab/css3-github-buttons/gh-buttons.css" rel="stylesheet">
