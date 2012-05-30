@@ -29,7 +29,8 @@ list_template = _.template [
   '<td><a '
   "<%= entry.type == 'directory' && !entry.submodule ? 'forward' :
     'href=\"' + (entry.submodule ? 'https://github.com/' + entry.submodule : (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name)) + '\"' %>"
-  '><%- entry.name %></a></td>'
+  '<%= entry.type == 'file' ? "target='_blank'": "" %>'
+	'><%- entry.name %></a></td>'
   '<td><span><%- entry.type == "file" ? entry.size : "—" %></span></td>'
   '<td><span><%= isNaN(entry.sloc) ? "—" : (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) %></span></td>'
   '<td><%- entry.modified %></td>'
