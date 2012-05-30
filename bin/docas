@@ -349,11 +349,11 @@ echo "Crowd applauds."
 
 # ### Step 8: Coda
 
-# Since if the `gh-pages` branch of the `sources_dir` is not up-to-date, next
-# synchronization need to pull `gh-pages` first (before documenting, commit,
-# and push).
+# If `gh-pages` branch of `sources_dir` is not up-to-date, next synchronization
+# needs to pull `gh-pages` back before documenting, commit, and push.
 #
-# Ensure `sources_dir` is up-to-date by:
+# In order to improve performance, `docas` will ensure `sources_dir` up-to-date
+# by:
 # 
 #   1. Checkout `master` branch of `ghpages_dir`.
 #   2. Delete local gh-pages branch *(less trouble for next synchronization)*.
@@ -361,7 +361,8 @@ echo "Crowd applauds."
 #
 # Why not have a cup of coffee, Docas?
 
-cd "$ghpages_dir" && git checkout --force --quiet master && git branch -D gh-pages > /dev/null
+cd "$ghpages_dir" && git checkout --force --quiet master
+# && git branch -D gh-pages > /dev/null
 rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
 
 # <img style="float:left" src="https://a248.e.akamai.net/assets.github.com/images/modules/about_page/octocat.png?1334862345"></img>
