@@ -6,4 +6,4 @@ $ ->
   do animate = ->
     bar = $ bars[start_index--]
     return unless bar.length
-    bar.animate {width: bar.attr('percent')}, 600, animate
+    bar.animate {width: bar.attr('percent')}, 600, "ease", animate

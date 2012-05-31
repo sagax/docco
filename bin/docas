@@ -240,7 +240,7 @@ echo "✓" $(date "+%H:%M:%S")
 
 # ### Step 4: Synchronize Documents (using Docco)
 
-echo -n "Generating Documents...               "
+echo -n "Synchronizing Documents...            "
 
 # * Synchronize deleted sources. Delete the according documents for all deleted
 # sources. Take care of hidden file without an extension.
@@ -289,10 +289,7 @@ echo "✓" $(date "+%H:%M:%S")
 # [docci]: docci.html
 
 echo -n "Generating Repository Cover Page...   "
-cd "$ghpages_dir" && mkdir -p stylesheets
-cp /usr/local/lib/docas/resources/index.css stylesheets/index.css
-cd "$sources_dir"
-docci -o "$ghpages_dir" "$sources_dir"
+cd "$sources_dir" && docci -o "$ghpages_dir" "$sources_dir"
 echo "✓" $(date "+%H:%M:%S")
 
 # ### Step 6: Static File Handling
@@ -304,36 +301,34 @@ echo "✓" $(date "+%H:%M:%S")
 #     + Used by repository cover page.
 #     + Used by documentations.
 
-cd "$ghpages_dir"
-mkdir -p stylesheets
+cd "$ghpages_dir" && mkdir -p stylesheets
+cp /usr/local/lib/docas/resources/index.css stylesheets/index.css
 cp /usr/local/lib/docas/resources/docco.css stylesheets/docco.css
 mkdir -p stylesheets/fonts
 cp /usr/local/lib/docas/resources/fonts/* stylesheets/fonts
 
-#   * JavaScripts *(will also be loaded from CDN in the future)*. Including:
+#   * JavaScripts *(loaded from CDN)*. Including:
 #
 #     + [zepto.js], the aerogel-weight jQuery-compatible JavaScript library.
 #     + [filesize.js], JavaScript library for readable file sizes used by the
 #     file browser.
-#     + [moment.js], a lightweight JavaScript date library, used by the browser
-#     and the commits history.
+#     + [moment.js], a lightweight JavaScript date library, used by the file
+#     browser and the commits history.
 #     + [toc.js], generate inner-document navigation panel client-side.
 #
-# [zepto.js]: http://zeptojs.com/
+# [zepto.js]:    http://zeptojs.com/
 # [filesize.js]: http://filesizejs.com/
-# [moment.js]: http://momentjs.com
-# [navigation.js]: http://
-# []
+# [moment.js]:   http://momentjs.com
+# [toc.js]:      http://projects.jga.me/toc/
 
 mkdir -p "javascript"
-cp "/usr/local/lib/docas/vendor/jquery.min.js" "javascript/jquery.min.js"
-cp "/usr/local/lib/docas/vendor/filesize.js" "javascript/filesize.js"
-cp "/usr/local/lib/docas/vendor/moment.min.js" "javascript/moment.min.js"
-cp "/usr/local/lib/docas/vendor/underscore-min.js" "javascript/underscore-min.js"
-cp "/usr/local/lib/docas/lib/langstats.js" "javascript/langstats.js"
-cp "/usr/local/lib/docas/lib/file_browser.js" "javascript/file_browser.js"
+cp "/usr/local/lib/docas/lib/index.js" "javascript/index.js"
+# cp "/usr/local/lib/docas/lib/langstats.js" "javascript/langstats.js"
+# cp "/usr/local/lib/docas/lib/file_browser.js" "javascript/file_browser.js"
 
-# * Copy other user specified files
+#   * Copy other user specified files. All files in the `docas` folder of the
+#   `master` branch will be cloned into the same folder of the `gh-pages`
+#   branch.
 
 if [ -d "$sources_dir/docas" ]; then
   cp "$sources_dir/docas/"* "$ghpages_dir/docas";
@@ -384,9 +379,12 @@ echo "Crowd applauds."
 # 
 #   1. Checkout `master` branch of `ghpages_dir`.
 #   2. Overriding `sources_dir` using `ghpages_dir`.
+#   3. Delete local branch `gh-pages`. So pruning local branches with remote
+#   branches can synchronize local and remote branches.
 
 cd "$ghpages_dir" && git checkout --force --quiet master
 rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
+cd "$sources_dir" && git branch -D gh-pages > /dev/null
 
 # Why not have a cup of coffee, Docas?
 #

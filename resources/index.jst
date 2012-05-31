@@ -61,14 +61,12 @@
    </tbody>
    </table>
   </div>
-  <script src="javascript/jquery.min.js" type="text/javascript"></script>
-  <script src="javascript/underscore-min.js" type="text/javascript"></script>
-  <script src="javascript/moment.min.js" type="text/javascript"></script>
-  <script src="javascript/filesize.js" type="text/javascript"></script>
-  <script src="javascript/langstats.js" type="text/javascript"></script>
-  <script src="javascript/file_browser.js" type="text/javascript"></script>
-  <script type="text/javascript">
-    $(function() { new file_browser("<%= user %>", "<%= repo %>", "docas/tree/docas.index"); })
-    </script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js"></script>
+<script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+<script src="http://baoshan.github.com/moment/min/moment.min.js"></script>
+<script src="http://cdn.filesizejs.com/filesize.js"></script>
+
+<script src="javascript/index.js"></script>
+<script>$(function(){new file_browser("<%= user %>","<%= repo %>","docas/tree/docas.index")})</script>
 </body>
 </html>
