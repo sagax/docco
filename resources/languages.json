@@ -24,6 +24,8 @@
     {"name" : "c", "symbol" : "//"},
   ".h":
     {"name" : "c", "symbol" : "//"},
+  ".cc":
+    {"name" : "cpp", "symbol" : "//"},
   ".cpp":
     {"name" : "cpp", "symbol" : "//"},
   ".php":
@@ -43,5 +45,9 @@
   ".m":
     {"name" : "objc", "symbol": "//"},
   ".scala":
-    {"name" : "scala", "symbol": "//"}
+    {"name" : "scala", "symbol": "//"},
+  ".sh":
+    { "name": "bash", "symbol": "#" },
+  ".mak":
+    { "name": "basemake", "symbol": "#" }
 }
