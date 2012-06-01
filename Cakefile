@@ -4,9 +4,15 @@ option '-p', '--prefix [DIR]', 'set the installation prefix for `cake install`'
 option '-w', '--watch', 'continually build the docas library'
 
 task 'build', 'build the docco library', (options) ->
-  coffee = spawn 'coffee', ['-c' + (if options.watch then 'w' else ''), '-o', 'lib', 'src']
-  coffee.stdout.on 'data', (data) -> console.log data.toString()
-  coffee.stderr.on 'data', (data) -> console.error data.toString()
+  exec [
+    'coffee ' + ['-c' + (if options.watch then 'w' else ''), '-o', 'lib', 'src'].join(' ')
+    'java -jar ~/compiler.jar --js lib/index.js --js_output_file lib/index.min.js'
+    'rm lib/index.js'
+  ].join(' && '), (err, stdout, stderr) ->
+    console.error stderr if err
+
+  # coffee.stdout.on 'data', (data) -> console.log data.toString()
+  # coffee.stderr.on 'data', (data) -> console.error data.toString()
 
 task 'install', 'install the `docco`, `docci`, `doccx`, and `docas` command into /usr/local (or --prefix)', (options) ->
   base = options.prefix or '/usr/local'

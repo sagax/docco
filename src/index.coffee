@@ -32,15 +32,16 @@ template = (str) ->
        "');}return p.join('');"
 
 # ## (Underscore) Template for Breadcrumb Navigation
-breadcrumb_template = _.template [
-  '<% path.forEach(function(dir, i) { %>'
-  '<%   if (i < path.length - 1) { %>'
-  '<a depth=<%= i %>><%= dir %></a>&nbsp;/&nbsp;'
-  '<%   } else { %>'
-  '<span><%= dir %></span>'
-  '<%   } %>'
-  '<% }) %>'
-].join ''
+breadcrumb_template = (path) ->
+  result = ''
+  path.forEach (dir, i) ->
+    if (i < path.length - 1)
+      result += '<a depth=' + i + '>' + dir + '</a>&nbsp;/&nbsp;'
+    else
+      result += '<span>' + dir + '</span>'
+  result
+
+console.log 'list_template'
 
 # ## (Underscore) Template for File Browser
 list_template = template [
@@ -104,8 +105,7 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
       breadcrumb_path  = breadcrumb_path[breadcrumb_start..breadcrumb_end]
 
       # ### Render Breadcrumb Navigator
-      $('#breadcrumb').html breadcrumb_template
-        path: [repo, breadcrumb_path...]
+      $('#breadcrumb').html breadcrumb_template [repo, breadcrumb_path...]
 
       # ### Handling Breadcrumb Navigation
       $('#breadcrumb a').click ->
@@ -215,17 +215,17 @@ update_usernames = (table) ->
   for span in spans
     emails[$(span).attr('email')] = null
   for email of emails
-    if usernames.hasOwnProperty email
-      username = usernames[email]
-      if username
-        $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
-    else
-      $.getJSON "https://api.github.com/legacy/user/email/#{email}", (data) ->
-        username = if data.user then data.user.login else null
-        usernames[email] = username
+    do (email) ->
+      if usernames.hasOwnProperty email
+        username = usernames[email]
         if username
           $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
-          
+      else
+        $.getJSON "https://api.github.com/legacy/user/email/#{email}", (data) ->
+          username = if data.user then data.user.login else null
+          usernames[email] = username
+          if username
+            $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
 
 # Expose the constructor globally.
 @file_browser = file_browser
