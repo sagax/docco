@@ -35,7 +35,7 @@ h1, h2, h3, h4, h5, h6 {
   position: fixed;
   top: 0; left: 525px; right: 0; bottom: 0;
   background: #f5f5ff;
-  /*border-left: 1px solid #e5e5ee;*/
+  border-left: 1px solid #e5e5ee;
   z-index: -1;
 }
 #jump_to, #jump_page {
@@ -493,31 +493,17 @@ span[data-lang="XQuery"] {
 
 
 body{ 
-  width:1366px;
-  background : -moz-linear-gradient(left center , #FFFFFF 524px, #CCCCCC 525px, #F5F5FF 1px) repeat scroll 0 0 transparent;
+  /*width:1366px;*/
+  /*background : -moz-linear-gradient(left center , #FFFFFF 524px, #CCCCCC 525px, #F5F5FF 1px) repeat scroll 0 0 transparent;*/
 }
-.left{/* background:#fff;  float:left; border:1px solid #E5E5EE;*/width:525px;}
-.left>h1{
-  padding:50px 25px 1px 50px;
-  margin-top:0px;
-}
-.left>p{
-  padding:10px 25px 1px 50px;
-	/*font-family:Helvetica,arial,freesans,clean,sans-serif;*/
+
+#container > table > tbody > tr > td:nth-child(1) p{
 	font-weight:300;
 	color:#666;
-	/*font-size:13px;*/
 	font-style:italic;
 }
 
 /*readme*/
-.readme{
-  width:450px;
-	min-height:5px;
-	/*float:left;*/
-	padding:10px 25px 1px 50px;
-	text-align:left;
-}
 .readme pre{
   margin:15px 0 15px;
     background-color: #F8F8F8;
@@ -540,7 +526,7 @@ body{
   width:775px;
 	min-height:5px;
 	float:left;
-	padding-left:25px;
+	/*padding-left:25px;*/
 	/*padding-top:25px;*/
 	overflow:hidden;
 	/*margin-top:140px;*/
@@ -794,7 +780,29 @@ pre code{
     border: 0px solid #DEDEDE;
     padding: 0 !important;
 }
-.left img{
+#container > table > tbody > tr > td:nth-child(1) a img{
   border:none;
-  float:right;
+	position:absolute;
+	top:0px;
+	right:0px;
+}
+
+/*背景*/
+#container > table > tbody > tr > td:nth-child(1) {
+    max-width: 450px;
+    min-height: 5px;
+    min-width: 450px;
+    overflow-x: hidden;
+    padding: 10px 25px 1px 50px;
+    text-align: left;
+    vertical-align: top;
+		display:inline-table;
+		position:relative;
+}
+#container > table > tbody > tr > td:nth-child(2) {
+    background: none repeat scroll 0 0 #F5F5FF;
+    border-left: 1px solid #E5E5EE;
+    padding: 14px 15px 16px 25px;
+    vertical-align: top;
+    width: 100%;
 }
