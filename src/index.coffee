@@ -32,7 +32,7 @@ template = (str) ->
        "');}return p.join('');"
 
 # ## (Underscore) Template for Breadcrumb Navigation
-breadcrumb_template = template [
+breadcrumb_template = _.template [
   '<% path.forEach(function(dir, i) { %>'
   '<%   if (i < path.length - 1) { %>'
   '<a depth=<%= i %>><%= dir %></a>&nbsp;/&nbsp;'

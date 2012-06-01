@@ -70,9 +70,9 @@ cat .touched_folders_with_duplications | sort -u > .touched_folders
 
 cd "$sources_dir"
 cat "$working_dir/.touched_folders" | while read folder; do
-
+  echo $folder
   mkdir -p "$working_dir/ghpages/docas/tree/$folder" && rm -f "$working_dir/ghpages/docas/tree/$folder/docas.index" && cd "$sources_dir/$folder"
-
+ 
   find . -mindepth 1 -maxdepth 1 | while read file; do
     file=$(echo $file | cut -c 3-)
     if [ "$file" != ".git" ]; then
