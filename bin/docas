@@ -310,28 +310,23 @@ cp /usr/local/lib/docas/resources/fonts/* stylesheets/fonts
 #   * JavaScripts *(loaded from CDN)*. Including:
 #
 #     + [zepto.js], the aerogel-weight jQuery-compatible JavaScript library.
-#     + [filesize.js], JavaScript library for readable file sizes used by the
-#     file browser.
 #     + [moment.js], a lightweight JavaScript date library, used by the file
 #     browser and the commits history.
 #     + [toc.js], generate inner-document navigation panel client-side.
 #
 # [zepto.js]:    http://zeptojs.com/
-# [filesize.js]: http://filesizejs.com/
 # [moment.js]:   http://momentjs.com
 # [toc.js]:      http://projects.jga.me/toc/
 
-mkdir -p "javascript"
-cp "/usr/local/lib/docas/lib/index.js" "javascript/index.js"
-# cp "/usr/local/lib/docas/lib/langstats.js" "javascript/langstats.js"
-# cp "/usr/local/lib/docas/lib/file_browser.js" "javascript/file_browser.js"
+mkdir -p javascript
+cp /usr/local/lib/docas/lib/index.js javascript/index.js
 
 #   * Copy other user specified files. All files in the `docas` folder of the
 #   `master` branch will be cloned into the same folder of the `gh-pages`
 #   branch.
 
 if [ -d "$sources_dir/docas" ]; then
-  cp "$sources_dir/docas/"* "$ghpages_dir/docas";
+  cp "$sources_dir/docas/"* "$ghpages_dir/docas"
 fi
 
 # ### Step 7: Push to Upstream

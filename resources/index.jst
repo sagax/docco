@@ -58,12 +58,14 @@
    </tr>
    </tbody>
    </table>
-  </div>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js"></script>
+ </div>
+<script>
+document.write('<script src=' +
+('__proto__' in {} ? 'http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js':'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js') +
+'><\\/script>')
+</script>
 <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
 <script src="http://baoshan.github.com/moment/min/moment.min.js"></script>
-<script src="http://cdn.filesizejs.com/filesize.js"></script>
-
 <script src="javascript/index.js"></script>
 <script>$(function(){new file_browser("<%= user %>","<%= repo %>","docas/tree/docas.index")})</script>
 </body>

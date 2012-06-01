@@ -11,26 +11,39 @@ $ ->
   do animate = ->
     bar = $ bars[start_index--]
     return unless bar.length
-    bar.animate {width: bar.attr('percent')}, 600, "ease", animate
+    bar.animate {width: bar.attr('percent')}, 600, 'linear', animate
 
 ###
 # GitHub Styled File Browser
 # (c) Copyright 2012 Baoshan Sheng
 ###
 
+template = (str) ->
+  new Function 'obj',
+    'var p=[],print=function(){p.push.apply(p,arguments);};' +
+    'with(obj){p.push(\'' +
+    str.replace(/[\r\t\n]/g, " ")
+       .replace(/'(?=[^<]*%>)/g,"\t")
+       .split("'").join("\\'")
+       .split("\t").join("'")
+       .replace(/<%=(.+?)%>/g, "',$1,'")
+       .split('<%').join("');")
+       .split('%>').join("p.push('") +
+       "');}return p.join('');"
+
 # ## (Underscore) Template for Breadcrumb Navigation
 breadcrumb_template = _.template [
-  '<% _.each(path, function(dir, i) { %>'
+  '<% path.forEach(function(dir, i) { %>'
   '<%   if (i < path.length - 1) { %>'
-  '<a depth=<%= i %>><%- dir %></a>&nbsp;/&nbsp;'
+  '<a depth=<%= i %>><%= dir %></a>&nbsp;/&nbsp;'
   '<%   } else { %>'
-  '<span><%- dir %></span>'
+  '<span><%= dir %></span>'
   '<%   } %>'
   '<% }) %>'
 ].join ''
 
 # ## (Underscore) Template for File Browser
-list_template = _.template [
+list_template = template [
   '<div depth="<%= index_depth %>" class="filelist">'
   '<table>'
   '<thead><tr><th></th><th>name</th><th>size</th><th>sloc</th><th>age</th><th>message<div class="history"><a target="_blank" href="https://github.com/<%= user %>/<%= repo %>/commits/master">history</a></div></th></tr></thead>'
@@ -38,18 +51,18 @@ list_template = _.template [
   '<% if(index_depth) { %>'
   '<tr class="directory"><td></td><td><a backward>..</a></td><td></td><td></td><td></td><td></td></tr>'
   '<% } %>'
-  '<% _.each(entries, function(entry) { %>'
+  '<% entries.forEach(function(entry) { %>'
   '<tr class="<%= entry.submodule ? "submodule" : entry.documented ? "document" : entry.type %>">'
   '<td class="icon"></td>'
   '<td><a '
   "<%= entry.type == 'directory' && !entry.submodule ? 'forward' :
     'href=\"' + (entry.submodule ? 'https://github.com/' + entry.submodule : (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name)) + '\"' %>"
   '<%= entry.type === "file" && !entry.documented ? "target=\'_blank\'": "" %>'
-  '><%- entry.name %></a></td>'
-  '<td><span><%- entry.type == "file" ? entry.size : "—" %></span></td>'
+  '><%= entry.name %></a></td>'
+  '<td><span><%= entry.type == "file" ? entry.size : "—" %></span></td>'
   '<td><span><%= isNaN(entry.sloc) ? "—" : (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) %></span></td>'
-  '<td><%- entry.modified %></td>'
-  '<td><div><span><%- entry.subject  %></span><span class="file_browser_author" email="<%- entry.email %>"> [<%- entry.author %>]</span></div></td>'
+  '<td><%= entry.modified %></td>'
+  '<td><div><span><%= entry.subject  %></span><span class="file_browser_author" email="<%= entry.email %>"> [<%= entry.author %>]</span></div></td>'
   '</tr>'
   '<% }); %>'
   '</tbody>'
@@ -143,7 +156,7 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
         $(table).css 'margin-left', -width if direction is -1
         $($('#filelists').children()[0]).animate
           'margin-left': (if direction is -1 then 0 else -1) * width
-        , 600, 'ease', -> $(current_table).remove()
+        , 400, 'linear', -> $(current_table).remove()
       else
         $('#filelists').append table
 
@@ -167,17 +180,17 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
 process_index = (index, gitmodules, base) ->
   lines = index.split('\n').filter((line) -> line)
   entries = []
-  _.each lines, (line) ->
+  lines.forEach (line) ->
     # Sample lines:
     #
     #   "-","57","Mon, 23 Apr 2012 15:40:04 +0800","Me","Initial Commit","<.gitignore>","0","-"
     #   "-","0","Mon, 23 Apr 2012 15:40:04 +0800","Me","Bootstrap","<app.js>","1","0"
     #   "d","204","Fri, 27 Apr 2012 19:50:34 +0800","Me","First Build","<bin>","0","-"
-    match = line.match /"(d|-)","(\d+)","([^"]+)","(.+)","(.+)","(.+)","<(.+)>","(0|1)","(\d+|-)"/
+    match = line.match /"(d|-)","(.+)","([^"]+)","(.+)","(.+)","(.+)","<(.+)>","(0|1)","(\d+|-)"/
     return unless match
     entry =
       type       : if match[1] is 'd' then 'directory' else 'file'
-      size       : filesize((parseInt match[2], 10), on)
+      size       : match[2] # filesize((parseInt match[2], 10), on)
       modified   : moment(new Date match[3]).fromNow()
       email      : match[4]
       author     : match[5]
@@ -192,15 +205,16 @@ process_index = (index, gitmodules, base) ->
     # For hidden file without extension.
     entry.document = entry.name + '.html' if entry.document is '.html'
     entries.push entry
-  _.sortBy entries, (entry) -> [entry.type, entry.name]
+  entries.sort (a, b) -> if [a.type, a.name] > [b.type, b.name] then 1 else -1
 
 usernames = {}
 
 update_usernames = (table) ->
-  _.chain($(table).find('span[email]'))
-  .map((span) -> $(span).attr('email'))
-  .union()
-  .each (email) ->
+  emails = {}
+  spans = $(table).find('span[email]')
+  for span in spans
+    emails[$(span).attr('email')] = null
+  for email of emails
     if usernames.hasOwnProperty email
       username = usernames[email]
       if username
