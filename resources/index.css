@@ -497,10 +497,11 @@ body{
   /*background : -moz-linear-gradient(left center , #FFFFFF 524px, #CCCCCC 525px, #F5F5FF 1px) repeat scroll 0 0 transparent;*/
 }
 
-#container > table > tbody > tr > td:nth-child(1) p{
+#container > table > tbody > tr:nth-child(1) > td:nth-child(1) p{
 	font-weight:300;
 	color:#666;
 	font-style:italic;
+	min-height:37px;
 }
 
 /*readme*/
@@ -798,6 +799,7 @@ pre code{
     vertical-align: top;
 		display:inline-table;
 		position:relative;
+		width:525px;
 }
 #container > table > tbody > tr > td:nth-child(2) {
     background: none repeat scroll 0 0 #F5F5FF;
