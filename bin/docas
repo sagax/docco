@@ -180,14 +180,18 @@ if [ "$(git branch -a | grep origin\/gh-pages | wc -l)" -eq 0 ]; then
 else
 
   cp -R "$sources_dir" "$ghpages_dir" && cd "$ghpages_dir" && rm -rf *
-  git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
+  if [ -n "$(git branch | grep "  gh-pages")" ]; then
+    git checkout --force --quiet gh-pages
+  else
+    git checkout --force --quiet -b gh-pages origin/gh-pages > /dev/null
+  fi
   echo -n "Finding Docas Commits Hashes...       "
   synced_docas_commit=$(git log --pretty=oneline | egrep -m 1 -i "^[0-9a-f]+.* docas.*synced.*[0-9a-f]+$" | xargs echo)
   synced_ghpages_hash=$(echo "$synced_docas_commit" | head -c 7)
   synced_sources_hash=$(echo "$synced_docas_commit" | tail -c 8 | head -c 7)
   cd "$sources_dir"
   synced_sources_hash=$(git log --pretty=oneline | egrep -m 1 "^$synced_sources_hash" | head -c 7 | xargs echo)
-  echo "✓" $(date "+%H:%M:%S")
+  echo -n "✓" $(date "+%H:%M:%S") " "
 
   # In case of `synced_ghpages_hash` is an empty string, `synced_sources_hash` equals head_hash.
   if [ "$synced_ghpages_hash" ] && [ "$synced_sources_hash" == "$head_hash" ]; then
@@ -236,7 +240,7 @@ echo "✓" $(date "+%H:%M:%S")
 
 # ### Step 4: Synchronize Documents (using Docco)
 
-echo -n "Generating Documents...               "
+echo -n "Synchronizing Documents...            "
 
 # * Synchronize deleted sources. Delete the according documents for all deleted
 # sources. Take care of hidden file without an extension.
@@ -285,62 +289,79 @@ echo "✓" $(date "+%H:%M:%S")
 # [docci]: docci.html
 
 echo -n "Generating Repository Cover Page...   "
-cd "$ghpages_dir" && mkdir -p stylesheets
-cp /usr/local/lib/docas/resources/index.css stylesheets/index.css
-cd "$sources_dir"
-docci -o "$ghpages_dir" "$sources_dir"
+cd "$sources_dir" && docci -o "$ghpages_dir" "$sources_dir"
 echo "✓" $(date "+%H:%M:%S")
 
 # ### Step 6: Static File Handling
 
-# * Make sure front-end required stylesheet exist.
+# Static files required by front-end web pages including:
+#
+#   * CSS stylesheets *(will be loaded from CDN in the future)*. Including:
+#
+#     + Used by repository cover page.
+#     + Used by documentations.
 
-cd "$ghpages_dir"
-mkdir -p stylesheets
+cd "$ghpages_dir" && mkdir -p stylesheets
+cp /usr/local/lib/docas/resources/index.css stylesheets/index.css
 cp /usr/local/lib/docas/resources/docco.css stylesheets/docco.css
 mkdir -p stylesheets/fonts
 cp /usr/local/lib/docas/resources/fonts/* stylesheets/fonts
 
-# * Make sure frond-end required scripts exist.
+#   * JavaScripts *(loaded from CDN)*. Including:
+#
+#     + [zepto.js], the aerogel-weight jQuery-compatible JavaScript library.
+#     + [filesize.js], JavaScript library for readable file sizes used by the
+#     file browser.
+#     + [moment.js], a lightweight JavaScript date library, used by the file
+#     browser and the commits history.
+#     + [toc.js], generate inner-document navigation panel client-side.
+#
+# [zepto.js]:    http://zeptojs.com/
+# [filesize.js]: http://filesizejs.com/
+# [moment.js]:   http://momentjs.com
+# [toc.js]:      http://projects.jga.me/toc/
 
 mkdir -p "javascript"
-cp "/usr/local/lib/docas/vendor/jquery.min.js" "javascript/jquery.min.js"
-cp "/usr/local/lib/docas/vendor/filesize.js" "javascript/filesize.js"
-cp "/usr/local/lib/docas/vendor/moment.min.js" "javascript/moment.min.js"
-cp "/usr/local/lib/docas/vendor/underscore-min.js" "javascript/underscore-min.js"
-cp "/usr/local/lib/docas/lib/langstats.js" "javascript/langstats.js"
-cp "/usr/local/lib/docas/lib/file_browser.js" "javascript/file_browser.js"
+cp "/usr/local/lib/docas/lib/index.js" "javascript/index.js"
+# cp "/usr/local/lib/docas/lib/langstats.js" "javascript/langstats.js"
+# cp "/usr/local/lib/docas/lib/file_browser.js" "javascript/file_browser.js"
 
-# * Copy other user specified files
+#   * Copy other user specified files. All files in the `docas` folder of the
+#   `master` branch will be cloned into the same folder of the `gh-pages`
+#   branch.
 
-if [ -d "$sources_dir/docas" ]; then cp "$sources_dir/docas/"* "$ghpages_dir/docas"; fi
+if [ -d "$sources_dir/docas" ]; then
+  cp "$sources_dir/docas/"* "$ghpages_dir/docas";
+fi
 
 # ### Step 7: Push to Upstream
 
-# Upon this phase, updated cover page (always) and documentations (probably) are
-# all ready. It's time to push back to `gh-pages` branch on GitHub.
+# Upon this phase, updated cover page (always will be updated) and
+# documentations (probably will not be updated) are all ready. It's time to push
+# back to `gh-pages` branch on GitHub.
 #
-# The [porcelain layer] of git-status is used to count files been created,
-# modified, or deleted. Output these numbers to the terminal.
+# The [porcelain layer] of `git-status` is used to count files / folders  been
+# created, modified, or deleted. Output the numbers to the terminal.
 #
 # [Porcelain Layer]:
 # http://schacon.github.com/git/git.html#_high_level_commands_porcelain
 
+echo -n "Pushing "
+
 cd "$ghpages_dir"
 status="$(git status --porcelain)"
-if [ "$verbose" = "on" ]; then
-  echo "Created:$(echo "$status" | egrep "^(\?\?)" | wc -l)"
-  echo "Altered:$(echo "$status" | egrep "^(M| M)" | wc -l)"
-  echo "Deleted:$(echo "$status" | egrep "^(D| D)" | wc -l)"
-fi
+created="$(echo "$status" | egrep "^(\?\?)" | wc -l)"
+altered="$(echo "$status" | egrep "^(M| M)" | wc -l)"
+deleted="$(echo "$status" | egrep "^(D| D)" | wc -l)"
+echo -n $created+, $altered~, $deleted- to GitHub...
+echo -en "\r\033[38C"
 
 # Following below steps to update gh-pages:
 # 
-#   1. Synchronize git index with local files,
-#   2. Commit the `gh-pages` branch, and,
-#   3. Synchronize the `gh-pages` branch with GitHub remotely.
+#   1. Synchronize git index with local files.
+#   2. Commit `gh-pages` branch.
+#   3. Synchronize `gh-pages` branch with GitHub remotely.
 
-echo -n "Pushing to gh-pages on GitHub...      "
 git add .
 git commit --all --quiet --message "Docas.io synced with $head_hash"
 git push --quiet origin gh-pages
@@ -350,21 +371,23 @@ echo "Crowd applauds."
 # ### Step 8: Coda
 
 # If `gh-pages` branch of `sources_dir` is not up-to-date, next synchronization
-# needs to pull `gh-pages` back before documenting, commit, and push.
+# needs to pull `gh-pages` back before documenting, commit, and push. Thus takes
+# longer.
 #
 # In order to improve performance, `docas` will ensure `sources_dir` up-to-date
 # by:
 # 
 #   1. Checkout `master` branch of `ghpages_dir`.
-#   2. Delete local gh-pages branch *(less trouble for next synchronization)*.
-#   3. Overriding `sources_dir` using `ghpages_dir`.
-#
-# Why not have a cup of coffee, Docas?
+#   2. Overriding `sources_dir` using `ghpages_dir`.
+#   3. Delete local branch `gh-pages`. So pruning local branches with remote
+#   branches can synchronize local and remote branches.
 
 cd "$ghpages_dir" && git checkout --force --quiet master
-# && git branch -D gh-pages > /dev/null
 rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
+cd "$sources_dir" && git branch -D gh-pages > /dev/null
 
+# Why not have a cup of coffee, Docas?
+#
 # <link href="http://nicolasgallagher.com/lab/css3-github-buttons/gh-buttons.css" rel="stylesheet">
 # <img style="float:left" src="https://a248.e.akamai.net/assets.github.com/images/modules/about_page/octocat.png?1334862345"></img>
 # <img id="mug" style="display:none;float:left;width:174px;height:174px" src="http://origin.kaboodle.com/hi/img/b/0/0/17f/a/AAAAC-kxKTAAAAAAAX-s1A.jpg"></img>
