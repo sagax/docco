@@ -1,7 +1,6 @@
-###
-# Languages Indicator
-# (c) Copyright 2012 Baoshan Sheng
-###
+# ## Languages Indicator
+#
+# Animate languages statistics bar chart on page load.
 
 $ ->
   bars = $('.code_stats span[data-lang][percent]')
@@ -12,13 +11,13 @@ $ ->
     bar = $ bars[start_index--]
     return unless bar.length
     return animate() if bar.attr('percent') is bar.css('width')
-    bar.animate {width: bar.attr('percent')}, 600, 'linear', animate
+    bar.animate
+      width: bar.attr('percent')
+    , 600, 'linear', animate
 
-###
-# GitHub Styled File Browser
-# (c) Copyright 2012 Baoshan Sheng
-###
+# ## GitHub Styled Repo Browser
 
+# ### Micro Template Engine for Rendering Content
 template = (str) ->
   new Function 'obj',
     'var p=[],print=function(){p.push.apply(p,arguments);};' +
@@ -32,7 +31,7 @@ template = (str) ->
        .split('%>').join("p.push('") +
        "');}return p.join('');"
 
-# ## (Underscore) Template for Breadcrumb Navigation
+# ### Hand-Made Template for Breadcrumb Navigation
 breadcrumb_template = (path) ->
   result = ''
   path.forEach (dir, i) ->
@@ -42,9 +41,7 @@ breadcrumb_template = (path) ->
       result += '<span>' + dir + '</span>'
   result
 
-console.log 'list_template'
-
-# ## (Underscore) Template for File Browser
+# ### Template for File Browser
 list_template = template [
   '<div depth="<%= index_depth %>" class="filelist">'
   '<table>'
@@ -57,7 +54,7 @@ list_template = template [
   '<tr class="<%= entry.submodule ? "submodule" : entry.documented ? "document" : entry.type %>">'
   '<td class="icon"></td>'
   '<td><a '
-  "<%= entry.type == 'directory' && !entry.submodule ? 'forward' :
+  "<%= entry.type == 'directory' && !entry.link_back && !entry.submodule ? 'forward' :
     'href=\"' + (entry.submodule ? 'https://github.com/' + entry.submodule : (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name)) + '\"' %>"
   '<%= entry.type === "file" && !entry.documented ? "target=\'_blank\'": "" %>'
   '><%= entry.name %></a></td>'
@@ -83,7 +80,7 @@ process_gitmodules = (gitmodules) ->
     hash
   , {}
 
-# ## Constructor Arguments
+# ### Constructor Arguments
 #
 # 1. `user`, used to generate correct link for undocumented sources. E.g.,
 # `https://github.com/user/repo/blob/master/awesome_file`
@@ -96,7 +93,7 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
   
   get_index = ->
 
-    # ### Ajax Call to Get Index
+    # #### Ajax Call to Get Index
     $.ajax
       type: 'GET'
       url: index_path
@@ -104,39 +101,36 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
       error: do (index_path) ->
         ->
           console.log 'opening', 'https://github.com/' + user + '/' + repo + '/tree/master/' + index_path
-          window.open 'https://github.com/' + user + '/' + repo + '/tree/master/' + index_path
+          window.open ('https://github.com/' + user + '/' + repo + '/tree/master/' + index_path), "GitHub"
 
       success: (index) ->
 
-        # ## Breadcrumb Navigation
+        # #### Render Breadcrumb Navigator
         breadcrumb_path  = index_path.split '/'
         breadcrumb_end   = breadcrumb_path.length - 2
         breadcrumb_start = breadcrumb_end - index_depth + 1
         breadcrumb_path  = breadcrumb_path[breadcrumb_start..breadcrumb_end]
-
-        # ### Render Breadcrumb Navigator
         $('#breadcrumb').html breadcrumb_template [repo, breadcrumb_path...]
 
-        # ### Handling Breadcrumb Navigation
+        # #### Handling Breadcrumb Interaction
         $('#breadcrumb a').click ->
           new_depth = $(@).attr('depth') * 1
           new_path = index_path.split '/'
           new_path.splice new_path.length - index_depth + new_depth - 1, index_depth - new_depth
           new file_browser user, repo, new_path.join('/'), new_depth, current_depth
 
-        # ## Content Table
-
+        # #### Render Content Table
+        #
         # `absolute_base` is used to generate github.com links for undocumented sources.
-        absolute_base = breadcrumb_path.join '/'
-
         # `relative_base` is used to generate links for documented sources.
+
+        absolute_base = breadcrumb_path.join '/'
         depth_offset  = index_depth - current_depth
         if depth_offset > 0
           relative_base = breadcrumb_path[breadcrumb_path.length - depth_offset..].join '/'
         else
           relative_base = new Array(-depth_offset + 1).join '../'
 
-        # ### Render Content Table
         table = $ list_template
           user          : user
           repo          : repo
@@ -147,17 +141,20 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
 
         update_usernames table
 
-        # ### Handling Folder Navigation
+        # #### Handling Content Interaction
+
         $(table).find('a[backward]').click ->
           new_path = index_path.split '/'
           new_path.splice new_path.length - 2, 1
           new file_browser user, repo, new_path.join('/'), index_depth - 1, current_depth
+
         $(table).find('a[forward]').click ->
           new_path = index_path.split '/'
           new_path.splice new_path.length - 1, 0, $(@).html()
           new file_browser user, repo, new_path.join('/'), index_depth + 1, current_depth
 
-        # ### Pushing / Poping the Table
+        # #### Pushing / Poping the Table
+
         current_table = $('#filelists div:first-child')[0]
         if current_table
           direction = if index_depth > parseInt $(current_table).attr('depth') then 1 else -1
@@ -169,6 +166,8 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
           , 400, 'linear', -> $(current_table).remove()
         else
           $('#filelists').append table
+
+  # #### Get Git Modules First
 
   if gitmodules_cache.hasOwnProperty user + '/' + repo
     get_index()
@@ -187,16 +186,21 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
         gitmodules_cache[user + '/' + repo] = {}
         get_index()
 
+# ### Docas Index Parser
+#
+# Docas generates indexes for repo browser using **[doccx]**. Sample index lines
+# are:
+#
+#     "-","57","Mon, 23 Apr 2012 15:40:04 +0800","Me","Initial Commit","<.gitignore>","0","-"
+#     "-","0","Mon, 23 Apr 2012 15:40:04 +0800","Me","Bootstrap","<app.js>","1","0"
+#     "d","204","Fri, 27 Apr 2012 19:50:34 +0800","Me","First Build","<bin>","0","-"
+#     "d","204","Fri, 27 Apr 2012 19:50:34 +0800","Me","First Build","<vendor>","2","-"
+
 process_index = (index, gitmodules, base) ->
-  lines = index.split('\n').filter((line) -> line)
+  lines = index.split("\n").filter((line) -> line)
   entries = []
   lines.forEach (line) ->
-    # Sample lines:
-    #
-    #   "-","57","Mon, 23 Apr 2012 15:40:04 +0800","Me","Initial Commit","<.gitignore>","0","-"
-    #   "-","0","Mon, 23 Apr 2012 15:40:04 +0800","Me","Bootstrap","<app.js>","1","0"
-    #   "d","204","Fri, 27 Apr 2012 19:50:34 +0800","Me","First Build","<bin>","0","-"
-    match = line.match /"(d|-)","(.+)","([^"]+)","(.+)","(.+)","(.+)","<(.+)>","(0|1)","(\d+|-)"/
+    match = line.match /"(d|-)","(.+)","([^"]+)","(.+)","(.+)","(.+)","<(.+)>","(0|1|2)","(\d+|-)"/
     return unless match
     entry =
       type       : if match[1] is 'd' then 'directory' else 'file'
@@ -207,38 +211,44 @@ process_index = (index, gitmodules, base) ->
       subject    : match[6]
       name       : match[7]
       documented : match[8] is '1'
+      link_back  : match[8] is '2'
       sloc       : parseInt match[9], 10
       submodule  : gitmodules[base + '/' + match[7]]
 
-    # Replace source extension for `.html` to get document file name.
+    # Replace source extension for `.html` to get document file name. For hidden
+    # file without extension, the document name is file name + `.html'.
     entry.document = entry.name.replace(/\.[^/.]+$/, '') + '.html' if entry.documented
-    # For hidden file without extension.
     entry.document = entry.name + '.html' if entry.document is '.html'
     entries.push entry
+    
   entries.sort (a, b) -> if [a.type, a.name] > [b.type, b.name] then 1 else -1
 
-# ## Replace emails with GitHub logins.
+# ### Replace Emails by GitHub Logins
 #
-# By leveraging GitHub api 
+# By leveraging GitHub api, file browser can replace emails by real GitHub
+# logins.
+#
+# **Notice:** every new domain should be registered through **Register a new
+# OAuth application** before making cross-domain ajax requests successfully.
+
 usernames = {}
 
 update_usernames = (table) ->
   emails = {}
-  spans = $(table).find('span[email]')
-  for span in spans
-    emails[$(span).attr('email')] = null
+  for span in $(table).find("span[email]")
+    emails[$(span).attr("email")] = null
   for email of emails
     do (email) ->
       if usernames.hasOwnProperty email
-        username = usernames[email]
-        if username
-          $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
+          username = usernames[email]
+          $(table).find("span[email='#{email}']").html("<a href='https://github.com/#{username}'>#{username}</a>") if username
       else
         $.getJSON "https://api.github.com/legacy/user/email/#{email}", (data) ->
-          username = if data.user then data.user.login else null
-          usernames[email] = username
-          if username
-            $(table).find('span[email="' + email + '"]').html("[<a href='https://github.com/#{username}'>#{username}</a>]")
+          usernames[email] = username = if data.user then data.user.login else null
+          $(table).find("span[email='#{email}']").html("<a href='https://github.com/#{username}'>#{username}</a>") if username
 
-# Expose file browser constructor globally.
+# ### Coda
+#
+# Expose `file_browser` constructor globally.
+
 @file_browser = file_browser

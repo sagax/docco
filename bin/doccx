@@ -22,7 +22,7 @@ done
 # ## Find Dirty Directories
 #
 # First, sort out dirty directories recursively into `.touched_folders`.
-echo A
+
 cd "$working_dir"
 cat .touched_sources .deleted_sources | while read file; do dirname "$file"; done | sort -u > .touched_folders_with_duplications
 cat .touched_folders_with_duplications | while read folder; do if ! [ -z "$folder" ]; then dirname "$folder"; fi; done | sort -u > .tmp_folders_1
@@ -67,10 +67,9 @@ cat .touched_folders_with_duplications | sort -u > .touched_folders
 # The regular expression used to parse the entry should be:
 #
 #     /"(d|-)","(.+)","([^"]+)","(.+)","(.+)","(.+)","<(.+)>","(0|1)","(\d+|-)"/
-echo B
+
 cd "$sources_dir"
-cat "$working_dir/.touched_folders" | while read folder; do
-  echo $folder
+cat "$working_dir/.touched_folders" | sort -r | while read folder; do
   mkdir -p "$working_dir/ghpages/docas/tree/$folder" && rm -f "$working_dir/ghpages/docas/tree/$folder/docas.index" && cd "$sources_dir/$folder"
  
   find . -mindepth 1 -maxdepth 1 | while read file; do
@@ -80,11 +79,15 @@ cat "$working_dir/.touched_folders" | while read folder; do
       ext="${filename:${#base} + 1}"
       if [[ -z "$base" && -n "$ext" ]]; then base=".$ext"; fi
       if [ -f "$working_dir/ghpages/$folder/$base.html" ]; then
-        documentable="\"1\",\"$(LANG=C grep -cv "^[ ]*$" "$file")\""
+	docas_type="\"1\",\"$(LANG=C grep -cv "^[ ]*$" "$file")\""
       else
-        documentable="\"0\",\"-\""
+	if [ -d "$working_dir/ghpages/docas/tree/$folder/$file" ]; then
+	  docas_type="\"0\",\"-\""
+	else
+	  docas_type="\"2\",\"-\""
+	fi
       fi
-      echo $(ls -dhl "$file" | awk '{{$1 = substr($1, 1, 1)} print "\""$1"\",\""$5"\""}'),$(git log -1 --format="\"%aD\",\"%ae\",\"%an\",\"%s\"" -- "$file"),"\"<$file>\"","$documentable" >> "$working_dir/ghpages/docas/tree/$folder/docas.index"
+      echo $(ls -dhl "$file" | awk '{{$1 = substr($1, 1, 1)} print "\""$1"\",\""$5"\""}'),$(git log -1 --format="\"%aD\",\"%ae\",\"%an\",\"%s\"" -- "$file"),"\"<$file>\"","$docas_type" >> "$working_dir/ghpages/docas/tree/$folder/docas.index"
     fi
   done
 done
