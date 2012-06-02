@@ -6,3 +6,5 @@ lib
 *.swo
 *.rdb
 node_modules
+*.min.js
+*.min.css

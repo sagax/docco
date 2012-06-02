@@ -234,8 +234,10 @@ fi
 echo -n "Calling Linguist HTTP @ port 4567...  "
 touch "$working_dir/.statist"
 touch "$working_dir/.touched_sources"
+touch "$working_dir/.deleted_sources"
 curl --silent --output "$working_dir/.statist"         "http://127.0.0.1:4567/statist?path=$sources_dir"
 curl --silent --output "$working_dir/.touched_sources" "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.touched"
+# curl --silent --output "$working_dir/.deleted_sources" "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.deleted"
 echo "✓" $(date "+%H:%M:%S")
 
 # ### Step 4: Synchronize Documents (using Docco)
@@ -249,7 +251,10 @@ cd "$ghpages_dir"
 cat "$working_dir/.deleted" | while read file; do
   deleted_document=${file%.*}
   if [ -z $deleted_document ]; then deleted_document=$file; fi
-  rm -f "$deleted_document.html"
+  if [ -f "$deleted_document.html" ]; then
+    echo $file >> "$working_dir"/.deleted_sources
+    rm -f "$deleted_document.html"
+  fi
 done
 
  
@@ -302,7 +307,7 @@ echo "✓" $(date "+%H:%M:%S")
 #     + Used by documentations.
 
 cd "$ghpages_dir" && mkdir -p stylesheets
-cp /usr/local/lib/docas/resources/index.css stylesheets/index.css
+cp /usr/local/lib/docas/resources/index.min.css stylesheets
 cp /usr/local/lib/docas/resources/docco.css stylesheets/docco.css
 mkdir -p stylesheets/fonts
 cp /usr/local/lib/docas/resources/fonts/* stylesheets/fonts
