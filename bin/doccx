@@ -26,10 +26,12 @@ done
 cd "$working_dir"
 cat .touched_sources .deleted_sources | while read file; do dirname "$file"; done | sort -u > .touched_folders_with_duplications
 cat .touched_folders_with_duplications | while read folder; do if ! [ -z "$folder" ]; then dirname "$folder"; fi; done | sort -u > .tmp_folders_1
-while [ "$(cat .tmp_folders_1)" != "." ]; do
+tmp=$(cat .tmp_folders_1)
+while [ "$tmp" != "." ] && [ -n "$tmp" ]; do
   cat .tmp_folders_1 >> .touched_folders_with_duplications
   mv  .tmp_folders_1    .tmp_folders_2
   cat .tmp_folders_2 | while read folder; do dirname "$folder"; done | sort -u > .tmp_folders_1
+  tmp=$(cat .tmp_folders_1)
 done
 cat .tmp_folders_1 >> .touched_folders_with_duplications
 cat .touched_folders_with_duplications | sort -u > .touched_folders

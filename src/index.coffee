@@ -61,7 +61,7 @@ list_template = template [
   '<td><span><%= entry.type == "file" ? entry.size : "—" %></span></td>'
   '<td><span><%= isNaN(entry.sloc) ? "—" : (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) %></span></td>'
   '<td><%= entry.modified %></td>'
-  '<td><div><span><%= entry.subject  %></span><span class="file_browser_author" email="<%= entry.email %>"> [<%= entry.author %>]</span></div></td>'
+  '<td><div><span><%= entry.subject  %></span><span class="file_browser_author" email="<%= entry.email %>"> <%= entry.author %></span></div></td>'
   '</tr>'
   '<% }); %>'
   '</tbody>'
@@ -75,8 +75,8 @@ process_gitmodules = (gitmodules) ->
   gitmodules = gitmodules.split /\[[^\]]*\]/
   gitmodules = gitmodules[1..]
   gitmodules.reduce (hash, submodule) ->
-    match = submodule.match /path = (.*)\n.*url = git(?:@|:\/\/)github\.com(?::|\/)(.*)\.git/
-    hash[match[1]] = match[4]
+    match = submodule.match /path = (.*)\n.*url = git(?:@|:\/\/)github\.com(?::|\/)(.*)(\.git)?/
+    hash[match[1]] = match[2]
     hash
   , {}
 
@@ -181,6 +181,7 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
       url: gitmodules
       success: (data) ->
         gitmodules_cache[user + '/' + repo] = process_gitmodules data
+        console.log gitmodules_cache
         get_index()
       error: ->
         gitmodules_cache[user + '/' + repo] = {}
@@ -213,8 +214,8 @@ process_index = (index, gitmodules, base) ->
       documented : match[8] is '1'
       link_back  : match[8] is '2'
       sloc       : parseInt match[9], 10
-      submodule  : gitmodules[base + '/' + match[7]]
-
+      submodule  : gitmodules[(if base then base + '/' else '') + match[7]]
+    console.log gitmodules, base, match[7]
     # Replace source extension for `.html` to get document file name. For hidden
     # file without extension, the document name is file name + `.html'.
     entry.document = entry.name.replace(/\.[^/.]+$/, '') + '.html' if entry.documented
