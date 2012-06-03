@@ -1,15 +1,15 @@
-# ## Languages Indicator
+# ## Widget A: Languages Stats
 #
-# Animate languages statistics bar chart on page load.
+# Animate bar chart of languages statistics on page load.
 
 $ ->
-  bars = $('.code_stats span[data-lang][percent]')
+  bars = $('.code_stats span[percent]')
   return unless bars.length
-  start_index = bars.length - 1
+  start_index = bars.length
 
   do animate = ->
-    bar = $ bars[start_index--]
-    return unless bar.length
+    return unless start_index
+    bar = $ bars[--start_index]
     return animate() if bar.attr('percent') is bar.css('width')
     bar.animate
       width: bar.attr('percent')
@@ -97,11 +97,6 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
     $.ajax
       type: 'GET'
       url: index_path
-
-      error: do (index_path) ->
-        ->
-          console.log 'opening', 'https://github.com/' + user + '/' + repo + '/tree/master/' + index_path
-          window.open ('https://github.com/' + user + '/' + repo + '/tree/master/' + index_path), "GitHub"
 
       success: (index) ->
 
