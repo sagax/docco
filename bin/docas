@@ -308,7 +308,7 @@ echo "✓" $(date "+%H:%M:%S")
 
 cd "$ghpages_dir" && mkdir -p stylesheets
 cp /usr/local/lib/docas/resources/index.min.css stylesheets
-cp /usr/local/lib/docas/resources/docco.css stylesheets/docco.css
+cp /usr/local/lib/docas/resources/docco.min.css stylesheets
 mkdir -p stylesheets/fonts
 cp /usr/local/lib/docas/resources/fonts/* stylesheets/fonts
 

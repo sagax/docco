@@ -1,9 +1,0 @@
-[submodule "vendor/linguist"]
-	path = vendor/linguist
-	url = git@github.com:baoshan/linguist.git
-[submodule "linguist"]
-	path = linguist
-	url = git@github.com:baoshan/linguist.git
-[submodule "pygments_http"]
-	path = pygments_http
-	url = git://github.com/baoshan/pygments_http

@@ -58,6 +58,8 @@ get_repo = (user, repo, callback) ->
   options = 
     host: 'api.github.com'
     path: "/repos/#{user}/#{repo}"
+    auth: fs.readFileSync(__dirname + '/../auth').toString().trim()
+
   req = https.get options, (res) ->
     return callback '' if res.statusCode isnt 200
     json = ''
