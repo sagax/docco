@@ -262,7 +262,7 @@ done
 
 cd "$sources_dir"
 # time find . -iname "*.js" | xargs du | sort -n -r | cut -f 2 | xargs docco -r baoshan/d3 -o x > /dev/null
-cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -r $(echo $repo | grep -P "(?<=/)([^\/]*)" -o) -o "$ghpages_dir" > /dev/null
+cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -r "$repo" -o "$ghpages_dir" > /dev/null
 
 echo "✓" $(date "+%H:%M:%S")
 

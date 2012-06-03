@@ -47,9 +47,15 @@ generate_index = (dirname, dest) ->
           source = dirname + '/' + source
           readme = showdown.makeHtml fs.readFileSync(source).toString() if not readme and path.existsSync(source) and fs.statSync(source).isFile()
         get_repo user, repo, (description) ->
-          html = index_template {
-            title: repo, description: description, statistics: statistics, log: log, readme: readme, user: user, repo: repo, opts: process.OPTS
-          }
+          html = index_template
+            title: repo
+            description: description
+            statistics: statistics
+            log: log
+            readme: readme
+            user: user
+            repo: repo
+            opts: process.OPTS
           fs.writeFile dest, html, (err) ->
             throw err if err
             process.exit()
