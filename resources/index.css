@@ -501,6 +501,7 @@ body{
 	font-weight:300;
 	color:#666;
 	font-style:italic;
+	min-height:50px;
 }
 
 /*readme*/
@@ -680,7 +681,7 @@ body{
 .filelist .document .icon:after{
   font-size:16px;
   font-family:'Octicons Regular';
-  color:#80A6CD;
+  color:#777777;
   content:"";
   float:right;
 }
@@ -803,4 +804,15 @@ pre code{
     padding: 14px 15px 16px 25px;
     vertical-align: top;
     width: 100%;
+}
+/*链接用图标进行标识*/
+#filebrowser table tr td:nth-child(2) a[href*="http"] {
+     background: url("data:image/gif;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAMAAwDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD0Qwy6zvnureK5vbqytGtzDbL+63GViCZA4VeDliOnABbAPFeJrO50q6tLW7+z/aFhfe6QrCJB50gRtqcDKBff1qwvi2YWtpDLpOk3HkwpGjz25dgoXjktXomj6PpbaHpzvplk8j2sbO7W6ksSoyScVtflZjuj/9k=") no-repeat scroll right center transparent;
+     padding-right: 15px;
+}
+/*code自动适应其所在地方的字体大小*/
+code{ font-size:89%;}
+/*调整列表的margin，不影响其原有的margin*/
+.readme ol,.readme ul{
+  margin : 15px 0px
 }
