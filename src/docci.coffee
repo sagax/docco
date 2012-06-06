@@ -56,6 +56,13 @@ generate_index = (dirname, dest) ->
             user: user
             repo: repo
             opts: process.OPTS
+            files_list: list_template
+              user          : user
+              repo          : repo
+              index_depth   : 0
+              absolute_base : ''
+              relative_base : ''
+              entries       : process_index(fs.readFileSync(destdir + '/docas/tree/docas.index').toString(), {}, '')
           fs.writeFile dest, html, (err) ->
             throw err if err
             process.exit()
@@ -143,6 +150,8 @@ generate_tree = (path, callback) ->
 fs       = require 'fs'
 path     = require 'path'
 showdown = require('./../vendor/showdown').Showdown
+{list_template, process_index} = require './index.js'
+
 # require 'js-yaml'
 {exec}   = require 'child_process'
 vendor = fs.readFileSync(__dirname + '/../vendor/linguist/lib/linguist/vendor.yml').toString()
