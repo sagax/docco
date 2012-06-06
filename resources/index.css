@@ -816,3 +816,6 @@ code{ font-size:89%;}
 .readme ol,.readme ul{
   margin : 15px 0px
 }
+
+/*p code超出边界时自动换行--针对连续的，没有空格的英文或符号*/
+p,code{word-wrap: break-word;}
