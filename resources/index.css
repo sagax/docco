@@ -819,3 +819,8 @@ code{ font-size:89%;}
 
 /*p code超出边界时自动换行--针对连续的，没有空格的英文或符号*/
 p,code{word-wrap: break-word;}
+
+/*ol ul中对中文缩进的修复*/
+.readme ol, .readme ul {
+    margin: 15px 0 15px -9px;
+}
