@@ -824,3 +824,9 @@ p,code{word-wrap: break-word;}
 .readme ol, .readme ul {
     margin: 15px 0 15px -9px;
 }
+
+/*修复IE下readme不设置最大宽度时被撑开的BUG*/
+.readme{
+  width:450px\9;
+	width:450px\0;
+}
