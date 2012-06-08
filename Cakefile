@@ -22,7 +22,7 @@ task 'install', 'install the `docco`, `docci`, `doccx`, and `docas` command into
   exec([
     "echo #{options.auth} > /usr/local/lib/docas/auth"
     'mkdir -p ' + lib
-    'cp -rf bin resources vendor lib ' + lib
+    'cp -rf bin resources vendor lib src ' + lib
     'ln -sf ' + lib + '/bin/docco ' + base + '/bin/docco'
     'ln -sf ' + lib + '/bin/docci ' + base + '/bin/docci'
     'ln -sf ' + lib + '/bin/doccx ' + base + '/bin/doccx'

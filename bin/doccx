@@ -82,6 +82,7 @@ cat "$working_dir/.touched_folders" | sort -r | while read folder; do
       if [[ -z "$base" && -n "$ext" ]]; then base=".$ext"; fi
       if [ -f "$working_dir/ghpages/$folder/$base.html" ]; then
 	docas_type="\"1\",\"$(LANG=C grep -cv "^[ ]*$" "$file")\""
+	# docas_type="\"1\",\"0\""
       else
 	if [ -d "$working_dir/ghpages/docas/tree/$folder/$file" ]; then
 	  docas_type="\"0\",\"-\""
