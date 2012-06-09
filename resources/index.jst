@@ -28,30 +28,31 @@
     <!--content-->
 		<div class="content">
 
-      <table class="code_stats">
-        <% statistics.forEach(function(entry) { %>
-        <tr>
-          <td><%= entry[0] %></td>
-          <td><%= entry[2] %></td>
-          <td><span data-lang="<%= entry[2] %>"></span></td>
-	  <td style="width:400px;"><div><span data-lang="<%= entry[2] %>" percent="<%= entry[0] %>" style="width: 0%;"></span><span><%= entry[1] %> sloc</span></div></td>
-        </tr>
-        <tr>
-        <% }); %>
-      </table>
-     
-      <ol>
-        <% for (var i = 0, l = log.length; i < l; i++) { %>
-        <% var entry = log[i]; %>
-        <li><%= entry.date %>, <%= entry.author %>, <%= entry.subject %></li>
-        <% } %>
-      </ol>
+<h2>Language Statistics</h2>
+<table class="code_stats">
+<% statistics.forEach(function(entry) { %>
+<tr>
+<td><%= entry[0] %></td>
+<td><%= entry[2] %></td>
+<td><span data-lang="<%= entry[2] %>"></span></td>
+<td style="width:400px;"><div><span data-lang="<%= entry[2] %>" percent="<%= entry[0] %>" style="width: 0%;"></span><span><%= entry[1] %> sloc</span></div></td>
+</tr>
+<tr>
+<% }); %>
+</table>
 
-  
-    <div id="filebrowser">
-      <div id="breadcrumb"><span><%= repo %></span></div>
-      <div id="filelists"><%= files_list %></div>
-    </div>
+<h2>Recent Activities</h2>
+<ol>
+<% for (var i = 0, l = log.length; i < l; i++) { %>
+<% var entry = log[i]; %>
+<li><%= entry.date %>, <%= entry.author %>, <%= entry.subject %></li>
+<% } %>
+</ol>
+
+<div id="filebrowser">
+<div id="breadcrumb"><span><%= repo %></span></div>
+<div id="filelists"><%= files_list %></div>
+</div>
   
     </div>
    </td>

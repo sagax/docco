@@ -8,6 +8,7 @@ task 'build', 'build the docco library', (options) ->
   exec [
     'coffee ' + ['-c' + (if options.watch then 'w' else ''), '-o', 'lib', 'src'].join(' ')
     'java -jar ~/compiler.jar --js lib/index.js --js_output_file lib/index.min.js' # && rm lib/index.js'
+    'java -jar ~/compiler.jar --js lib/docas.js --js_output_file lib/docas.min.js' # && rm lib/index.js'
     'cleancss -o resources/index.min.css resources/index.css'
     'cleancss -o resources/docco.min.css resources/docco.css'
   ].join(' && '), (err, stdout, stderr) ->

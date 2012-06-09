@@ -52,7 +52,7 @@ list_template = template """
 <thead><tr><th></th><th>name</th><th><span>sloc</span>&nbsp;&nbsp;<span class="selected">size</span></th><th>age</th><th><span class="selected">message</span>&nbsp;&nbsp;<span>description</span><div class="history"><a target="_blank" href="https://github.com/<%= user %>/<%= repo %>/commits/master">history</a></div></th></tr></thead>
 <tbody>
 <% if(index_depth) { %>
-<tr class="directory"><td></td><td><a backward>..</a></td><td></td><td></td><td></td><td></td></tr>
+<tr class="directory"><td></td><td><a backward>..</a></td><td></td><td></td><td></td></tr>
 <% } %>
 <% entries.forEach(function(entry) { %>
 <tr class="<%= entry.submodule ? "submodule" : entry.action === "s" ? "document" : entry.type %>">
@@ -228,11 +228,10 @@ process_index = (index, gitmodules, base) ->
     segments = entry.name.split '.'
     while segments[0] is ''
       segments.splice 0, 1
-    entry.document = segments[0...(segments.length > 1 ? segments.length - 1 : segments.length)].join('.') + '.html' if entry.action is 's'
+    entry.document = segments[0...(if segments.length > 1 then segments.length - 1 else segments.length)].join('.') + '.html' if entry.action is 's'    
     entry.submodule = gitmodules[(if base then base + '/' else '') + entry.name]
     entry.modified = local_moment(new Date entry.date * 1000).fromNow()
     entries.push entry
-    
   entries.sort (a, b) -> if [a.type, a.name] > [b.type, b.name] then 1 else -1
 
 # ### Replace Emails by GitHub Logins

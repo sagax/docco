@@ -328,6 +328,7 @@ cp /usr/local/lib/docas/resources/fonts/* stylesheets/fonts
 
 mkdir -p javascript
 cp /usr/local/lib/docas/lib/index.min.js javascript
+cp /usr/local/lib/docas/lib/docas.min.js javascript
 
 #   * Copy other user specified files. All files in the `docas` folder of the
 #   `master` branch will be cloned into the same folder of the `gh-pages`
@@ -395,7 +396,6 @@ cd "$sources_dir" && git branch -D gh-pages > /dev/null
 # <img style="float:left" src="https://a248.e.akamai.net/assets.github.com/images/modules/about_page/octocat.png?1334862345"></img>
 # <img id="mug" style="display:none;float:left; margin:39px 0 0 70px;" src="../docas/coffeescript_logo.png"></img>
 # <input id="coffee" class="button" style="float:left; margin-top:125px;" type="button" value="YES, PLEASE!"></input>
-# <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 # <script>
 # $('#coffee').click(function(){$('#mug').css('display', 'block'); $(this).remove();})
 # </script>

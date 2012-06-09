@@ -88,9 +88,7 @@ generate_documentation = (source, callback) ->
           #     sections.splice 0, 1
       depth = source.split('/').length - 1
       if depth then css = [0..depth-1].map(-> '..').join('/') + '/stylesheets/docco.min.css' else css = 'stylesheets/docco.min.css'
-      line = code
-      line.match(language.comment_matcher) and not line.match(language.comment_filter)
-      generate_html source, css, sections, description
+      generate_html source, css, sections, description, depth
       callback()
 
 # Given a string of source code, parse out each comment and the code that
@@ -109,6 +107,7 @@ parse = (source, code) ->
   lines    = code.split '\n'
   sections = []
   language = get_language source
+  console.log 'language', language
   has_code = docs_text = code_text = ''
 
   save = (docs, code) ->
@@ -116,6 +115,7 @@ parse = (source, code) ->
 
   if lines[0].match(language.comment_matcher) and not lines[0].match(language.comment_filter)
     description = lines[0].replace(language.comment_matcher, '').trim()
+  else description = ""
 
   for line in lines
     if line.match(language.comment_matcher) and not line.match(language.comment_filter)
@@ -183,7 +183,7 @@ highlight = (source, sections, callback) ->
 # Once all of the code is finished highlighting, we can generate the HTML file
 # and write out the documentation. Pass the completed sections into the template
 # found in `resources/docco.jst`
-generate_html = (source, css, sections, description) ->
+generate_html = (source, css, sections, description, depth) ->
   title_segments = real_source(source).split('/')
   title_segments.shift() if title_segments[0] is '.'
   head_title = process.OPTS.repo + ' » ' + title_segments.join(' › ') #  path.basename real_source source
@@ -198,7 +198,7 @@ generate_html = (source, css, sections, description) ->
   for pattern, stylesheet of conf.page_stylesheets
     stylesheets.push root_dir + 'docas/' + stylesheet if source.match new RegExp "^#{pattern.replace('*', '.*')}$"
   html  = docco_template {
-    head_title: head_title, title: title, sections: sections, css: css, javascripts: javascripts, stylesheets: stylesheets, google_analytics: conf.google_analytics, description: description
+    head_title: head_title, title: title, sections: sections, css: css, javascripts: javascripts, stylesheets: stylesheets, google_analytics: conf.google_analytics, description: description, depth: depth
   }
   console.log "docco: #{source} -> #{dest}"
   ensure_directory (path.dirname dest), ->
