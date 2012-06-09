@@ -396,6 +396,6 @@ cd "$sources_dir" && git branch -D gh-pages > /dev/null
 # <img style="float:left" src="https://a248.e.akamai.net/assets.github.com/images/modules/about_page/octocat.png?1334862345"></img>
 # <img id="mug" style="display:none;float:left; margin:39px 0 0 70px;" src="../docas/coffeescript_logo.png"></img>
 # <input id="coffee" class="button" style="float:left; margin-top:125px;" type="button" value="YES, PLEASE!"></input>
-# <script>
-# $('#coffee').click(function(){$('#mug').css('display', 'block'); $(this).remove();})
+# <script>window.onload = function(){$('#coffee').click(function(){$('#mug').css('display', 'block');
+# $(this).remove();})};
 # </script>
