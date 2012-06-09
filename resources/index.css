@@ -830,3 +830,11 @@ p,code{word-wrap: break-word;}
   width:450px\9;
 	width:450px\0;
 }
+
+.repo_nav thead span {
+  padding: 1px 3px;
+}
+.repo_nav thead .selected { 
+  background-color: #ccc;
+}
+.repo_nav tbody .hidden { display: none }

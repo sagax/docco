@@ -62,7 +62,8 @@ generate_index = (dirname, dest) ->
               index_depth   : 0
               absolute_base : ''
               relative_base : ''
-              entries       : process_index(fs.readFileSync(destdir + '/docas/tree/docas.index').toString(), {}, '')
+              entries       : process_index(fs.readFileSync(destdir + '/docas.index').toString(), {}, '')
+            gitmodules    : process_gitmodules()
           fs.writeFile dest, html, (err) ->
             throw err if err
             process.exit()
@@ -184,6 +185,19 @@ index_template  = template fs.readFileSync(__dirname + '/../resources/index.jst'
 
 # The CSS styles we'd like to apply to the documentation.
 index_styles    = fs.readFileSync(__dirname + '/../resources/index.css').toString()
+
+process_gitmodules = ->
+  try
+    gitmodules = fs.readFileSync(destdir + '/gitmodules').toString()
+    gitmodules = gitmodules.split /\[[^\]]*\]/
+    gitmodules = gitmodules[1..]
+    return gitmodules.reduce (hash, submodule) ->
+      match = submodule.match /path = (.*)\n.*url = git(?:@|:\/\/)github\.com(?::|\/)(.*)(\.git)?/
+      hash[match[1]] = match[2]
+      hash
+    , {}
+  catch e
+    return {}
 
 # Run the script.
 # For each recognized source file passed in as an argument, generate the documentation. Log sources of unknown types.

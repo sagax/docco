@@ -117,6 +117,7 @@ else
   echo "✓" $(date "+%H:%M:%S")
 
 fi
+
 # ### Step 2: Checkout (or Generate) gh-pages Branch, List Touched Files
 
 # Docas will only re-render documents for touched sources, in some scenarios,
@@ -280,8 +281,8 @@ echo "✓" $(date "+%H:%M:%S")
 
 echo -n "Generating File & Folder Indexes...   "
 # doccx -s "$sources_dir" -w "$working_dir"
-cat "$working_dir"/.touched "$working_dir"/.deleted | \
-  ruby /usr/local/lib/docas/src/unique_directories.rb --working_dir "$working_dir" --sources_dir "$sources_dir"
+# cat "$working_dir/.touched" "$working_dir/.deleted" | \
+ruby /usr/local/lib/docas/src/doccx.rb --working "$working_dir" --sources "$sources_dir"
 echo "✓" $(date "+%H:%M:%S")
 
 # Upon this phase, following materials were all ready:

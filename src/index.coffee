@@ -16,12 +16,10 @@ if typeof $ isnt 'undefined'
         width: bar.attr('percent')
       , 600, 'linear', animate
 
-if typeof moment is 'undefined'
-  local_moment = require 'moment'
-else
-  local_moment = moment
-
 # ## GitHub Styled Repo Browser
+
+{ user, repo, gitmodules } = docas if typeof docas isnt 'undefined'
+local_moment = if typeof moment is 'undefined' then require 'moment' else moment
 
 # ### Micro Template Engine for Rendering Content
 template = (str) ->
@@ -50,20 +48,19 @@ breadcrumb_template = (path) ->
 # ### Template for File Browser
 list_template = template """
 <div depth="<%= index_depth %>" class="filelist">
-<table>
-<thead><tr><th></th><th>name</th><th>size</th><th>sloc</th><th>age</th><th>message<div class="history"><a target="_blank" href="https://github.com/<%= user %>/<%= repo %>/commits/master">history</a></div></th></tr></thead>
+<table class="repo_nav">
+<thead><tr><th></th><th>name</th><th><span>sloc</span>&nbsp;&nbsp;<span class="selected">size</span></th><th>age</th><th><span class="selected">message</span>&nbsp;&nbsp;<span>description</span><div class="history"><a target="_blank" href="https://github.com/<%= user %>/<%= repo %>/commits/master">history</a></div></th></tr></thead>
 <tbody>
 <% if(index_depth) { %>
 <tr class="directory"><td></td><td><a backward>..</a></td><td></td><td></td><td></td><td></td></tr>
 <% } %>
 <% entries.forEach(function(entry) { %>
-<tr class="<%= entry.submodule ? "submodule" : entry.documented ? "document" : entry.type %>">
+<tr class="<%= entry.submodule ? "submodule" : entry.action === "s" ? "document" : entry.type %>">
 <td class="icon"></td>
-<td><a <%= entry.type == 'directory' && !entry.link_back && !entry.submodule ? 'forward' : 'href=\"' + (entry.submodule ? 'https://github.com/' + entry.submodule : (entry.documented ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name)) + '\"' %><%= entry.link_back ? "target=\'_blank\'": "" %>><%= entry.name %></a></td>
-<td><span<%= entry.type == "file" ? "" : " class='na'" %>><%= entry.type == "file" ? entry.size : "—" %></span></td>
-<td><span<%= isNaN(entry.sloc) ? " class='na'" : "" %>><%= isNaN(entry.sloc) ? "—" : (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) %></span></td>
+<td><a <%= entry.type == 'directory' && !entry.submodule ? 'forward' : 'href=\"' + (entry.submodule ? 'https://github.com/' + entry.submodule : (entry.action === 's' ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name)) + '\"' %><%= entry.action === "g" ? "target=\'_blank\'": "" %>><%= entry.name %></a></td>
+<td><span class="hidden <%= entry.sloc ? "" : "" %>"><%= entry.sloc ? (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) : "-" %></span><span><%= entry.size %></span></td>
 <td><%= entry.modified %></td>
-<td><div><span><%= entry.subject  %></span><span class="file_browser_author" email="<%= entry.email %>"> <%= entry.author %></span></div></td>
+<td><div><span><%= entry.message %></span><span class="file_browser_author" email="<%= entry.email %>"> <%= entry.author %></span></div><div class="hidden"><%= entry.description %></div></td>
 </tr>
 <% }); %>
 </tbody>
@@ -71,21 +68,9 @@ list_template = template """
 </div>
 """.replace('\n', '')
 
-gitmodules_cache = {}
-
-process_gitmodules = (gitmodules) ->
-  gitmodules = gitmodules.split /\[[^\]]*\]/
-  gitmodules = gitmodules[1..]
-  gitmodules.reduce (hash, submodule) ->
-    match = submodule.match /path = (.*)\n.*url = git(?:@|:\/\/)github\.com(?::|\/)(.*)(\.git)?/
-    hash[match[1]] = match[2]
-    hash
-  , {}
-
-
 first_time = on
 
-regist_events = (user, repo, table, index_path, index_depth, current_depth) ->
+regist_events = (table, index_path, index_depth, current_depth) ->
 
   update_usernames table
 
@@ -94,12 +79,36 @@ regist_events = (user, repo, table, index_path, index_depth, current_depth) ->
   $(table).find('a[backward]').click ->
     new_path = index_path.split '/'
     new_path.splice new_path.length - 2, 1
-    new file_browser user, repo, new_path.join('/'), index_depth - 1, current_depth
+    new Repo_Navigator new_path.join('/'), index_depth - 1, current_depth
+
+  $(table).find('thead th:nth-child(3) span:nth-child(1)').click ->
+    $(table).find('thead th:nth-child(3) span:nth-child(1)').addClass('selected')
+    $(table).find('thead th:nth-child(3) span:nth-child(2)').removeClass('selected')
+    $(table).find('tbody tr td:nth-child(3) span:nth-child(1)').removeClass('hidden')
+    $(table).find('tbody tr td:nth-child(3) span:nth-child(2)').addClass('hidden')
+
+  $(table).find('thead th:nth-child(3) span:nth-child(2)').click ->
+    $(table).find('thead th:nth-child(3) span:nth-child(1)').removeClass('selected')
+    $(table).find('thead th:nth-child(3) span:nth-child(2)').addClass('selected')
+    $(table).find('tbody tr td:nth-child(3) span:nth-child(1)').addClass('hidden')
+    $(table).find('tbody tr td:nth-child(3) span:nth-child(2)').removeClass('hidden')
+
+  $(table).find('thead th:nth-child(5) span:nth-child(1)').click ->
+    $(table).find('thead th:nth-child(5) span:nth-child(1)').addClass('selected')
+    $(table).find('thead th:nth-child(5) span:nth-child(2)').removeClass('selected')
+    $(table).find('tbody tr td:nth-child(5) div:nth-child(1)').removeClass('hidden')
+    $(table).find('tbody tr td:nth-child(5) div:nth-child(2)').addClass('hidden')
+
+  $(table).find('thead th:nth-child(5) span:nth-child(2)').click ->
+    $(table).find('thead th:nth-child(5) span:nth-child(1)').removeClass('selected')
+    $(table).find('thead th:nth-child(5) span:nth-child(2)').addClass('selected')
+    $(table).find('tbody tr td:nth-child(5) div:nth-child(1)').addClass('hidden')
+    $(table).find('tbody tr td:nth-child(5) div:nth-child(2)').removeClass('hidden')
 
   $(table).find('a[forward]').click ->
     new_path = index_path.split '/'
     new_path.splice new_path.length - 1, 0, $(@).html()
-    new file_browser user, repo, new_path.join('/'), index_depth + 1, current_depth
+    new Repo_Navigator new_path.join('/'), index_depth + 1, current_depth
 
   # #### Pushing / Poping the Table
   return if first_time
@@ -124,10 +133,10 @@ regist_events = (user, repo, table, index_path, index_depth, current_depth) ->
 # 4. `index_depth`, the depth of the index file, `0` for root directory of the repo.
 # 5. `current_depth`, optional, the depth of the current page, defaults to
 # `index_depth`.
-file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_depth) ->
+Repo_Navigator = (index_path = "docas.index", index_depth = 0, current_depth = index_depth) ->
  
   if first_time
-    regist_events user, repo,  $('#filelists').children()[0], index_path, index_depth, current_depth
+    regist_events $('#filelists').children()[0], index_path, index_depth, current_depth
     first_time = off
     return 
 
@@ -142,9 +151,8 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
 
         # #### Render Breadcrumb Navigator
         breadcrumb_path  = index_path.split '/'
-        breadcrumb_end   = breadcrumb_path.length - 2
-        breadcrumb_start = breadcrumb_end - index_depth + 1
-        breadcrumb_path  = breadcrumb_path[breadcrumb_start..breadcrumb_end]
+        breadcrumb_end   = breadcrumb_path.length - 1
+        breadcrumb_path  = breadcrumb_path[0...breadcrumb_end]
         $('#breadcrumb').html breadcrumb_template [repo, breadcrumb_path...]
 
         # #### Handling Breadcrumb Interaction
@@ -152,7 +160,7 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
           new_depth = $(@).attr('depth') * 1
           new_path = index_path.split '/'
           new_path.splice new_path.length - index_depth + new_depth - 1, index_depth - new_depth
-          new file_browser user, repo, new_path.join('/'), new_depth, current_depth
+          new Repo_Navigator new_path.join('/'), new_depth, current_depth
 
         # #### Render Content Table
         #
@@ -172,30 +180,11 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
           index_depth   : index_depth
           absolute_base : absolute_base
           relative_base : relative_base
-          entries       : process_index index, gitmodules_cache[user + '/' + repo], absolute_base
+          entries       : process_index index, gitmodules, absolute_base
 
-        regist_events user, repo, table, index_path, index_depth, current_depth
+        regist_events table, index_path, index_depth, current_depth
 
-
-  # #### Get Git Modules First
-
-  if gitmodules_cache.hasOwnProperty user + '/' + repo
-    get_index()
-  else
-    gitmodules = index_path.split '/'
-    gitmodules = gitmodules[0 .. gitmodules.length - index_depth - 3]
-    gitmodules.push 'gitmodules'
-    gitmodules = gitmodules.join '/'
-    $.ajax
-      type: 'GET'
-      url: gitmodules
-      success: (data) ->
-        gitmodules_cache[user + '/' + repo] = process_gitmodules data
-        # console.log gitmodules_cache
-        get_index()
-      error: ->
-        gitmodules_cache[user + '/' + repo] = {}
-        get_index()
+  get_index()
 
 # ### Docas Index Parser
 #
@@ -207,37 +196,48 @@ file_browser = (user, repo, index_path, index_depth = 0, current_depth = index_d
 #     "d","204","Fri, 27 Apr 2012 19:50:34 +0800","Me","First Build","<bin>","0","-"
 #     "d","204","Fri, 27 Apr 2012 19:50:34 +0800","Me","First Build","<vendor>","2","-"
 
+index_entry_segments = [
+  "type"
+  "name"
+  "action"
+  "size"
+  "sloc"
+  "author"
+  "email"
+  "date"
+  "description"
+  "message"
+]
+
 process_index = (index, gitmodules, base) ->
-  # console.log 'asda', index, gitmodules, base
-  lines = index.split("\n").filter((line) -> line)
+  lines = index.split("\n")
+  lines.pop()
   entries = []
   lines.forEach (line) ->
-    match = line.match /"(d|-)","(.+)","([^"]+)","(.+)","(.+)","(.+)","<(.+)>","(0|1|2)","(\d+|-)"/
-    return unless match
-    entry =
-      type       : if match[1] is 'd' then 'directory' else 'file'
-      size       : match[2] # filesize((parseInt match[2], 10), on)
-      modified   : local_moment(new Date match[3]).fromNow()
-      email      : match[4]
-      author     : match[5]
-      subject    : match[6]
-      name       : match[7]
-      documented : match[8] is '1'
-      link_back  : match[8] is '2'
-      sloc       : parseInt match[9], 10
-      submodule  : gitmodules[(if base then base + '/' else '') + match[7]]
-    # console.log gitmodules, base, match[7]
-    # Replace source extension for `.html` to get document file name. For hidden
-    # file without extension, the document name is file name + `.html'.
-    entry.document = entry.name.replace(/\.[^/.]+$/, '') + '.html' if entry.documented
-    entry.document = entry.name + '.html' if entry.document is '.html'
+    entry = {}
+    pattern = /[^\|]\|/g
+    index = position = 0
+    while result = pattern.exec line
+      value = line.substring position, result.index + 1
+      value = if typeof $ is 'undefined' then value.trim() else $.trim value
+      value = value.replace '||', '|'
+      entry[index_entry_segments[index++]] = value
+      position = pattern.lastIndex
+    entry[index_entry_segments[index]] = line.substr(position).replace('||', '|')
+    entry.type = if entry.type is 'd' then 'directory' else 'file'
+    segments = entry.name.split '.'
+    while segments[0] is ''
+      segments.splice 0, 1
+    entry.document = segments[0...(segments.length > 1 ? segments.length - 1 : segments.length)].join('.') + '.html' if entry.action is 's'
+    entry.submodule = gitmodules[(if base then base + '/' else '') + entry.name]
+    entry.modified = local_moment(new Date entry.date * 1000).fromNow()
     entries.push entry
     
   entries.sort (a, b) -> if [a.type, a.name] > [b.type, b.name] then 1 else -1
 
 # ### Replace Emails by GitHub Logins
 #
-# By leveraging GitHub api, file browser can replace emails by real GitHub
+# By leveraging GitHub api, repo navigator can replace emails by real GitHub
 # logins.
 #
 # **Notice:** every new domain should be registered through **Register a new
@@ -251,23 +251,28 @@ update_usernames = (table) ->
     emails[$(span).attr("email")] = null
   for email of emails
     do (email) ->
+      update_table = (username) ->
+        $(table).find("span[email='#{email}']").html("<a href='https://github.com/#{username}'>#{username}</a>") if username
       if usernames.hasOwnProperty email
-          username = usernames[email]
-          $(table).find("span[email='#{email}']").html("<a href='https://github.com/#{username}'>#{username}</a>") if username
+        update_table usernames[email]
       else
         $.getJSON "https://api.github.com/legacy/user/email/#{email}", (data) ->
-          usernames[email] = username = if data.user then data.user.login else null
-          $(table).find("span[email='#{email}']").html("<a href='https://github.com/#{username}'>#{username}</a>") if username
+          update_table usernames[email] = if data and data.user then data.user.login else null
 
 # ### Coda
 #
-# Expose `file_browser` constructor globally.
-
-@file_browser = file_browser
+# Expose `repo_browser` constructor globally.
+#
+#   * For browser environment, initialize the (root level) `Repo_Navigator`.
+#   * For node.js environment, expose:
+#     + `process_index`: used for processing the (root level) `docas.index`
+#     + `breadcrumb_template`: used for rendering the breadcrumb in the `index.html`
+#     + `list_template`: used for rendering the content of the navigator in the `index.html`
 
 if typeof window is 'undefined'
   module.exports =
-    process_index: process_index
-    list_template: list_template
-    breadcrumb_template: breadcrumb_template
-
+    process_index       : process_index
+    breadcrumb_template : breadcrumb_template
+    list_template       : list_template
+else
+  new Repo_Navigator
