@@ -666,7 +666,15 @@ body{
 	padding: 7px 3px;
 	vertical-align: middle;
 }
-.filelist table thead span{ background : none; border-radius:2px;-moz-transition: all 0.3s linear 0s; cursor:pointer}
+.filelist table thead span{ 
+  background : none; 
+  border-radius:2px;
+  -moz-transition: all 0.3s linear 0s; 
+  -webkit-transition: all 0.3s linear 0s; 
+  -ms-transition: all 0.3s linear 0s;
+  transition: all 0.3s linear 0s;  
+  cursor:pointer
+}
 .filelist table thead span.selected{ background : #ccc !important;}
 .filelist table thead span:hover{ background : #ddd!important;}
 .filelist .directory .icon:after{
