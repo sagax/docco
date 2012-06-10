@@ -626,12 +626,14 @@ body{
 .filelist table thead tr th:nth-child(3){
 	width:50px;
 	text-align:right;
-  padding:7px 0px 7px 0px;
+  /*padding:7px 0px 7px 0px;*/
+  padding:7px 20px 7px 7px;
 }
 .filelist table thead tr th:nth-child(4){
 	width:65px;
 	text-align:right;
-  padding:7px 24px 7px 0;
+  /*padding:7px 24px 7px 0;*/
+  padding:7px 20px 7px 0;
 }
 .filelist table thead tr th:nth-child(5){
 	width:90px;
@@ -664,6 +666,9 @@ body{
 	padding: 7px 3px;
 	vertical-align: middle;
 }
+.filelist table thead span{ background : none; border-radius:2px;-moz-transition: all 0.3s linear 0s; cursor:pointer}
+.filelist table thead span.selected{ background : #ccc !important;}
+.filelist table thead span:hover{ background : #ddd!important;}
 .filelist .directory .icon:after{
   font-size:16px;
   font-family:'Octicons Regular';
@@ -712,27 +717,40 @@ body{
 .filelist table tbody tr td:nth-child(3){
 	width:50px;
 	text-align:right;
-	padding:7px 0px 7px 0px;
+	/*padding:7px 0px 7px 0px;*/
+	padding:7px 20px 7px 7px;
 }
 .filelist table tbody tr td:nth-child(4){
 	width:65px;
-	padding:7px 24px 7px 0;
+	/*padding:7px 24px 7px 0;*/
 	text-align:right;
+	padding:7px 20px 7px 0;
 }
 .filelist table tbody tr td:nth-child(5){
 	width:90px;
 	padding:7px 15px 7px 0px;
+	min-width:350px;
 }
-.filelist table tbody tr td:nth-child(6){
+.filelist table tbody tr td:nth-child(5)>div:first-child(1){
+  max-width: 400px;
+  min-width:250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+	position:relative;
+}
+.filelist table tbody tr td:nth-child(5)>div:first-child(1):hover .file_browser_author{
+  display:inline-block;
+}
+/*.filelist table tbody tr td:nth-child(6){
 	padding:7px 3px;
   min-width:250px;
 }
 .filelist table tbody tr td:nth-child(6) div {
      position: relative;
      white-space: nowrap;
-}
+}*/
 
-.filelist table tbody tr td:nth-child(6) div span:first-child {
+.filelist table tbody tr td:nth-child(5) div:first-child span:first-child {
      display: inline-block;
      float: left;
      max-width: 370px;
@@ -759,9 +777,9 @@ body{
 .file_browser_author a:hover{ color:#fff; text-decoration:underline;}
 .file_browser_author a:active{ color:#fff; text-decoration:none;}
 .file_browser_author a:visited{ color:#fff; text-decoration:none;}
-.filelist table tbody tr td:nth-child(6):hover .file_browser_author {
+/*.filelist table tbody tr td:nth-child(6):hover .file_browser_author {
      display: inline-block;
-}
+}*/
 /*左侧背景修改*/
 /*#container>table>tbody>tr>td:nth-child(2){
     background: none repeat scroll 0 0 #F5F5FF;
