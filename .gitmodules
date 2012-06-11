@@ -1,0 +1,3 @@
+[submodule "vendor/linguist"]
+	path = vendor/linguist
+	url = git://github.com/baoshan/linguist.git
