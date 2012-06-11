@@ -54,9 +54,9 @@ list_template = template """
 <tr class="directory"><td></td><td><a backward>..</a></td><td></td><td></td><td></td></tr>
 <% } %>
 <% entries.forEach(function(entry) { %>
-<tr class="<%= entry.submodule ? "m" : entry.type %>">
+<tr class="<%= entry.type %>">
 <td class="icon"></td>
-<td><a <%= entry.type == 'd' && !entry.submodule ? 'forward' : 'href=\"' + (entry.submodule ? 'https://github.com/' + entry.submodule : (entry.action === 's' ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name)) + '\"' %><%= entry.action === "g" ? "target=\'_blank\'": "" %>><%= entry.name %></a></td>
+<td><a <%= entry.type == 'd' ? 'forward' : 'href=\"' + (entry.type == 'm' ? 'https://github.com/' + entry.submodule : (entry.action === 's' ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name)) + '\"' %><%= entry.action === "g" ? "target=\'_blank\'": "" %>><%= entry.name %></a></td>
 <td><span class="hidden <%= entry.sloc ? "" : "" %>"><%= entry.sloc ? (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) : "-" %></span><span><%= entry.size %></span></td>
 <td><%= entry.modified %></td>
 <td><div><span><%= entry.message %></span><span class="file_browser_author" email="<%= entry.email %>"> <%= entry.author %></span></div><div class="hidden"><%= entry.description %></div></td>

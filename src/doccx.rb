@@ -77,7 +77,7 @@ end
 # Fields are seperated by ` | ` (vertical bar with left and right spaces). Each
 # line represents a single entry.
 repo = Grit::Repo.new options[:sources]
-gitmodules = Grit::Submodules.config repo
+gitmodules = Grit::Submodule.config repo
 directories.each do |directory|
   FileUtils.mkdir_p target_directory = "#{options[:working]}/ghpages/#{directory}"
   open("#{target_directory}/docas.index", 'w') { |f|
@@ -91,7 +91,7 @@ directories.each do |directory|
         file = File.open glob
         log = repo.log('master', glob, :max_count =>1)[0]
         type = file.stat.directory? ? 'd' : 'f'
-	type = 'm' if (type == 'd') && (gitmodules.include? glob)
+	type = 'm' + gitmodules[glob]["url"].match(/git(?:@|:\/\/)github\.com(?::|\/)([^\.]*)(\.git)?/)[1] if (type == 'd') && (gitmodules.include? glob)
         size = file.size
         sloc = ''
         author = log.author.name.gsub '|', '||'

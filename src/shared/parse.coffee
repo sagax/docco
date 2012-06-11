@@ -43,6 +43,9 @@ process_index = (index, gitmodules, base) ->
     while segments[0] is ''
       segments.splice 0, 1
     entry.document = segments[0...(if segments.length > 1 then segments.length - 1 else segments.length)].join('.') + '.html' if entry.action is 's'
+    if entry.type[0] = 'm'
+      entry.submodule = entry.type.substr 1
+      entry.type = 'm'
     entry.submodule = gitmodules[(if base then base + '/' else '') + entry.name]
     entry.modified = _moment(new Date entry.date * 1000).fromNow() if _moment
     entries.push entry
