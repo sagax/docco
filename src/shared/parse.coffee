@@ -43,10 +43,11 @@ process_index = (index, gitmodules, base) ->
     while segments[0] is ''
       segments.splice 0, 1
     entry.document = segments[0...(if segments.length > 1 then segments.length - 1 else segments.length)].join('.') + '.html' if entry.action is 's'
-    if entry.type[0] = 'm'
+    if entry.type[0] is 'm'
       entry.submodule = entry.type.substr 1
       entry.type = 'm'
-    entry.submodule = gitmodules[(if base then base + '/' else '') + entry.name]
     entry.modified = _moment(new Date entry.date * 1000).fromNow() if _moment
     entries.push entry
-  entries.sort (a, b) -> if "#{a.type}#{a.name}" > "#{b.type}#{b.name}" then 1 else -1
+  entries.sort (a, b) ->
+    is_file = (type) -> if type is 'f' then 1 else 0
+    if "#{is_file a.type}#{a.name}" > "#{is_file b.type}#{b.name}" then 1 else -1

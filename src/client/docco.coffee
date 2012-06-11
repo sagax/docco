@@ -12,11 +12,11 @@ render_jump_to = (index_path, root_path, depth) ->
       for entry in index
         html += "<a class='source #{entry.type}' "
         if entry.action is 's'
-          html += 'href="' + index_path[0...index_path.length - 1].join('/') + '/' + entry.document + '"'
-        else if entry.action is 'g'
-          html += 'href="https://github.com/' + docas.repo + '/' + root_path.join('/') + '/' + entry.name + '"'
+          html += 'href="' + (if index_path.length > 1 then index_path[0...index_path.length - 1].join('/') + '/' else '') + entry.document + '"'
         else if entry.type is 'm'
           html += 'href="https://github.com/' + entry.submodule + '"'
+        else if entry.action is 'g'
+          html += 'href="https://github.com/' + docas.repo + '/tree/master/' + root_path.join('/') + '/' + entry.name + '"'
         else if entry.type is 'd'
           html += 'dir="d"'
         html += '>' + entry.name + '</a>'
