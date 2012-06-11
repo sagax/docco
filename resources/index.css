@@ -677,28 +677,21 @@ body{
 }
 .filelist table thead span.selected{ background : #ccc !important;}
 .filelist table thead span:hover{ background : #ddd!important;}
-.filelist .directory .icon:after{
+.filelist .d .icon:after{
   font-size:16px;
   font-family:'Octicons Regular';
   color:#80A6CD;
   content:"";
   float:right;
 }
-.filelist .file .icon:after{
+.filelist .f .icon:after{
   font-size:16px;
   font-family:'Octicons Regular';
   color:#777777;
   content:"";
   float:right;
 }
-.filelist .document .icon:after{
-  font-size:16px;
-  font-family:'Octicons Regular';
-  color:#777777;
-  content:"";
-  float:right;
-}
-.filelist .submodule .icon:after{
+.filelist .m .icon:after{
   font-size:16px;
   font-family:'Octicons Regular';
   color:#3CBF5E;

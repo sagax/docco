@@ -327,8 +327,8 @@ cp /usr/local/lib/docas/resources/fonts/* stylesheets/fonts
 # [toc.js]:      http://projects.jga.me/toc/
 
 mkdir -p javascript
-cp /usr/local/lib/docas/lib/index.min.js javascript
-cp /usr/local/lib/docas/lib/docas.min.js javascript
+cp /usr/local/lib/docas/lib/client/index.min.js javascript
+cp /usr/local/lib/docas/lib/client/docco.min.js javascript
 
 #   * Copy other user specified files. All files in the `docas` folder of the
 #   `master` branch will be cloned into the same folder of the `gh-pages`

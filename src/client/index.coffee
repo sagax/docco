@@ -19,7 +19,6 @@ if typeof $ isnt 'undefined'
 # ## GitHub Styled Repo Browser
 
 { user, repo, gitmodules } = docas if typeof docas isnt 'undefined'
-local_moment = if typeof moment is 'undefined' then require 'moment' else moment
 
 # ### Micro Template Engine for Rendering Content
 template = (str) ->
@@ -55,9 +54,9 @@ list_template = template """
 <tr class="directory"><td></td><td><a backward>..</a></td><td></td><td></td><td></td></tr>
 <% } %>
 <% entries.forEach(function(entry) { %>
-<tr class="<%= entry.submodule ? "submodule" : entry.action === "s" ? "document" : entry.type %>">
+<tr class="<%= entry.submodule ? "m" : entry.type %>">
 <td class="icon"></td>
-<td><a <%= entry.type == 'directory' && !entry.submodule ? 'forward' : 'href=\"' + (entry.submodule ? 'https://github.com/' + entry.submodule : (entry.action === 's' ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name)) + '\"' %><%= entry.action === "g" ? "target=\'_blank\'": "" %>><%= entry.name %></a></td>
+<td><a <%= entry.type == 'd' && !entry.submodule ? 'forward' : 'href=\"' + (entry.submodule ? 'https://github.com/' + entry.submodule : (entry.action === 's' ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name)) + '\"' %><%= entry.action === "g" ? "target=\'_blank\'": "" %>><%= entry.name %></a></td>
 <td><span class="hidden <%= entry.sloc ? "" : "" %>"><%= entry.sloc ? (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) : "-" %></span><span><%= entry.size %></span></td>
 <td><%= entry.modified %></td>
 <td><div><span><%= entry.message %></span><span class="file_browser_author" email="<%= entry.email %>"> <%= entry.author %></span></div><div class="hidden"><%= entry.description %></div></td>
@@ -185,54 +184,6 @@ Repo_Navigator = (index_path = "docas.index", index_depth = 0, current_depth = i
         regist_events table, index_path, index_depth, current_depth
 
   get_index()
-
-# ### Docas Index Parser
-#
-# Docas generates indexes for repo browser using **[doccx]**. Sample index lines
-# are:
-#
-#     "-","57","Mon, 23 Apr 2012 15:40:04 +0800","Me","Initial Commit","<.gitignore>","0","-"
-#     "-","0","Mon, 23 Apr 2012 15:40:04 +0800","Me","Bootstrap","<app.js>","1","0"
-#     "d","204","Fri, 27 Apr 2012 19:50:34 +0800","Me","First Build","<bin>","0","-"
-#     "d","204","Fri, 27 Apr 2012 19:50:34 +0800","Me","First Build","<vendor>","2","-"
-
-index_entry_segments = [
-  "type"
-  "name"
-  "action"
-  "size"
-  "sloc"
-  "author"
-  "email"
-  "date"
-  "description"
-  "message"
-]
-
-process_index = (index, gitmodules, base) ->
-  lines = index.split("\n")
-  lines.pop()
-  entries = []
-  lines.forEach (line) ->
-    entry = {}
-    pattern = /[^\|]\|/g
-    index = position = 0
-    while result = pattern.exec line
-      value = line.substring position, result.index + 1
-      value = if typeof $ is 'undefined' then value.trim() else $.trim value
-      value = value.replace '||', '|'
-      entry[index_entry_segments[index++]] = value
-      position = pattern.lastIndex
-    entry[index_entry_segments[index]] = line.substr(position).replace('||', '|')
-    entry.type = if entry.type is 'd' then 'directory' else 'file'
-    segments = entry.name.split '.'
-    while segments[0] is ''
-      segments.splice 0, 1
-    entry.document = segments[0...(if segments.length > 1 then segments.length - 1 else segments.length)].join('.') + '.html' if entry.action is 's'    
-    entry.submodule = gitmodules[(if base then base + '/' else '') + entry.name]
-    entry.modified = local_moment(new Date entry.date * 1000).fromNow()
-    entries.push entry
-  entries.sort (a, b) -> if [a.type, a.name] > [b.type, b.name] then 1 else -1
 
 # ### Replace Emails by GitHub Logins
 #

@@ -1,51 +1,61 @@
 
-index_entry_segments = [
-  "type"
-  "name"
-  "action"
-  "size"
-  "sloc"
-  "author"
-  "email"
-  "date"
-  "description"
-  "message"
-]
+render_jump_to = (index_path, root_path, depth) ->
 
-process_index = (index, gitmodules, base) ->
-  lines = index.split("\n")
-  lines.pop()
-  entries = []
-  lines.forEach (line) ->
-    entry = {}
-    pattern = /[^\|]\|/g
-    index = position = 0
-    while result = pattern.exec line
-      value = line.substring position, result.index + 1
-      value = if typeof $ is 'undefined' then value.trim() else $.trim value
-      value = value.replace '||', '|'
-      entry[index_entry_segments[index++]] = value
-      position = pattern.lastIndex
-    entry[index_entry_segments[index]] = line.substr(position).replace('||', '|')
-    entry.type = if entry.type is 'd' then 'directory' else 'file'
-    segments = entry.name.split '.'
-    while segments[0] is ''
-      segments.splice 0, 1
-      entry.document = segments[0...(if segments.length > 1 then segments.length - 1 else segments.length)].join('.') + '.html' if entry.action is 's'
-    entry.submodule = gitmodules[(if base then base + '/' else '') + entry.name]
-    entry.modified = moment(new Date entry.date * 1000).fromNow()
-    entries.push entry
-    
-  entries.sort (a, b) -> if [a.type, a.name] > [b.type, b.name] then 1 else -1
+  $.get index_path.join('/'), (data) ->
 
-
-$ ->
-  $.get 'docas.index', (data) ->
     index = process_index data, {}, ''
-    index = index.filter (entry) -> entry.action is 's'
-    if index.length > 1
+    console.log index
+    if index.length
       html = '<div id="jump_to">Jump To &hellip;<div id="jump_wrapper"><div id="jump_page">'
+      if depth
+        html += "<a dir='u' class='s d'>to upper dir</a>"
       for entry in index
-        html += '<a class="source" href="' + entry.document + '">' + entry.name + '</a>'
+        html += "<a class='source #{entry.type}' "
+        if entry.action is 's'
+          html += 'href="' + index_path[0...index_path.length - 1].join('/') + '/' + entry.document + '"'
+        else if entry.action is 'g'
+          html += 'href="https://github.com/' + docas.repo + '/' + root.join('/') + '/' + entry.name + '"'
+        else if entry.type is 'd'
+          html += 'dir="d"'
+        html += '>' + entry.name + '</a>'
       html += '</div></div></div>'
-      $('#background').after($(html))
+      jump_to = $ $(html)[0]
+      jump_to.find('a[dir]').click ->
+        if $(@).attr('dir') is 'u'
+          root.pop()
+          if index_path.length > 1
+            index_path.splice index_path.length - 2, 1
+          else
+            index_path.splice index_path.length - 1, 0, '..'
+        else
+          root.push $(@).html()
+          index_path.splice index_path.length - 1, 0, $(@).html()
+        console.log index_path, root, depth + (if $(@).attr('dir') is 'u' then -1 else 1 ) * 1
+        render_jump_to index_path, root, depth + (if $(@).attr('dir') is 'u' then -1 else 1 ) * 1
+
+      jump_wrapper = jump_to.find '#jump_wrapper'
+
+      if $('#jump_to').length
+        min_height = $('#jump_to > :first-child').height()
+        jump_wrapper.css('min-height', min_height)
+        jump_wrapper.addClass 'show'
+        $('#jump_to').remove()
+
+      jump_wrapper.on 'mouseout', (e) ->
+        jump_wrapper.removeClass 'show' if e.target.id is 'jump_wrapper'
+
+      jump_to.on 'mouseout', (e) ->
+        jump_wrapper.removeClass 'show' if e.target.id is 'jump_to'
+
+      jump_to.find('#jump_page a').on 'mouseover', ->
+        jump_wrapper.css 'min-height', ''
+
+      $('#background').after(jump_to)
+
+# ## Initiate Jump To Links on Load
+$ ->
+  root_path = window.location.pathname.split '/'
+  root_path.pop()
+  root_path.shift()
+  root_path = root_path.splice root_path.length - docas.depth
+  render_jump_to ['docas.index'], root_path, docas.depth

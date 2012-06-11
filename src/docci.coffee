@@ -151,8 +151,7 @@ generate_tree = (path, callback) ->
 fs       = require 'fs'
 path     = require 'path'
 showdown = require('./../vendor/showdown').Showdown
-{list_template, process_index} = require './index.js'
-
+{list_template, process_index} = require './client/index.js'
 # require 'js-yaml'
 {exec}   = require 'child_process'
 vendor = fs.readFileSync(__dirname + '/../vendor/linguist/lib/linguist/vendor.yml').toString()

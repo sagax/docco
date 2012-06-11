@@ -68,7 +68,8 @@ generate_documentation = (source, callback) ->
   fs.readFile (real_source source), "utf-8", (error, code) ->
     
     throw error if error
-    sections = parse source, code
+    
+    {description, sections} = parse source, code
     highlight source, sections, ->
       if /[^_]_$/.exec path.extname source
         if sections.length > 0
@@ -102,12 +103,10 @@ generate_documentation = (source, callback) ->
 #       code_html: ...
 #     }
 #
-description = ""
 parse = (source, code) ->
   lines    = code.split '\n'
   sections = []
   language = get_language source
-  console.log 'language', language
   has_code = docs_text = code_text = ''
 
   save = (docs, code) ->
@@ -127,7 +126,7 @@ parse = (source, code) ->
       has_code = yes
       code_text += line + '\n'
   save docs_text, code_text
-  sections
+  {description: description, sections: sections}
 
 pygments_http_ports = [5923, 5924, 5925, 5926]
 
@@ -198,7 +197,16 @@ generate_html = (source, css, sections, description, depth) ->
   for pattern, stylesheet of conf.page_stylesheets
     stylesheets.push root_dir + 'docas/' + stylesheet if source.match new RegExp "^#{pattern.replace('*', '.*')}$"
   html  = docco_template {
-    head_title: head_title, title: title, sections: sections, css: css, javascripts: javascripts, stylesheets: stylesheets, google_analytics: conf.google_analytics, description: description, depth: depth
+    head_title: head_title
+    title: title
+    sections: sections
+    css: css
+    javascripts: javascripts
+    stylesheets: stylesheets
+    google_analytics: conf.google_analytics
+    description: description
+    depth: depth
+    repo: process.OPTS.repo
   }
   console.log "docco: #{source} -> #{dest}"
   ensure_directory (path.dirname dest), ->

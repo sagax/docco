@@ -7,15 +7,14 @@ option '-a', '--auth [AUTH]', 'specify basic authentication when install'
 task 'build', 'build the docco library', (options) ->
   exec [
     'coffee ' + ['-c' + (if options.watch then 'w' else ''), '-o', 'lib', 'src'].join(' ')
-    'java -jar ~/compiler.jar --js lib/index.js --js_output_file lib/index.min.js' # && rm lib/index.js'
-    'java -jar ~/compiler.jar --js lib/docas.js --js_output_file lib/docas.min.js' # && rm lib/index.js'
+    'coffee -cj lib/client/index.js src/shared/parse.coffee src/client/index.coffee'
+    'coffee -cj lib/client/docco.js src/shared/parse.coffee src/client/docco.coffee'
+    'java -jar ~/compiler.jar --js lib/client/index.js --js_output_file lib/client/index.min.js'
+    'java -jar ~/compiler.jar --js lib/client/docco.js --js_output_file lib/client/docco.min.js'
     'cleancss -o resources/index.min.css resources/index.css'
     'cleancss -o resources/docco.min.css resources/docco.css'
   ].join(' && '), (err, stdout, stderr) ->
     console.error stderr if err
-
-  # coffee.stdout.on 'data', (data) -> console.log data.toString()
-  # coffee.stderr.on 'data', (data) -> console.error data.toString()
 
 task 'install', 'install the `docco`, `docci`, `doccx`, and `docas` command into /usr/local (or --prefix)', (options) ->
   base = options.prefix or '/usr/local'

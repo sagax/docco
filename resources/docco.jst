@@ -26,5 +26,6 @@
 </body>
 <script>document.write('<script src=' + ('__proto__' in {} ? 'http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js':'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js') + '><\\/script>')</script>
 <script src="http://baoshan.github.com/moment/min/moment.min.js"></script>
-<script src="<%= new Array(depth + 1).join('../') %>javascript/docas.min.js"></script>
+<script>docas={repo:"<%= repo %>",depth:<%= depth %>}</script>
+<script src="<%= new Array(depth + 1).join('../') %>javascript/docco.min.js"></script>
 </html>
