@@ -856,3 +856,9 @@ p,code{word-wrap: break-word;}
   background-color: #ccc;
 }
 .repo_nav tbody .hidden { display: none }
+
+#language_statistics_heading, #recent_commits_heading {
+font-family: Helvetica,arial,freesans,clean,sans-serif;
+font-weight: 300;
+color: #333;
+}
