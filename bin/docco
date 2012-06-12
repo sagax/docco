@@ -30,4 +30,4 @@ if(pos == -1) pos = process.ARGV.indexOf('--repo');
 if(pos != -1) process.OPTS.repo = process.ARGV.splice(pos, 2)[1];
 
 // Kick start the processing procedure.
-require(lib + '/docco.js');
+require(lib + '/server/docco.js');

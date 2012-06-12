@@ -216,7 +216,7 @@ else
     echo "Previously synced with $synced_sources_hash"
     cd "$sources_dir"
     git diff --name-status $synced_sources_hash..HEAD > "$working_dir/.git-diff"
-    if [ -n "$(cat "$working_dir/.git-diff" | grep "\.docas\.conf")" ]; then
+    if [ -n "$(cat "$working_dir/.git-diff" | grep "\.docas\/conf")" ]; then
       all_files_are_touched
     else
       egrep "^(A|M)" "$working_dir/.git-diff" | cut -c 3- > "$working_dir/.touched"
@@ -263,7 +263,7 @@ done
 
 cd "$sources_dir"
 # time find . -iname "*.js" | xargs du | sort -n -r | cut -f 2 | xargs docco -r baoshan/d3 -o x > /dev/null
-cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -r "$repo" -o "$ghpages_dir" > /dev/null
+cat "$working_dir/.touched_sources" | tr '\n' '\0' | xargs -0 docco -r "$repo" -o "$ghpages_dir" # > /dev/null
 
 echo "✓" $(date "+%H:%M:%S")
 
@@ -334,7 +334,8 @@ cp /usr/local/lib/docas/lib/client/docco.min.js javascript
 #   `master` branch will be cloned into the same folder of the `gh-pages`
 #   branch.
 
-if [ -d "$sources_dir/docas" ]; then
+if [ -d "$sources_dir/.docas" ]; then
+  mkdir -p "$ghpages_dir/docas"
   cp "$sources_dir/.docas/"* "$ghpages_dir/docas"
 fi
 

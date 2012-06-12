@@ -1,6 +1,6 @@
 fs = require 'fs'
 
-module.exports = (conf) ->
+module.exports.parse = (conf) ->
 
   conf = fs.readFileSync conf, 'utf-8'
   result = 
@@ -13,7 +13,7 @@ module.exports = (conf) ->
   if google_analytics_match = conf.match /^google_analytics:(.*)$/m
     result.google_analytics = google_analytics_match[1].trim()
 
-  if page_javascripts_match = conf.match /[^|\n]page_javascripts: *((\n  .*)*)/
+  if page_javascripts_match = conf.match /(?:^|\n)page_javascripts: *((\n  .*)*)/
 
     entries = page_javascripts_match[1]
               .split('\n')
@@ -23,7 +23,7 @@ module.exports = (conf) ->
     for entry in entries
       result.page_javascripts[entry[0]] = entry[1]  
 
-  if page_stylesheets_match = conf.match /[^|\n]page_stylesheets: *((\n  .*)*)/
+  if page_stylesheets_match = conf.match /(?:^|\n)page_stylesheets: *((\n  .*)*)/
 
     entries = page_stylesheets_match[1]
               .split('\n')

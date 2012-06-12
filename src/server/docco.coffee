@@ -54,7 +54,8 @@ fs = require 'fs'
 http = require 'http'
 querystring = require 'querystring'
 config = {}
-try config = require('./config_parser').parse ".docas/conf"
+config = require('./config_parser').parse ".docas/conf"
+console.log 'config', config
 
 #### Main Documentation Generation Functions
 
@@ -189,10 +190,17 @@ generate_html = (source, css, sections, description, depth) ->
   if depth then root_dir = [0..depth-1].map(-> '..').join('/') + '/' else prefix = ''
   javascripts = []
   for pattern, javascript of config.page_javascripts
-    javascripts.push root_dir + 'docas/' + javascript if source.match new RegExp "^#{pattern.replace('*', '.*')}$"
+    console.log source, pattern, javascript
+    if match = source.match new RegExp "^#{pattern.replace('*', '(.*)')}$"
+      javascript = javascript.replace('[1]', (match[1] or '')).replace('[2]', (match[2] or '')).replace('[3]', (match[3] or ''))
+      javascripts.push root_dir + 'docas/' + javascript
+
   stylesheets = []
   for pattern, stylesheet of config.page_stylesheets
-    stylesheets.push root_dir + 'docas/' + stylesheet if source.match new RegExp "^#{pattern.replace('*', '.*')}$"
+    if source.match new RegExp "^#{pattern.replace('*', '(.*)')}$"
+      stylesheet = stylesheet.replace('[1]', (match[1] or '')).replace('[2]', (match[2] or '')).replace('[3]', (match[3] or ''))
+      stylesheets.push stylesheet
+
   html  = docco_template {
     head_title: head_title
     title: title
@@ -215,7 +223,7 @@ generate_html = (source, css, sections, description, depth) ->
 # (the JavaScript implementation of Markdown).
 fs       = require 'fs'
 path     = require 'path'
-showdown = require('./../vendor/showdown').Showdown
+showdown = require('../../vendor/showdown').Showdown
 {spawn, exec} = require 'child_process'
 
 # A list of the languages that Docco supports, mapping the file extension to
@@ -258,7 +266,7 @@ ensure_directory = (dir, callback) ->
   exec "mkdir -p #{dir}", -> callback()
 
 # Create the template that we will use to generate the Docco HTML page.
-docco_template  = _.template fs.readFileSync __dirname + '/../resources/docco.jst', 'utf-8'
+docco_template  = _.template fs.readFileSync __dirname + '/../../resources/docco.jst', 'utf-8'
 
 # The start of each Pygments highlight block.
 highlight_start = '<div class="highlight"><pre>'
