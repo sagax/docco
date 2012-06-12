@@ -26,4 +26,4 @@ if(pos == -1) pos = process.ARGV.indexOf('--out');
 if(pos != -1) process.OPTS.out = process.ARGV.splice(pos, 2)[1];
 
 // Kick start the processing procedure.
-require(lib + '/docci.js');
+require(lib + '/server/docci.js');

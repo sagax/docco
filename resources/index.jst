@@ -5,63 +5,59 @@
 <link rel="stylesheet" media="all" href="stylesheets/index.min.css" />
 </head>
 <body>
-  <div id="container">
-   <div id="background"></div>
-   <table cellpadding="0" cellspacing="0">
-   <tbody>
-   <tr>
-   <td>
-    <div style="position:absolute;top:0px;left:0px;width:525px">
-    <a href="https://github.com/<%= user %>/<%= repo %>"><img src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
-    </div>
-    <h1><%= title %></h1>
-    <p><%= description %></p>
-    <!--readme-->
-    </td>
-    <td></td>
-    </tr>
-    <tr>
-    <td>
-		<div class="readme"><%= readme %></div>
-    </td>
-    <td>
-    <!--content-->
-		<div class="content">
-
+<div id="container">
+<div id="background"></div>
+<table cellpadding="0" cellspacing="0">
+<tbody>
+<tr>
+<td>
+<div style="position:absolute;top:0px;left:0px;width:525px">
+<a href="https://github.com/<%= user %>/<%= repo %>"><img src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+</div>
+<h1><%= repo %></h1>
+<p><%= description %></p>
+<!--readme-->
+</td>
+<td></td>
+</tr>
+<tr>
+<td>
+<div class="readme"><%= readme %></div>
+</td>
+<td>
+<!--content-->
+<div class="content">
 <h2 id="language_statistics_heading">Language Statistics</h2>
 <table class="code_stats">
-<% statistics.forEach(function(entry) { %>
+<% language_statistics.forEach(function(entry) { %>
 <tr>
-<td><%= entry[0] %></td>
-<td><%= entry[2] %></td>
-<td><span data-lang="<%= entry[2] %>"></span></td>
-<td style="width:400px;"><div><span data-lang="<%= entry[2] %>" percent="<%= entry[0] %>" style="width: 0%;"></span><span><%= entry[1] %> sloc</span></div></td>
+<td><%= entry.percent %></td>
+<td><%= entry.language %></td>
+<td><span data-lang="<%= entry.language %>"></span></td>
+<td style="width:400px;"><div><span data-lang="<%= entry.language %>" percent="<%= entry.percent %>" style="width:0%;"></span><span><%= entry.sloc %> sloc</span></div></td>
 </tr>
 <tr>
 <% }); %>
 </table>
-
-<h2 id="recent_commits_heading">Recent Activities</h2>
-<ol>
-<% for (var i = 0, l = log.length; i < l; i++) { %>
-<% var entry = log[i]; %>
-<li><%= entry.date %>, <%= entry.author %>, <%= entry.subject %></li>
+<h2 id="recent_commits_heading">Recent Commits</h2>
+<ol id="recent_commits">
+<% for (var i = 0, l = recent_commits.length; i < l; i++) { %>
+<% var entry = recent_commits[i]; %>
+<li><%= entry.subject %>, <%= entry.author %><span val="<%= entry.date %>"></span></li>
 <% } %>
 </ol>
-
 <div id="filebrowser">
 <div id="breadcrumb"><span><%= repo %></span></div>
 <div id="filelists"><%= files_list %></div>
 </div>
-  
-    </div>
-   </td>
-   </tr>
-   </tbody>
-   </table>
- </div>
-<script>docas = {user: "<%= user %>", repo: "<%= repo %>", gitmodules: <%= JSON.stringify(gitmodules) %>}</script>
-<script>document.write('<script src=' + ('__proto__' in {} ? 'http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js':'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js') + '><\\/script>')</script>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<script>docas={user:"<%= user %>",repo:"<%= repo %>"}</script>
+<script>document.write('<script src=' + ('__proto__' in {} ? 'http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js':'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js') + '><\/script>')</script>
 <script src="http://baoshan.github.com/moment/min/moment.min.js"></script>
 <script src="javascript/index.min.js"></script>
 </body>

@@ -1,4 +1,4 @@
-# Generate `docas.index` for all touched source directories.
+# Generate `docas.idx` for all touched source directories.
 
 require 'set'
 require 'grit'
@@ -51,7 +51,7 @@ def humanize_number size
   end
 end
 
-# ## Generate docas.index For Touched Directories
+# ## Generate docas.idx For Touched Directories
 #
 # Find all repositories
 #
@@ -61,7 +61,7 @@ end
 # In order to accelerate processing, multi-threading is used to make Grit's
 # `log` faster. The maximum parallel threads is set to 4.
 #
-# Generated `docas.index` will be of the following format:
+# Generated `docas.idx` will be of the following format:
 #
 #   * type
 #   * name
@@ -80,7 +80,7 @@ repo = Grit::Repo.new options[:sources]
 gitmodules = Grit::Submodule.config repo
 directories.each do |directory|
   FileUtils.mkdir_p target_directory = "#{options[:working]}/ghpages/#{directory}"
-  open("#{target_directory}/docas.index", 'w') { |f|
+  open("#{target_directory}/docas.idx", 'w') { |f|
     threads = []
     Dir.glob("#{directory}/*").each { |glob|
       if threads.size == 4

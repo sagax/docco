@@ -1,7 +1,5 @@
 
-_moment = if typeof window is 'undefined' then require '../../vendor/moment.js' else moment
-
-# ## Fields of `docas.index`:
+# ## Fields of `docas.idx`:
 # * **type**: `f` or `d` for file and directory accordingly.
 # * **name**: 'awesome.file'
 # * **action**: 's' for documented source, ``
@@ -25,8 +23,8 @@ index_entry_segments = [
   "message"
 ]
 
-process_index = (index, gitmodules, base) ->
-  lines = index.split "\n"
+process_index = (index) ->
+  lines = index.split '\n'
   lines.pop()
   entries = []
   lines.forEach (line) ->
@@ -46,8 +44,11 @@ process_index = (index, gitmodules, base) ->
     if entry.type[0] is 'm'
       entry.submodule = entry.type.substr 1
       entry.type = 'm'
-    entry.modified = _moment(new Date entry.date * 1000).fromNow() if _moment
+    entry.modified = if typeof moment is 'undefined' then entry.date * 1 else moment(new Date entry.date * 1000).fromNow()
     entries.push entry
   entries.sort (a, b) ->
     is_file = (type) -> if type is 'f' then 1 else 0
     if "#{is_file a.type}#{a.name}" > "#{is_file b.type}#{b.name}" then 1 else -1
+
+if typeof window is 'undefined'
+  module.exports = process_index

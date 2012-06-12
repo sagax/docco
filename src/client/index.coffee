@@ -44,29 +44,6 @@ breadcrumb_template = (path) ->
       result += '<span>' + dir + '</span>'
   result
 
-# ### Template for File Browser
-list_template = template """
-<div depth="<%= index_depth %>" class="filelist">
-<table class="repo_nav">
-<thead><tr><th></th><th>name</th><th><span>sloc</span>&nbsp;&nbsp;<span class="selected">size</span></th><th>age</th><th><span class="selected">message</span>&nbsp;&nbsp;<span>description</span><div class="history"><a target="_blank" href="https://github.com/<%= user %>/<%= repo %>/commits/master">history</a></div></th></tr></thead>
-<tbody>
-<% if(index_depth) { %>
-<tr class="directory"><td></td><td><a backward>..</a></td><td></td><td></td><td></td></tr>
-<% } %>
-<% entries.forEach(function(entry) { %>
-<tr class="<%= entry.type %>">
-<td class="icon"></td>
-<td><a <%= entry.type == 'd' ? 'forward' : 'href=\"' + (entry.type == 'm' ? 'https://github.com/' + entry.submodule : (entry.action === 's' ? (relative_base ? relative_base + '/' : '') + entry.document : 'https://github.com/' + user + '/' + repo + '/blob/master/' + (absolute_base ? absolute_base + '/' : '') + entry.name)) + '\"' %><%= entry.action === "g" ? "target=\'_blank\'": "" %>><%= entry.name %></a></td>
-<td><span class="hidden <%= entry.sloc ? "" : "" %>"><%= entry.sloc ? (entry.sloc + " " + (entry.sloc > 1 ? "lines" : "line")) : "-" %></span><span><%= entry.size %></span></td>
-<td><%= entry.modified %></td>
-<td><div><span><%= entry.message %></span><span class="file_browser_author" email="<%= entry.email %>"> <%= entry.author %></span></div><div class="hidden"><%= entry.description %></div></td>
-</tr>
-<% }); %>
-</tbody>
-</table>
-</div>
-""".replace('\n', '')
-
 first_time = on
 
 regist_events = (table, index_path, index_depth, current_depth) ->
@@ -123,31 +100,40 @@ regist_events = (table, index_path, index_depth, current_depth) ->
   else
     $('#filelists').append table
 
+waiting_for_ajax_response = off
+ 
 # ### Constructor Arguments
 #
 # 1. `user`, used to generate correct link for undocumented sources. E.g.,
 # `https://github.com/user/repo/blob/master/awesome_file`
 # 2. `repo`, also used to generate above link.
-# 3. `index_path`, path to `docas.index` file.
+# 3. `index_path`, path to `docas.idx` file.
 # 4. `index_depth`, the depth of the index file, `0` for root directory of the repo.
 # 5. `current_depth`, optional, the depth of the current page, defaults to
 # `index_depth`.
-Repo_Navigator = (index_path = "docas.index", index_depth = 0, current_depth = index_depth) ->
- 
+Repo_Navigator = (index_path = "docas.idx", index_depth = 0, current_depth = index_depth) ->
+
+  return if waiting_for_ajax_response
+
   if first_time
     regist_events $('#filelists').children()[0], index_path, index_depth, current_depth
     first_time = off
+    $('#filelists tbody td:nth-child(4)').forEach (td) ->
+      $(td).html moment(new Date $(td).attr('val') * 1000).fromNow()
     return 
 
-  get_index = ->
-
+  $('.spinner').show()
+  get_index = ->    
+    waiting_for_ajax_response = on
     # #### Ajax Call to Get Index
     $.ajax
       type: 'GET'
-      url: index_path
+      url: index_path + "?timestamp=" + Date.now().valueOf()
 
       success: (index) ->
 
+        waiting_for_ajax_response = off
+        $('.spinner').show()
         # #### Render Breadcrumb Navigator
         breadcrumb_path  = index_path.split '/'
         breadcrumb_end   = breadcrumb_path.length - 1
@@ -215,14 +201,15 @@ update_usernames = (table) ->
 #
 #   * For browser environment, initialize the (root level) `Repo_Navigator`.
 #   * For node.js environment, expose:
-#     + `process_index`: used for processing the (root level) `docas.index`
+#     + `process_index`: used for processing the (root level) `docas.idx`
 #     + `breadcrumb_template`: used for rendering the breadcrumb in the `index.html`
 #     + `list_template`: used for rendering the content of the navigator in the `index.html`
 
-if typeof window is 'undefined'
-  module.exports =
-    process_index       : process_index
-    breadcrumb_template : breadcrumb_template
-    list_template       : list_template
-else
+if typeof window isnt 'undefined'
+
+  # Show each commit's date in relative format.
+  $('#recent_commits span[val]').forEach (span) ->
+    $(span).html ', ' + moment(new Date(1 * $(span).attr('val'))).fromNow()
+
+  # Regist repo browser's events.
   new Repo_Navigator

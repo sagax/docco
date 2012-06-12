@@ -1,0 +1,8 @@
+page_javascripts:
+  bin/*: examples.js
+  *: all.js
+
+page_stylesheets:
+  *: common.css
+
+project_page: docas.html

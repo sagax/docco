@@ -49,15 +49,12 @@
 # * And if you happen to be a **.NET**
 # aficionado, check out [Don Wilson](https://github.com/dontangg)'s 
 # [Nocco](http://dontangg.github.com/nocco/).
-
+_ = require 'underscore'
 fs = require 'fs'
-http = require('http')
-querystring = require('querystring')
-conf_parser = require "#{__dirname}/conf_parser"
-try
-  conf = conf_parser '.docas.conf'
-catch e
-  conf = {}
+http = require 'http'
+querystring = require 'querystring'
+config = {}
+try config = require('./config_parser').parse ".docas/conf"
 
 #### Main Documentation Generation Functions
 
@@ -191,10 +188,10 @@ generate_html = (source, css, sections, description, depth) ->
   depth = source.split('/').length - 1
   if depth then root_dir = [0..depth-1].map(-> '..').join('/') + '/' else prefix = ''
   javascripts = []
-  for pattern, javascript of conf.page_javascripts
+  for pattern, javascript of config.page_javascripts
     javascripts.push root_dir + 'docas/' + javascript if source.match new RegExp "^#{pattern.replace('*', '.*')}$"
   stylesheets = []
-  for pattern, stylesheet of conf.page_stylesheets
+  for pattern, stylesheet of config.page_stylesheets
     stylesheets.push root_dir + 'docas/' + stylesheet if source.match new RegExp "^#{pattern.replace('*', '.*')}$"
   html  = docco_template {
     head_title: head_title
@@ -203,7 +200,7 @@ generate_html = (source, css, sections, description, depth) ->
     css: css
     javascripts: javascripts
     stylesheets: stylesheets
-    google_analytics: conf.google_analytics
+    google_analytics: config.google_analytics
     description: description
     depth: depth
     repo: process.OPTS.repo
@@ -260,23 +257,8 @@ destination = (filepath) ->
 ensure_directory = (dir, callback) ->
   exec "mkdir -p #{dir}", -> callback()
 
-# Micro-templating, originally by John Resig, borrowed by way of
-# [Underscore.js](http://documentcloud.github.com/underscore/).
-template = (str) ->
-  new Function 'obj',
-    'var p=[],print=function(){p.push.apply(p,arguments);};' +
-    'with(obj){p.push(\'' +
-    str.replace(/[\r\t\n]/g, " ")
-       .replace(/'(?=[^<]*%>)/g,"\t")
-       .split("'").join("\\'")
-       .split("\t").join("'")
-       .replace(/<%=(.+?)%>/g, "',$1,'")
-       .split('<%').join("');")
-       .split('%>').join("p.push('") +
-       "');}return p.join('');"
-
 # Create the template that we will use to generate the Docco HTML page.
-docco_template  = template fs.readFileSync(__dirname + '/../resources/docco.jst').toString()
+docco_template  = _.template fs.readFileSync __dirname + '/../resources/docco.jst', 'utf-8'
 
 # The start of each Pygments highlight block.
 highlight_start = '<div class="highlight"><pre>'

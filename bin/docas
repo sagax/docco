@@ -271,7 +271,7 @@ echo "✓" $(date "+%H:%M:%S")
 
 # Update file and folder indexes for touched file and folder using **[doccx]**.
 #
-# Doccx will generated `docas.index` in `docas/tree` folder for all folders list
+# Doccx will generated `docas.idx` in `docas/tree` folder for all folders list
 # in the follow input:
 #
 #   1. `.touched`
@@ -282,7 +282,7 @@ echo "✓" $(date "+%H:%M:%S")
 echo -n "Generating File & Folder Indexes...   "
 # doccx -s "$sources_dir" -w "$working_dir"
 # cat "$working_dir/.touched" "$working_dir/.deleted" | \
-ruby /usr/local/lib/docas/src/doccx.rb --working "$working_dir" --sources "$sources_dir"
+ruby /usr/local/lib/docas/src/server/doccx.rb --working "$working_dir" --sources "$sources_dir"
 echo "✓" $(date "+%H:%M:%S")
 
 # Upon this phase, following materials were all ready:
@@ -297,7 +297,7 @@ echo "✓" $(date "+%H:%M:%S")
 # [docci]: docci.html
 
 echo -n "Generating Repository Cover Page...   "
-cd "$sources_dir" && docci -o "$ghpages_dir" "$sources_dir"
+docci "$sources_dir" "$ghpages_dir" "$repo"
 echo "✓" $(date "+%H:%M:%S")
 
 # ### Step 6: Static File Handling
@@ -335,7 +335,7 @@ cp /usr/local/lib/docas/lib/client/docco.min.js javascript
 #   branch.
 
 if [ -d "$sources_dir/docas" ]; then
-  cp "$sources_dir/docas/"* "$ghpages_dir/docas"
+  cp "$sources_dir/.docas/"* "$ghpages_dir/docas"
 fi
 
 # ### Step 7: Push to Upstream
