@@ -67,7 +67,7 @@ h1, h2, h3, h4, h5, h6 {
       #jump_page .source {
         display: block;
 		min-width: 60px;
-		padding: 5px 8px 5px 27px;
+		padding: 5px 8px 5px 30px;
         text-decoration: none;
         border-top: 1px solid #eee;
         position: relative;
@@ -83,14 +83,14 @@ h1, h2, h3, h4, h5, h6 {
       	
       }
       
-      #jump_page .source:hover span,#jump_page .s span{
+      #jump_page .source:hover span,#jump_page .s:hover span{
       	display: block;
       }
       #jump_page .d {
 		display: block;
 		background-color: #eee;
 		margin: 3px 0;
-		padding: 3px 8px 3px 27px;
+		padding: 3px 8px 3px 30px;
       }
         #jump_page .f:hover {
           background: #f5f5ff;
