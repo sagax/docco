@@ -63,7 +63,7 @@ console.log 'config', config
 # up into comment/code sections, highlighting them for the appropriate language,
 # and merging them into an HTML template.
 generate_documentation = (source, callback) ->
-  fs.readFile (real_source source), "utf-8", (error, code) ->
+  fs.readFile (get_real_source source), "utf-8", (error, code) ->
     
     throw error if error
     
@@ -181,7 +181,8 @@ highlight = (source, sections, callback) ->
 # and write out the documentation. Pass the completed sections into the template
 # found in `resources/docco.jst`
 generate_html = (source, css, sections, description, depth) ->
-  title_segments = real_source(source).split('/')
+  real_source = get_real_source source
+  title_segments = real_source.split('/')
   title_segments.shift() if title_segments[0] is '.'
   head_title = process.OPTS.repo + ' » ' + title_segments.join(' › ') #  path.basename real_source source
   title = title_segments[title_segments.length - 1]
@@ -191,13 +192,14 @@ generate_html = (source, css, sections, description, depth) ->
   javascripts = []
   for pattern, javascript of config.page_javascripts
     console.log source, pattern, javascript
-    if match = source.match new RegExp "^#{pattern.replace('*', '(.*)')}$"
+    if match = real_source.match new RegExp "^#{pattern.replace('*', '(.*)')}$"
       javascript = javascript.replace('[1]', (match[1] or '')).replace('[2]', (match[2] or '')).replace('[3]', (match[3] or ''))
       javascripts.push root_dir + 'docas/' + javascript
 
   stylesheets = []
   for pattern, stylesheet of config.page_stylesheets
-    if source.match new RegExp "^#{pattern.replace('*', '(.*)')}$"
+    console.log source, pattern, stylesheet
+    if match = real_source.match new RegExp "^#{pattern.replace('*', '(.*)')}$"
       stylesheet = stylesheet.replace('[1]', (match[1] or '')).replace('[2]', (match[2] or '')).replace('[3]', (match[3] or ''))
       stylesheets.push stylesheet
 
@@ -277,7 +279,7 @@ highlight_end   = '</pre></div>'
 # To correctly recognize shebang scripts, a pseduo extname should be passed
 # in, such as bin/docco.js_, the last underscore indicates there's no extname
 # actually. Dirty? But works:)
-real_source = (source) ->
+get_real_source = (source) ->
   dirname  = path.dirname  source
   extname  = path.extname  source
   basename = path.basename source, extname
@@ -286,6 +288,14 @@ real_source = (source) ->
 
 # Run the script.
 # For each recognized source file passed in as an argument, generate the documentation. Log sources of unknown types.
+
+markdowns = process.ARGV.filter((source) -> source.substr(source.length - 3) is '.md')
+for markdown in markdowns
+  fs.readFile markdown, 'utf-8', (err, res) ->
+    html = showdown.makeHtml res
+    ensure_directory (path.dirname markdown), ->
+      fs.writeFile destination(markdown), html
+
 sources = process.ARGV.filter((source) -> (get_language source) ? console.log "Unknown Type: #{source}").sort()
 destdir = process.OPTS.out ? 'docs'
 if sources.length

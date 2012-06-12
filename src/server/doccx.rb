@@ -94,6 +94,7 @@ directories.each do |directory|
 	type = 'm' + gitmodules[glob]["url"].match(/git(?:@|:\/\/)github\.com(?::|\/)([^\.]*)(\.git)?/)[1] if (type == 'd') && (gitmodules.include? glob)
         size = file.size
         sloc = ''
+        puts glob
         author = log.author.name.gsub '|', '||'
         email = log.author.email.gsub '|', '||'
         date = log.date.strftime '%s'
