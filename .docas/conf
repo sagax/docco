@@ -6,4 +6,4 @@ page_stylesheets:
   *: common.css
   bin/*: [1]_tutorial.css
 
-project_page: docas.html
+project_page: index.html
