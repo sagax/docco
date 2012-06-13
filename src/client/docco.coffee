@@ -6,7 +6,7 @@ render_jump_to = (index_path, root_path, depth) ->
     index = process_index data
     html = '<div id="jump_to">Jump To &hellip;<div id="jump_wrapper"><div id="jump_page">'
     if depth
-      html += "<a dir='u' class='s d'>..&nbsp;</a>"
+      html += "<a dir='u' class='s d'><span>←</span>..&nbsp;</a>"
     for entry in index
       html += "<a class='source #{entry.type}' "
       if entry.action is 's'
@@ -17,7 +17,7 @@ render_jump_to = (index_path, root_path, depth) ->
         html += 'href="https://github.com/' + docas.repo + '/tree/master/' + root_path.join('/') + '/' + entry.name + '"'
       else if entry.type is 'd'
         html += 'dir="d"'
-      html += '>' + entry.name + '</a>'
+      html += '>' + (if entry.type is 'd' then '<span>→</span>' else '') + entry.name + '</a>'
     html += '</div><div class="spinner"></div></div></div>'
     jump_to = $ $(html)[0]
     jump_to.find('a[dir]').click ->
@@ -29,7 +29,7 @@ render_jump_to = (index_path, root_path, depth) ->
           index_path.splice index_path.length - 1, 0, '..'
       else
         root_path.push $(@).html()
-        index_path.splice index_path.length - 1, 0, $(@).html()
+        index_path.splice index_path.length - 1, 0, $(@).html().substr(14)
       render_jump_to index_path, root_path, depth + (if $(@).attr('dir') is 'u' then -1 else 1 ) * 1
 
     jump_wrapper = jump_to.find '#jump_wrapper'

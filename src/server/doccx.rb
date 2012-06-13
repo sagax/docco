@@ -115,11 +115,14 @@ directories.each do |directory|
           if (type == 'f') && (File.exists? document)
             sloc = 0
             file.each_line { |line| sloc += 1 unless /\S/ !~ line.encode!('UTF-8', 'UTF-8', :invalid => :replace) }
-            source = File.open document
-            source.readline
-            description = source.readline
-            description = (description[2...description.size] || '').strip.gsub '|', '||'
-            action = 's'
+	    begin
+              source = File.open document
+              source.readline
+              description = source.readline
+              description = (description[2...description.size] || '').strip.gsub '|', '||'
+              action = 's'
+	    rescue
+	    end
           else
             action = 'g'
           end
