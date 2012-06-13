@@ -33,7 +33,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 #jump_to, #jump_page {
   background: white;
-  font: 10px Arial;
+  font: 11px Arial;
   text-transform: uppercase;
   cursor: pointer;
   text-align: right;
@@ -71,26 +71,30 @@ h1, h2, h3, h4, h5, h6 {
         text-decoration: none;
         border-top: 1px solid #eee;
         position: relative;
+        height: 13px;
+        line-height: 13px;
       }
       #jump_page .source span,#jump_page .s span{
       	display: none;
       	position: absolute;
       	left: 10px;
+      	top: 0;
       	font-size: 13px;
       	font-weight: bold;
-      	line-height: 10px;
-      	height: 13px;
-      	
       }
       
       #jump_page .source:hover span,#jump_page .s:hover span{
       	display: block;
       }
+      
       #jump_page .d {
 		display: block;
 		background-color: #eee;
 		margin: 3px 0;
 		padding: 3px 8px 3px 30px;
+		height: 13px;
+		line-height: 13px;
+		position: relative;
       }
         #jump_page .f:hover {
           background: #f5f5ff;
