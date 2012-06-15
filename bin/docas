@@ -369,7 +369,7 @@ echo -en "\r\033[38C"
 #   3. Synchronize `gh-pages` branch with GitHub remotely.
 
 git add .
-git commit --all --quiet --message "Docas.io synced with $head_hash: $head_message"
+git commit --all --quiet --message "Docas.io synced with $head_hash: $head_subject"
 git push --quiet origin gh-pages
 echo "✓" $(date "+%H:%M:%S")
 echo "Crowd applauds."
