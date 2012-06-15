@@ -41,10 +41,16 @@ set -e
 
 if [ $# -eq 0 ]; then
 
+  echo "0"
   if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" == "true" ]; then
+  echo "1"
  
     addr="$(git remote -v | egrep -m 1 "origin")"
-    repo="$(echo $addr  | grep -P "(?<=\:)[^\.]*(?=(\.git| ))" -o)"
+  echo "$addr"
+    repo="$(echo $addr  | grep -P "(?<=\/|\:)[^\.]*(?=(\.git| ))" -o)"
+  echo "3"
+    mode="development"
+    echo $mode
 
   else
 
@@ -66,6 +72,7 @@ if [ $# -eq 0 ]; then
 else
 
   repo=$1
+  mode="production"
 
 fi
 
@@ -96,7 +103,7 @@ ghpages_dir="$working_dir/ghpages"
 # rename scenarios.
 
 sources_git="$sources_dir/.git"
-if [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-inside-work-tree)" == "true" ]; then
+if [ $mode == "production" ] && [ -d "$sources_git" ] && [ "$(git --git-dir $sources_git rev-parse --is-inside-work-tree)" == "true" ]; then
 
   echo -n "Fetching from GitHub...               "
   cd "$sources_dir"
@@ -113,7 +120,11 @@ else
 
   echo -n "Cloning from GitHub...                "
   rm -rf "$storage_dir"
-  git clone --quiet "git@github.com:$repo.git" "$sources_dir"
+  if [ $mode == "production" ]; then
+    git clone --quiet "git@github.com:$repo.git" "$sources_dir"
+  else
+    git clone --quiet . "$sources_dir"
+  fi
   echo "✓" $(date "+%H:%M:%S")
 
 fi
@@ -370,7 +381,9 @@ echo -en "\r\033[38C"
 
 git add .
 git commit --all --quiet --message "Docas.io synced with $head_hash: $head_subject"
-git push --quiet origin gh-pages
+if [ $mode == "production" ]; then
+  git push --quiet origin gh-pages
+fi
 echo "✓" $(date "+%H:%M:%S")
 echo "Crowd applauds."
 
@@ -388,9 +401,17 @@ echo "Crowd applauds."
 #   3. Delete local branch `gh-pages`. So pruning local branches with remote
 #   branches can synchronize local and remote branches.
 
-cd "$ghpages_dir" && git checkout --force --quiet master
-rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
-cd "$sources_dir" && git branch -D gh-pages > /dev/null
+if [ $mode == "development" ]; then
+
+  rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
+
+else
+
+  cd "$ghpages_dir" && git checkout --force --quiet master
+  rm -rf "$sources_dir" && cp -r "$ghpages_dir" "$sources_dir"
+  cd "$sources_dir" && git branch -D gh-pages > /dev/null
+
+fi
 
 # Why not have a cup of coffee, Docas?
 #

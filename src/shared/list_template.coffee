@@ -19,7 +19,7 @@ template = (str) ->
 list_template = template """
 <div depth="<%= index_path.length %>" class="filelist">
 <table class="repo_nav">
-<thead><tr><th></th><th>name</th><th><span class="<%= size == 'sloc' ? 'selected' : '' %>">sloc</span>&nbsp;&nbsp;<span lass="<%= size == 'size' ? 'selected' : '' %>">size</span></th><th>age</th><th><span class="<%= message == 'message' ? 'selected' : '' %>">message</span>&nbsp;&nbsp;<span class="<%= message == 'description' ? 'selected' : '' %>">description</span><div class="history"><a target="_blank" href="https://github.com/<%= user %>/<%= repo %>/commits/master">history</a></div></th></tr></thead>
+<thead><tr><th></th><th>name</th><th><span class="<%= size == 'sloc' ? 'selected' : '' %>">sloc</span>&nbsp;&nbsp;<span class="<%= size == 'size' ? 'selected' : '' %>">size</span></th><th>age</th><th><span class="<%= message == 'message' ? 'selected' : '' %>">message</span>&nbsp;&nbsp;<span class="<%= message == 'description' ? 'selected' : '' %>">description</span><div class="history"><a target="_blank" href="https://github.com/<%= user %>/<%= repo %>/commits/master">history</a></div></th></tr></thead>
 <tbody>
 <% if(index_path.length) { %>
 <tr class="directory"><td></td><td><a backward>..</a></td><td></td><td></td><td></td></tr>
