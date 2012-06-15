@@ -51,6 +51,20 @@ def humanize_number size
   end
 end
 
+# ## Get Document Name
+#
+# Document name will be the same file name with extention `.html`, examples:
+#
+#   + `awe_some_source.rb` -> `aws_some_source.html`
+#   + `.hidden_source` -> `hidden_source.html`
+def get_document_name source_name
+  segments = source_name.split '.'
+  while segments[0] == ''
+    segments.shift
+  end
+  segments[0...(segments.size > 1 ? segments.size - 1 : 1)].join('.') + '.html'
+end
+
 # ## Generate docas.idx For Touched Directories
 #
 # Find all repositories
@@ -77,55 +91,53 @@ end
 # Fields are seperated by ` | ` (vertical bar with left and right spaces). Each
 # line represents a single entry.
 repo = Grit::Repo.new options[:sources]
-gitmodules = Grit::Submodule.config repo
+submodules = Grit::Submodule.config repo
+
 directories.each do |directory|
   FileUtils.mkdir_p target_directory = "#{options[:working]}/ghpages/#{directory}"
-  open("#{target_directory}/docas.idx", 'w') { |f|
+  File.open "#{target_directory}/docas.idx", 'w' do |f|
     threads = []
-    Dir.glob("#{directory}/*").each { |glob|
+    Dir.glob("#{directory}/*").each do |glob|
       if threads.size == 4
         threads.map(&:join)
         threads.clear
       end
       threads.push Thread.new {
         file = File.open glob
-        log = repo.log('master', glob, :max_count =>1)[0]
         type = file.stat.directory? ? 'd' : 'f'
-	type = 'm' + gitmodules[glob]["url"].match(/(?:git@|git:\/\/|http:\/\/)github\.com(?::|\/)([^\.]*)(\.git)?/)[1] if (type == 'd') && (gitmodules.include? glob)
+	type = 'm' + submodules[glob]["url"].match(/(?:git@|git:\/\/|http:\/\/)github\.com(?::|\/)([^\.]*)(\.git)?/)[1] if (type == 'd') && (submodules.include? glob)
+        name = glob[directory.size + 1...glob.size]
+        action = ''
         size = file.size
         sloc = ''
-        puts glob
+        log = repo.log('master', glob, :max_count =>1)[0]
         author = log.author.name.gsub '|', '||'
         email = log.author.email.gsub '|', '||'
         date = log.date.strftime '%s'
+        description = ''
         message = log.message.gsub '|', '||'
-        filename = glob[directory.size+1...glob.size]
-        desc = ''
-        if (type == 'd')
-          action = ''
+
+        # Folder specific fields.
+        if type == 'd'
           size = "#{Dir.new(glob).entries.size - 2} items"
-          description = ''
           readme_path = "#{glob}/README.md"
           if File.exists? readme_path
-            readme = File.open readme_path
-            if not readme.eof?
-              first_line = readme.readline
-              if readme.eof? or readme.readline.strip == ''
-                match = first_line.match /\s{4}(.*)/
-                if !match.nil?
-                  description = match[1]
-                end
+            begin
+              readme = File.open readme_path
+              description_line = readme.readline
+              if readme.eof? or readme.readline.strip.size == 0
+                description = description_line.match(/\s{4}(.*)/)[1]
               end
+            rescue
             end
           end
+
+        # Populating file specified fields.
         else
+
           size = humanize_number size
-          segments = filename.split '.'
-          while segments[0] == ''
-            segments.shift
-          end
-          documentname = segments[0...(segments.size > 1 ? segments.size - 1 : segments.size)].join('.') + '.html'
-          document = "#{options[:working]}/ghpages/#{directory}/#{documentname}"
+          document = "#{options[:working]}/ghpages/#{directory}/#{get_document_name name}"
+          puts document
           if (type == 'f') && (File.exists? document)
             sloc = 0
             file.each_line { |line| sloc += 1 unless /\S/ !~ line.encode!('UTF-8', 'UTF-8', :invalid => :replace) }
@@ -134,24 +146,22 @@ directories.each do |directory|
             action = 'g'
           end
 
+          # Recognize description for the source file.
           begin
             source = File.open glob
-            if not source.eof?
-              first_line = source.readline
-              if source.eof? or source.readline.encode!('UTF-8', 'UTF-8', :invalid => :replace).strip == ''
-                match = first_line.match /\S{1,2}\s{4}(.*)/
-                if !match.nil?
-                  match[1]
-                  description = match[1]
-                end
-              end
+            description_line = source.readline
+            description_line = source.readline if description_line[0..1] == '#!'
+            if source.eof? or source.readline.strip.size <= 1
+              description = description_line.match(/\S{1,3}\s{4}(.*)/)[1]
             end
           rescue
           end
+
         end
-        f << [
+
+        f.puts [
           type,
-          filename,
+          name,
           action,
           size,
           sloc,
@@ -160,9 +170,10 @@ directories.each do |directory|
           date,
           description,
           message
-        ].join(" | ") + "\n"
+        ].join ' | '
+
       }
-    }
+    end
     threads.map(&:join)
-  }
+  end
 end

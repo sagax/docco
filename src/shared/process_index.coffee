@@ -45,6 +45,8 @@ process_index = (index) ->
       entry.submodule = entry.type.substr 1
       entry.type = 'm'
     entry.modified = if typeof moment is 'undefined' then entry.date * 1 else moment(new Date entry.date * 1000).fromNow()
+    if entry.type is 'f' and entry.name[entry.name.length-3...entry.name.length] is '.md'
+      entry.is_markdown = on
     entries.push entry
   entries.sort (a, b) ->
     is_file = (type) -> if type is 'f' then 1 else 0

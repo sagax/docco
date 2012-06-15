@@ -42,10 +42,13 @@ generate_index = ->
         language_statistics: parse_language_statistics()
         recent_commits: recent_commits
         files_list: list_template
-          user          : user
-          repo          : repo
+          user       : user
+          repo       : repo
           index_path : []
-          entries : process_index repo_index
+          size       : 'size'
+          message    : 'message'
+          entries    : process_index repo_index
+      console.log process_index repo_index
       fs.writeFileSync target_file, index_html
 
 # ## Get GitHub Repo Data

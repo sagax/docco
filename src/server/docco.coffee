@@ -57,7 +57,6 @@ http = require 'http'
 querystring = require 'querystring'
 config = {}
 config = require('./config_parser').parse ".docas/conf"
-console.log 'config', config
 
 #### Main Documentation Generation Functions
 
@@ -129,7 +128,10 @@ parse = (source, code) ->
       has_code = yes
       code_text += line + '\n'
   save docs_text, code_text
-  {description: description, sections: sections}
+  {
+    description: description
+    sections: sections
+  }
 
 pygments_http_ports = [5923, 5924, 5925, 5926]
 
@@ -196,14 +198,12 @@ generate_html = (source, css, sections, description, depth) ->
   if depth then root_dir = [0..depth-1].map(-> '..').join('/') + '/' else prefix = ''
   javascripts = []
   for pattern, javascript of config.page_javascripts
-    console.log source, pattern, javascript
     if match = real_source.match new RegExp "^#{pattern.replace('*', '(.*)')}$"
       javascript = javascript.replace('[1]', (match[1] or '')).replace('[2]', (match[2] or '')).replace('[3]', (match[3] or ''))
       javascripts.push root_dir + 'docas/' + javascript
 
   stylesheets = []
   for pattern, stylesheet of config.page_stylesheets
-    console.log source, pattern, stylesheet
     if match = real_source.match new RegExp "^#{pattern.replace('*', '(.*)')}$"
       stylesheet = stylesheet.replace('[1]', (match[1] or '')).replace('[2]', (match[2] or '')).replace('[3]', (match[3] or ''))
       stylesheets.push stylesheet

@@ -43,28 +43,38 @@ regist_events = (table, index_path) ->
   $(table).find('a[backward]').click ->
     new TreeBrowser index_path[0...index_path.length - 1]
 
+  $(table).find('a[forward]').click ->
+    new TreeBrowser index_path.concat $(@).html()
+
+  $(table).find('a[readme]').click ->
+    file_name = $(@).attr 'readme'
+    if TreeBrowser._readme_path isnt [index_path..., file_name].join()
+      show_readme index_path, file_name
+
   $(table).find('thead th:nth-child(3) span:nth-child(1)').click ->
+    $.cookie 'size', 'sloc'
     $(@).addClass('selected').next().removeClass('selected')
     $(table).find('tbody tr td:nth-child(3) span:nth-child(1)').removeClass('hidden')
     $(table).find('tbody tr td:nth-child(3) span:nth-child(2)').addClass('hidden')
 
   $(table).find('thead th:nth-child(3) span:nth-child(2)').click ->
+    $.cookie 'size', 'size'
     $(@).addClass('selected').prev().removeClass('selected')
     $(table).find('tbody tr td:nth-child(3) span:nth-child(1)').addClass('hidden')
     $(table).find('tbody tr td:nth-child(3) span:nth-child(2)').removeClass('hidden')
 
   $(table).find('thead th:nth-child(5) span:nth-child(1)').click ->
+    $.cookie 'message', 'message'
     $(@).addClass('selected').next().removeClass('selected')
     $(table).find('tbody tr td:nth-child(5) div:nth-child(1)').removeClass('hidden')
     $(table).find('tbody tr td:nth-child(5) div:nth-child(2)').addClass('hidden')
 
   $(table).find('thead th:nth-child(5) span:nth-child(2)').click ->
+    $.cookie 'message', 'description'
     $(@).addClass('selected').prev().removeClass('selected')
     $(table).find('tbody tr td:nth-child(5) div:nth-child(1)').addClass('hidden')
     $(table).find('tbody tr td:nth-child(5) div:nth-child(2)').removeClass('hidden')
 
-  $(table).find('a[forward]').click ->
-    new TreeBrowser index_path.concat $(@).html()
 
   # #### Pushing / Poping the Table
   return if $(table).parent()[0]
@@ -77,6 +87,23 @@ regist_events = (table, index_path) ->
     'margin-left': (if direction is 'r' then 0 else -1) * width
   , 400, 'linear', -> $(current_table).remove()
  
+show_readme = (index_path, file) ->
+  $.ajax
+    url: [index_path..., file].join '/'
+    success: (html) ->
+      return unless html
+      TreeBrowser._readme_path = [index_path..., file].join()
+      $('.readme').animate {
+        opacity: 0
+      }, 400, 'linear', ->
+        readme_parent = $('.readme').parent()
+        $('.readme').remove()
+        new_readme = $("<div class='readme'>#{html}</div>").css('opacity', '0')
+        $(readme_parent).append new_readme
+        $(new_readme).animate {
+           opacity: 1
+        }, 400, "linear"
+
 # ### Constructor Arguments
 #
 # 1. `user`, used to generate correct link for undocumented sources. E.g.,
@@ -98,27 +125,12 @@ TreeBrowser = (index_path = []) ->
 
   $('.spinner').show()
 
+
   get_index = ->
     TreeBrowser._ajaxing = on
 
-    show_readme_body = (html) ->
-      TreeBrowser._readme_path = index_path.join()
-      $('.readme').animate {
-        opacity: 0
-      }, 400, 'linear', ->
-        readme_parent = $('.readme').parent()
-        $('.readme').remove()
-        new_readme = $("<div class='readme'>#{html}</div>").css('opacity', '0')
-        $(readme_parent).append new_readme
-        $(new_readme).animate {
-           opacity: 1
-        }, 400, "linear"
-
     if TreeBrowser._readme_path isnt index_path.join()
-      $.ajax
-        url: [index_path..., 'README.html'].join '/'
-        success: (html) ->
-          show_readme_body html if html
+      show_readme index_path, 'README.html'
 
     # #### Ajax Call to Get Index
     $.ajax
@@ -143,13 +155,15 @@ TreeBrowser = (index_path = []) ->
           repo       : repo
           index_path : index_path
           entries    : process_index index
-
+          size       : $.cookie 'size'
+          message    : $.cookie 'message'
+        console.log $.cookie('size'), $.cookie('message')
         regist_events table, index_path
 
   get_index()
 
 TreeBrowser._ajaxing = off
-TreeBrowser._readme_path = ""
+TreeBrowser._readme_path = "README.html"
 
 # ### Replace Emails by GitHub Logins
 #
@@ -188,6 +202,18 @@ if typeof window isnt "undefined"
   # Show each commit's date in relative format.
   $("#recent_commits span[val]").forEach (span) ->
     $(span).html ", " + moment(new Date(1 * $(span).attr("val"))).fromNow()
+
+  # On page load, do:
+  #
+  #   + Show `size` or `sloc` according to cookie `size`.
+  #   + Show `message` or `description` according to cookie `message`.
+  $ ->
+
+    if $.cookie('size') is 'sloc'
+      $('.repo_nav th:nth-child(3) span:nth-child(1)').trigger 'click'
+
+    if $.cookie('message') is 'description'
+      $('.repo_nav th:nth-child(5) span:nth-child(2)').trigger 'click'
 
   # Regist repo browser's events.
   new TreeBrowser
