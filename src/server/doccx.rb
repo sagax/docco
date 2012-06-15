@@ -91,7 +91,7 @@ directories.each do |directory|
         file = File.open glob
         log = repo.log('master', glob, :max_count =>1)[0]
         type = file.stat.directory? ? 'd' : 'f'
-	type = 'm' + gitmodules[glob]["url"].match(/git(?:@|:\/\/)github\.com(?::|\/)([^\.]*)(\.git)?/)[1] if (type == 'd') && (gitmodules.include? glob)
+	type = 'm' + gitmodules[glob]["url"].match(/(?:git@|git:\/\/|http:\/\/)github\.com(?::|\/)([^\.]*)(\.git)?/)[1] if (type == 'd') && (gitmodules.include? glob)
         size = file.size
         sloc = ''
         puts glob
@@ -104,6 +104,20 @@ directories.each do |directory|
         if (type == 'd')
           action = ''
           size = "#{Dir.new(glob).entries.size - 2} items"
+          description = ''
+          readme_path = "#{glob}/README.md"
+          if File.exists? readme_path
+            readme = File.open readme_path
+            if not readme.eof?
+              first_line = readme.readline
+              if readme.eof? or readme.readline.strip == ''
+                match = first_line.match /\s{4}(.*)/
+                if !match.nil?
+                  description = match[1]
+                end
+              end
+            end
+          end
         else
           size = humanize_number size
           segments = filename.split '.'
@@ -116,30 +130,37 @@ directories.each do |directory|
             sloc = 0
             file.each_line { |line| sloc += 1 unless /\S/ !~ line.encode!('UTF-8', 'UTF-8', :invalid => :replace) }
             action = 's'
-	    begin
-              source = File.open document
-              first_line = source.readline.strip
-
-              # Markdown files' descriptions are the `code` tags at
-              # first lines. Remove the `<pre><code>` parts from the string.
-	      if first_line != '<!DOCTYPE html>'
-                puts document, 'MARKDOWN'
-                description = first_line[11..-1]
-
-              # Regular sources' descriptions are the `code` comment
-              # at first lines.
-	      else
-                source.readline
-	        description = source.readline.strip
-	        description = (description[2..-1] || '').gsub '|', '||'
-	      end
-	    rescue
-	    end
           else
             action = 'g'
           end
+
+          begin
+            source = File.open glob
+            if not source.eof?
+              first_line = source.readline
+              if source.eof? or source.readline.encode!('UTF-8', 'UTF-8', :invalid => :replace).strip == ''
+                match = first_line.match /\S{1,2}\s{4}(.*)/
+                if !match.nil?
+                  match[1]
+                  description = match[1]
+                end
+              end
+            end
+          rescue
+          end
         end
-        f << "#{type} | #{filename} | #{action} | #{size} | #{sloc} | #{author} | #{email} | #{date} | #{description} | #{message}\n"
+        f << [
+          type,
+          filename,
+          action,
+          size,
+          sloc,
+          author,
+          email,
+          date,
+          description,
+          message
+        ].join(" | ") + "\n"
       }
     }
     threads.map(&:join)

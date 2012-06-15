@@ -1,4 +1,4 @@
-# Define supported languages.
+#    Define supported languages.
 
 module.exports =
   '.c':

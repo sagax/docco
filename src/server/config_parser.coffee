@@ -1,3 +1,5 @@
+#    Parse config file located at .docas/conf
+
 fs = require 'fs'
 
 module.exports.parse = (conf) ->
