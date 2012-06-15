@@ -1,3 +1,5 @@
+#     Repository Cover Page Generator
+
 # **Docci** generates a simple cover page for each repository, helping users
 # take a quick glance at the project. 
 # The generated cover page contains following components:
@@ -42,9 +44,7 @@ generate_index = ->
         files_list: list_template
           user          : user
           repo          : repo
-          index_depth   : 0
-          absolute_base : ''
-          relative_base : ''
+          index_path : []
           entries : process_index repo_index
       fs.writeFileSync target_file, index_html
 

@@ -1,3 +1,5 @@
+#     Documentation Generator
+
 # **Docco** is a quick-and-dirty, hundred-line-long, literate-programming-style
 # documentation generator. It produces HTML
 # that displays your comments alongside your code. Comments are passed through
@@ -111,8 +113,11 @@ parse = (source, code) ->
     sections.push docs_text: docs, code_text: code
 
   if lines[0].match(language.comment_matcher) and not lines[0].match(language.comment_filter)
-    description = lines[0].replace(language.comment_matcher, '').trim()
-  else description = ""
+    if line[1] is ''
+      description = lines[0].replace(language.comment_matcher, '').trim()
+    else
+      description = ''
+  else description = ''
 
   for line in lines
     if line.match(language.comment_matcher) and not line.match(language.comment_filter)
@@ -291,10 +296,12 @@ get_real_source = (source) ->
 
 markdowns = process.ARGV.filter((source) -> source.substr(source.length - 3) is '.md')
 for markdown in markdowns
-  fs.readFile markdown, 'utf-8', (err, res) ->
-    html = showdown.makeHtml res
-    ensure_directory (path.dirname markdown), ->
-      fs.writeFile destination(markdown), html
+  do (markdown) ->
+    fs.readFile markdown, 'utf-8', (err, res) ->
+      html = showdown.makeHtml res
+      dest_file = destination markdown
+      ensure_directory (path.dirname dest_file), ->
+        fs.writeFile dest_file, html
 
 sources = process.ARGV.filter((source) -> (get_language source) ? console.log "Unknown Type: #{source}").sort()
 destdir = process.OPTS.out ? 'docs'

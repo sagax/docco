@@ -1,4 +1,4 @@
-# Generate `docas.idx` for all touched source directories.
+#    Folder Index Generator
 
 require 'set'
 require 'grit'
@@ -115,12 +115,23 @@ directories.each do |directory|
           if (type == 'f') && (File.exists? document)
             sloc = 0
             file.each_line { |line| sloc += 1 unless /\S/ !~ line.encode!('UTF-8', 'UTF-8', :invalid => :replace) }
+            action = 's'
 	    begin
               source = File.open document
-              source.readline
-              description = source.readline
-              description = (description[2...description.size] || '').strip.gsub '|', '||'
-              action = 's'
+              first_line = source.readline.strip
+
+              # Markdown files' descriptions are the `code` tags at
+              # first lines. Remove the `<pre><code>` parts from the string.
+              #
+	      if first_line == '<!DOCTYPE html>'
+                description = first_line[11..-1]
+
+              # Regular sources' descriptions are the `code` comment
+              # at first lines.
+	      else
+	        description = source.readline.strip
+	        description = (description[2..-1] || '').gsub '|', '||'
+	      end
 	    rescue
 	    end
           else
