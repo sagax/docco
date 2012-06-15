@@ -1,5 +1,5 @@
 
-# ## Provide a Description for your Source
+## Provide a Description for your Source
 
 Descriptions of sources will be included in the repository navigator.
 If the first line is the comment symbol following 4 spaces, and following
