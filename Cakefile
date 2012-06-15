@@ -9,7 +9,7 @@ task 'build', 'build the docco library', (options) ->
     'coffee ' + ['-c' + (if options.watch then 'w' else ''), '-o', 'lib', 'src'].join(' ')
     'coffee -cj lib/client/index.js src/shared/process_index.coffee src/shared/list_template.coffee src/client/index.coffee'
     'coffee -cj lib/client/docco.js src/shared/process_index.coffee src/client/docco.coffee'
-    'java -jar ~/compiler.jar --js vendor/cookie.js lib/client/index.js --js_output_file lib/client/index.min.js'
+    'java -jar ~/compiler.jar --js vendor/moment.js vendor/cookie.js lib/client/index.js --js_output_file lib/client/index.min.js'
     'java -jar ~/compiler.jar --js lib/client/docco.js --js_output_file lib/client/docco.min.js'
     'cleancss -o resources/index.min.css resources/index.css'
     'cleancss -o resources/docco.min.css resources/docco.css'
