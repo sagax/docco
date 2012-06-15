@@ -122,13 +122,14 @@ directories.each do |directory|
 
               # Markdown files' descriptions are the `code` tags at
               # first lines. Remove the `<pre><code>` parts from the string.
-              #
-	      if first_line == '<!DOCTYPE html>'
+	      if first_line != '<!DOCTYPE html>'
+                puts document, 'MARKDOWN'
                 description = first_line[11..-1]
 
               # Regular sources' descriptions are the `code` comment
               # at first lines.
 	      else
+                source.readline
 	        description = source.readline.strip
 	        description = (description[2..-1] || '').gsub '|', '||'
 	      end

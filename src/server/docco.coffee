@@ -113,7 +113,7 @@ parse = (source, code) ->
     sections.push docs_text: docs, code_text: code
 
   if lines[0].match(language.comment_matcher) and not lines[0].match(language.comment_filter)
-    if line[1] is ''
+    if lines[1] is ''
       description = lines[0].replace(language.comment_matcher, '').trim()
     else
       description = ''
