@@ -37,7 +37,6 @@ regist_events = (table, index_path) ->
 
   update_usernames()
 
-
   # #### Handling Content Interaction
 
   $(table).find('a[backward]').click ->
@@ -129,12 +128,9 @@ TreeBrowser = (index_path = []) ->
   get_index = ->
     TreeBrowser._ajaxing = on
 
-    if TreeBrowser._readme_path isnt index_path.join()
-      show_readme index_path, 'README.html'
-
     # #### Ajax Call to Get Index
     $.ajax
-      url: [index_path..., "docas.idx", "?timestamp=#{Date.now().valueOf()}"].join '/'
+      url: [index_path..., "docas.idx?timestamp=#{Date.now().valueOf()}"].join '/'
 
       error: ->
         delete TreeBrowser._ajaxing
@@ -159,6 +155,9 @@ TreeBrowser = (index_path = []) ->
           message    : $.cookie 'message'
         console.log $.cookie('size'), $.cookie('message')
         regist_events table, index_path
+
+    if TreeBrowser._readme_path isnt index_path.join()
+      show_readme index_path, 'README.html'
 
   get_index()
 
