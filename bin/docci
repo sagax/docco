@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-//     Node.js script to prepare arguments for docci.js
+//     (Node.js) Shebang to parse arguments for /src/server/docci.coffee
 
 // This node shell script is used to prepare required parameters for docci.js
 // to generate index.html for a git repository.
@@ -9,7 +9,6 @@
 
 var path = require('path');
 var fs = require('fs');
-// var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
 
 process.ARGV = process.argv = process.argv.slice(2, process.argv.length);
 

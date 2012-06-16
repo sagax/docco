@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-//     Node.js shebang to parse arguments for docco
+//     (Node.js) Shebang to parse arguments for /src/server/docco
 
 // This node shell script is used to prepare required parameters for docco.js
 // to generate documents for passed in sources.
