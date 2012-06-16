@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Node.js script to prepare arguments for docci.js
+
+//     Node.js script to prepare arguments for docci.js
 
 // This node shell script is used to prepare required parameters for docci.js
 // to generate index.html for a git repository.

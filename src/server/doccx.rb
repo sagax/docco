@@ -150,7 +150,11 @@ directories.each do |directory|
           begin
             source = File.open glob
             description_line = source.readline
-            description_line = source.readline if description_line[0..1] == '#!'
+            if description_line[0..1] == '#!'
+              source.readline
+              description_line = source.readline 
+            end
+            puts description_line
             if source.eof? or source.readline.strip.size <= 1
               description = description_line.match(/\S{1,3}\s{4}(.*)/)[1]
             end

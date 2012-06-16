@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Main (shell) script to orchestrate building processes.
+
+#     Main (shell) script to orchestrate building processes.
 
 # ## Introduction
 #
