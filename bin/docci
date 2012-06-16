@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Node.js script to prepare arguments for docci.js
 
 // This node shell script is used to prepare required parameters for docci.js
 // to generate index.html for a git repository.
@@ -7,7 +8,7 @@
 
 var path = require('path');
 var fs = require('fs');
-var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
+// var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
 
 process.ARGV = process.argv = process.argv.slice(2, process.argv.length);
 
@@ -26,4 +27,4 @@ if(pos == -1) pos = process.ARGV.indexOf('--out');
 if(pos != -1) process.OPTS.out = process.ARGV.splice(pos, 2)[1];
 
 // Kick start the processing procedure.
-require(lib + '/server/docci.js');
+require('../lib/server/docci.js');

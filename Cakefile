@@ -19,14 +19,12 @@ task 'build', 'build the docco library', (options) ->
 task 'install', 'install the `docco`, `docci`, `doccx`, and `docas` command into /usr/local (or --prefix)', (options) ->
   base = options.prefix or '/usr/local'
   lib  = base + '/lib/docas'
-  exec([
+  exec [
     'mkdir -p ' + lib
     "printf #{options.auth} > /usr/local/lib/docas/auth"
     'cp -rf bin resources vendor lib src node_modules ' + lib
     'ln -sf ' + lib + '/bin/docco ' + base + '/bin/docco'
     'ln -sf ' + lib + '/bin/docci ' + base + '/bin/docci'
-    'ln -sf ' + lib + '/bin/doccx ' + base + '/bin/doccx'
     'ln -sf ' + lib + '/bin/docas ' + base + '/bin/docas'
   ].join(' && '), (err, stdout, stderr) ->
     console.error stderr if err
-  )
