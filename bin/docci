@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-//     (Node.js) Shebang to parse arguments for /src/server/docci.coffee
+//     Node.js shebang to generate index.html (using /src/server/docci.coffee)
 
 // This node shell script is used to prepare required parameters for docci.js
 // to generate index.html for a git repository.
