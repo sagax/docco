@@ -251,6 +251,7 @@ touch "$working_dir/.statist"
 touch "$working_dir/.touched_sources"
 touch "$working_dir/.deleted_sources"
 curl --silent --output "$working_dir/.statist"         "http://127.0.0.1:4567/statist?path=$sources_dir"
+echo ".touched_sources"
 curl --silent --output "$working_dir/.touched_sources" "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.touched"
 # curl --silent --output "$working_dir/.deleted_sources" "http://127.0.0.1:4567/sources?path=$sources_dir&list=$working_dir/.deleted"
 echo "✓" $(date "+%H:%M:%S")
