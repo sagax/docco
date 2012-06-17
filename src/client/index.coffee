@@ -1,24 +1,58 @@
+#    Client script designed specifically for index.html
+
 # ## Widget A: Languages Stats
 #
 # Animate bar chart of languages statistics on page load.
 
-if typeof $ isnt 'undefined'
-  $ ->
-    bars = $('.code_stats span[percent]')
-    return unless bars.length
-    start_index = bars.length
+bars = $('#code_stats span[percent]')
 
-    do animate = ->
-      return unless start_index
-      bar = $ bars[--start_index]
-      return animate() if bar.attr('percent') is bar.css('width')
-      bar.animate
-        width: bar.attr('percent')
-      , 600, 'linear', animate
+if bars.length
+  start_index = bars.length
+  fps = 20
+  duration = 1000
+  do animate = ->
+    return unless start_index
+    bar = $ bars[--start_index]
+    number_span = bar.next()
+    total = 1 * number_span.attr 'total'
+    do (number_span, total) ->
+      current = 0
+      step = total * 1000 / duration / fps
+      do increase = ->
+        if (current += step) > total
+          current = total
+        else
+          setTimeout increase, 1000 / fps
+        number_span.html Math.floor(current) + ' sloc'
+    return animate() if bar.attr('percent') is bar.css('width')
+    bar.animate
+      width: bar.attr('percent')
+    , duration, 'linear', animate
 
-# ## GitHub Styled Repo Browser
 
-{ user, repo } = docas if typeof docas isnt 'undefined'
+# ## Widget B: Markdown Browser
+
+current_markdown_path = "README.html"
+
+show_markdown = (index_path, file) ->
+  $.ajax
+    url: [index_path..., file].join '/'
+    success: (html) ->
+      return unless html
+      current_markdown_path = [index_path..., file].join()
+      $('.markdown_browser').animate {
+        opacity: 0
+      }, 400, 'linear', ->
+        markdown_container = $('.markdown_browser').parent()
+        $('.markdown_browser').remove()
+        new_markdown = $("<div class='markdown_browser'>#{html}</div>").css('opacity', '0')
+        $(markdown_container).append new_markdown
+        $(new_markdown).animate {
+           opacity: 1
+        }, 400, "linear"
+
+# ## Widget C: GitHub Styled Repo Browser
+{ user, repo } = docas
 
 # ### Hand-Made Template for Breadcrumb Navigation
 breadcrumb_template = (path) ->
@@ -31,49 +65,41 @@ breadcrumb_template = (path) ->
       result += '<span>' + dir + '</span>'
   result
 
-first_time = on
-
-regist_events = (table, index_path) ->
+post_render = (table, index_path) ->
 
   update_usernames()
 
   # #### Handling Content Interaction
 
   $(table).find('a[backward]').click ->
-    new TreeBrowser index_path[0...index_path.length - 1]
+    render_tree_browser index_path[0...index_path.length - 1]
 
   $(table).find('a[forward]').click ->
-    new TreeBrowser index_path.concat $(@).html()
+    render_tree_browser [index_path..., $(@).html()]
 
-  $(table).find('a[readme]').click ->
-    file_name = $(@).attr 'readme'
-    if TreeBrowser._readme_path isnt [index_path..., file_name].join()
-      show_readme index_path, file_name
+  $(table).find('a[markdown]').click ->
+    file_name = $(@).attr 'markdown'
+    current_row = $(@).parent().parent()
+    current_row.siblings().removeClass 'shown'
+    current_row.addClass 'shown'
+    if current_markdown_path isnt [index_path..., file_name].join()
+      show_markdown index_path, file_name
 
-  $(table).find('thead th:nth-child(3) span:nth-child(1)').click ->
+  $(table).find('thead th:nth-child(3) > :first-child').click ->
     $.cookie 'size', 'sloc'
-    $(@).addClass('selected').next().removeClass('selected')
-    $(table).find('tbody tr td:nth-child(3) span:nth-child(1)').removeClass('hidden')
-    $(table).find('tbody tr td:nth-child(3) span:nth-child(2)').addClass('hidden')
+    $('.repo_nav tr > :nth-child(3)').attr 'class', 'sloc'
 
-  $(table).find('thead th:nth-child(3) span:nth-child(2)').click ->
+  $(table).find('thead th:nth-child(3) > :last-child').click ->
     $.cookie 'size', 'size'
-    $(@).addClass('selected').prev().removeClass('selected')
-    $(table).find('tbody tr td:nth-child(3) span:nth-child(1)').addClass('hidden')
-    $(table).find('tbody tr td:nth-child(3) span:nth-child(2)').removeClass('hidden')
+    $('.repo_nav tr > :nth-child(3)').attr 'class', 'size'
 
-  $(table).find('thead th:nth-child(5) span:nth-child(1)').click ->
+  $(table).find('thead th:last-child > :first-child').click ->
     $.cookie 'message', 'message'
-    $(@).addClass('selected').next().removeClass('selected')
-    $(table).find('tbody tr td:nth-child(5) div:nth-child(1)').removeClass('hidden')
-    $(table).find('tbody tr td:nth-child(5) div:nth-child(2)').addClass('hidden')
+    $('.repo_nav tr > :last-child').attr 'class', 'message'
 
-  $(table).find('thead th:nth-child(5) span:nth-child(2)').click ->
+  $(table).find('thead th:last-child > :nth-child(2)').click ->
     $.cookie 'message', 'description'
-    $(@).addClass('selected').prev().removeClass('selected')
-    $(table).find('tbody tr td:nth-child(5) div:nth-child(1)').addClass('hidden')
-    $(table).find('tbody tr td:nth-child(5) div:nth-child(2)').removeClass('hidden')
-
+    $('.repo_nav tr > :last-child').attr 'class', 'description'
 
   # #### Pushing / Poping the Table
   return if $(table).parent()[0]
@@ -85,84 +111,49 @@ regist_events = (table, index_path) ->
   $($('#filelists').children()[0]).animate
     'margin-left': (if direction is 'r' then 0 else -1) * width
   , 400, 'linear', -> $(current_table).remove()
- 
-show_readme = (index_path, file) ->
+
+waiting_for_response = off
+
+render_tree_browser = (index_path) ->
+
+  return if waiting_for_response
+
+  $('.tree_browser_spinner').show()
+  waiting_for_response = on
+
+  # #### Ajax Call to Get Index
+  #
+  # If browser caching becomes a problem, append
+  # 
+  #     "?timestamp=#{Date.now().valueOf()}"
+  #
+  # as the query string.
   $.ajax
-    url: [index_path..., file].join '/'
-    success: (html) ->
-      return unless html
-      TreeBrowser._readme_path = [index_path..., file].join()
-      $('.readme').animate {
-        opacity: 0
-      }, 400, 'linear', ->
-        readme_parent = $('.readme').parent()
-        $('.readme').remove()
-        new_readme = $("<div class='readme'>#{html}</div>").css('opacity', '0')
-        $(readme_parent).append new_readme
-        $(new_readme).animate {
-           opacity: 1
-        }, 400, "linear"
+    url: [index_path..., 'docas.idx'].join '/'
 
-# ### Constructor Arguments
-#
-# 1. `user`, used to generate correct link for undocumented sources. E.g.,
-# `https://github.com/user/repo/blob/master/awesome_file`
-# 2. `repo`, also used to generate above link.
-# 3. `index_path`, path to `docas.idx` file.
-# 4. `index_depth`, the depth of the index file, `0` for root directory of the repo.
-# 5. `current_depth`, optional, the depth of the current page, defaults to
-# `index_depth`.
-TreeBrowser = (index_path = []) ->
+    success: (index) ->
+      waiting_for_response = off
+      $('.tree_browser_spinner').hide()
 
-  return if TreeBrowser._ajaxing
+      # #### Render Breadcrumb Navigator
+      $('#breadcrumb')
+        .html(breadcrumb_template index_path)
+        .find('a').click ->
+          render_tree_browser index_path[0...$(@).attr('depth')]
 
-  if first_time
-    regist_events $('#filelists div')[0], index_path
-    $('#filelists tbody td:nth-child(4)').forEach (td) ->
-      $(td).html moment(new Date $(td).attr('val') * 1000).fromNow()
-    return first_time = off
+      # #### Render Content Table
+      table = $ list_template
+        user       : user
+        repo       : repo
+        index_path : index_path
+        entries    : process_index index
+        size       : $.cookie 'size'
+        message    : $.cookie 'message'
 
-  $('.spinner').show()
+      post_render table, index_path
 
-
-  get_index = ->
-    TreeBrowser._ajaxing = on
-
-    # #### Ajax Call to Get Index
-    $.ajax
-      url: [index_path..., "docas.idx?timestamp=#{Date.now().valueOf()}"].join '/'
-
-      error: ->
-        delete TreeBrowser._ajaxing
-
-      success: (index) ->
-        delete TreeBrowser._ajaxing
-        $('.spinner').hide()
-
-        # #### Render Breadcrumb Navigator
-        $('#breadcrumb')
-          .html(breadcrumb_template index_path)
-          .find('a').click ->
-            new TreeBrowser index_path[0...$(@).attr('depth')]
-
-        # #### Render Content Table
-        table = $ list_template
-          user       : user
-          repo       : repo
-          index_path : index_path
-          entries    : process_index index
-          size       : $.cookie 'size'
-          message    : $.cookie 'message'
-        console.log $.cookie('size'), $.cookie('message')
-        regist_events table, index_path
-
-    if TreeBrowser._readme_path isnt index_path.join()
-      show_readme index_path, 'README.html'
-
-  get_index()
-
-TreeBrowser._ajaxing = off
-TreeBrowser._readme_path = "README.html"
+  if current_markdown_path isnt [index_path..., 'README.html'].join()
+    show_markdown index_path, 'README.html'
 
 # ### Replace Emails by GitHub Logins
 #
@@ -194,25 +185,22 @@ update_usernames = ->
           success: (data) ->
             update_table usernames[email] = JSON.parse(data).user.login
 
-# ### Coda
+# ## Page Load
 
-if typeof window isnt "undefined"
+$.cookie('size', ($.cookie('size') or 'size'))
+$.cookie('message', ($.cookie('message') or 'message'))
 
-  # Show each commit's date in relative format.
-  $("#recent_commits span[val]").forEach (span) ->
-    $(span).html ", " + moment(new Date(1 * $(span).attr("val"))).fromNow()
+# On page load, do:
+#
+#   + Switch `size` or `sloc` according to cookie `size`.
+#   + Switch `message` or `description` according to cookie `message`.
+$ ->
+  $('.repo_nav tr > :nth-child(3)').attr('class', $.cookie('size'))
+  $('.repo_nav tr > :nth-child(5)').attr('class', $.cookie('message'))
 
-  # On page load, do:
-  #
-  #   + Show `size` or `sloc` according to cookie `size`.
-  #   + Show `message` or `description` according to cookie `message`.
-  $ ->
+# Calculate relative date.
+$('[relative_date]').forEach (el) ->
+  $(el).html moment(new Date 1 * $(el).attr('relative_date')).fromNow()
 
-    if $.cookie('size') is 'sloc'
-      $('.repo_nav th:nth-child(3) span:nth-child(1)').trigger 'click'
-
-    if $.cookie('message') is 'description'
-      $('.repo_nav th:nth-child(5) span:nth-child(2)').trigger 'click'
-
-  # Regist repo browser's events.
-  new TreeBrowser
+# Regist repo browser's events.
+post_render $('.repo_nav'), []

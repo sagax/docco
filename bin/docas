@@ -121,7 +121,7 @@ if [ $mode == "production" ] && [ -d "$sources_git" ] && [ "$(git --git-dir $sou
 else
 
   echo -n "Cloning from GitHub...                "
-  rm -rf "$storage_dir"
+  rm -rf "$sources_dir"
   if [ $mode == "production" ]; then
     git clone --quiet "git@github.com:$repo.git" "$sources_dir"
   else

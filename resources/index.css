@@ -218,30 +218,6 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 	background: -webkit-linear-gradient(#FAFAFA,#EAEAEA);
 }
 
-/*#filelists table thead td:first-child{
-	padding-right: 0;
-}
-
-#filelists table thead td:first-child+td{
-	width: 95px;
-}
-
-#filelists table thead td:first-child+td+td{
-	width: 40px;
-}
-
-#filelists table thead td:first-child+td+td+td{
-	width: 65px;
-}
-
-#filelists table thead td:first-child+td+td+td+td{
-	width: 100px;
-}
-
-
-#filelists table thead td:first-child+td+td+td+td+td{
-	width: 120px;
-}*/
 #filelists table tbody td{
 	border-bottom: 1px solid #CACACA;
 	background-color:#F8F8F8;
@@ -249,14 +225,7 @@ body .il { color: #666666 }                     /* Literal.Number.Integer.Long *
 	white-space:nowrap;
 }
 
-/*#filelists > table tbody td:last-child{
-	white-space:pre;
-}*/
-
 #filelists table td.icon{
-/*width: 18px;
-height: 16px;
-background:url(https://a248.e.akamai.net/assets.github.com/images/icons/dir.png) no-repeat 0 50% #F8F8F8;*/
 }
 
 
@@ -505,7 +474,7 @@ body{
 }
 
 /*readme*/
-.readme pre{
+.markdown_browser pre{
   margin:15px 0 15px;
     background-color: #F8F8F8;
     border: 1px solid #E8E8E8;
@@ -517,7 +486,7 @@ body{
     overflow: auto;
     padding: 6px 10px;
 }
-.readme pre code{
+.markdown_browser pre code{
 	white-space:pre;
 	margin:0;
 	padding:0;
@@ -533,16 +502,16 @@ body{
 	/*margin-top:140px;*/
 }
 /*代码统计*/
-.code_stats { border-collapse:collapse; font:13px/1.4 Helvetica,arial,freesans,clean,sans-serif; margin-bottom:20px;}
-.code_stats span{ display:inline-block;}
-.code_stats tr td:nth-child(1){text-align:right;color:#666; padding-right:6px;}
-.code_stats tr td:nth-child(2){text-align:right;color:#333;}
-.code_stats tr td:nth-child(3){ padding-left:5px; padding-right:4px;}
-.code_stats tr td:nth-child(3) span{width:8px;height:10px;}
-.code_stats tr td:nth-child(4){ width:200px;}
-.code_stats tr td:nth-child(4) div{ position:relative; width:100%; display:inline-block;}
-.code_stats tr td:nth-child(4) span:nth-child(1){ height:10px; min-width:3px; border-radius: 0px 2px 2px 0px;}
-.code_stats tr td:nth-child(4) span:nth-child(2){ position:absolute; top:0px; text-indent:4px; text-align:left; color:#666; width:60px; white-space:nowrap;}
+#code_stats { border-collapse:collapse; font:13px/1.4 Helvetica,arial,freesans,clean,sans-serif; margin-bottom:20px;}
+#code_stats span{ display:inline-block;}
+#code_stats tr td:nth-child(1){text-align:right;color:#666; padding-right:6px;}
+#code_stats tr td:nth-child(2){text-align:right;color:#333;}
+#code_stats tr td:nth-child(3){ padding-left:5px; padding-right:4px;}
+#code_stats tr td:nth-child(3) span{width:8px;height:10px;}
+#code_stats tr td:nth-child(4){ width:200px;}
+#code_stats tr td:nth-child(4) div{ position:relative; width:100%; display:inline-block;}
+#code_stats tr td:nth-child(4) span:nth-child(1){ height:10px; min-width:3px; border-radius: 0px 2px 2px 0px;}
+#code_stats tr td:nth-child(4) span:nth-child(2){ position:absolute; top:0px; text-indent:4px; text-align:left; color:#666; width:60px; white-space:nowrap;}
 
 
 .content>ol{
@@ -666,7 +635,7 @@ body{
 	padding: 7px 3px;
 	vertical-align: middle;
 }
-.filelist table thead span{ 
+.filelist table thead span,.filelist table thead span{ 
   background : none; 
   border-radius:2px;
   -moz-transition: all 0.3s linear 0s; 
@@ -675,8 +644,17 @@ body{
   transition: all 0.3s linear 0s;  
   cursor:pointer
 }
-.filelist table thead span.selected{ background : #ccc !important;}
-.filelist table thead span:hover{ background : #ddd!important;}
+.filelist table thead span.selected,
+.filelist table thead .size span:last-child,
+.filelist table thead .sloc span:first-child,
+.filelist table thead .message span:first-child,
+.filelist table thead .description span:nth-child(2) { 
+  background : #ccc !important;
+}
+.filelist table thead span:hover
+{ 
+	background : #ddd!important;
+}
 .filelist .d .icon:after{
   font-size:16px;
   font-family:'Octicons Regular';
@@ -709,7 +687,7 @@ body{
 	text-decoration:underline;
 }
 .filelist table tbody tr td:nth-child(1){
-	width:27px;
+	width:25px;
   padding:7px 4px 7px 0px;
 }
 .filelist table tbody tr td:nth-child(2){
@@ -737,9 +715,9 @@ body{
   min-width:250px;
     overflow: hidden;
     text-overflow: ellipsis;
-	position:relative;
+	/*position:relative;*/
 }
-.filelist table tbody tr td:nth-child(5) div:first-child{ position:relative}
+.filelist table tbody tr td:nth-child(5) div:first-child{ /*position:relative*/}
 .filelist table tbody tr td:nth-child(5):hover .file_browser_author{display:inline-block}
 /*.filelist table tbody tr td:nth-child(6){
 	padding:7px 3px;
@@ -831,7 +809,7 @@ pre code{
 /*code自动适应其所在地方的字体大小*/
 code{ font-size:89%;}
 /*调整列表的margin，不影响其原有的margin*/
-.readme ol,.readme ul{
+.markdown_browser ol,.markdown_browser ul{
   margin : 15px 0px
 }
 
@@ -839,12 +817,12 @@ code{ font-size:89%;}
 p,code{word-wrap: break-word;}
 
 /*ol ul中对中文缩进的修复*/
-.readme ol, .readme ul {
+.markdown_browser ol, .markdown_browser ul {
     margin: 15px 0 15px -9px;
 }
 
 /*修复IE下readme不设置最大宽度时被撑开的BUG*/
-.readme{
+.markdown_browser{
   width:450px\9;
 	width:450px\0;
 }
@@ -861,4 +839,73 @@ p,code{word-wrap: break-word;}
 font-family: Helvetica,arial,freesans,clean,sans-serif;
 font-weight: 300;
 color: #333;
+}
+.filelist a {
+	-webkit-transition: background-color 0.1s linear,color 0.1s linear;
+	-moz-transition: background-color 0.1s linear,color 0.1s linear;
+	transition: background-color 0.1s linear,color 0.1s linear;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	padding: 3px 5px;
+}
+.filelist a:active {
+	background-color: #4183C4;
+	color: #183551;
+}
+.filelist .shown a {
+	background-color: #4183C4;
+	color: #fff;
+	text-shadow:  0 1px 0 #183551;
+}
+.filelist a:hover{
+	text-decoration: none !important;
+}
+.filelist a[href]:hover{
+	text-decoration: underline !important;
+}
+.filelist td:nth-child(3) {
+	position: relative;
+}
+.filelist td:nth-child(3) span{
+	position: absolute;
+	right: 20px;
+	-webkit-transition: opacity 1s ease-in-out 0s;
+	-moz-transition: opacity 1s ease-in-out 0s;
+	transition: opacity 1s ease-in-out 0s;
+}
+.filelist td:nth-child(3).sloc span:last-child {
+	 opacity: 0;
+}
+.filelist td:nth-child(3).sloc span:first-child {
+	 opacity: 1;
+}
+.filelist td:nth-child(3).size span:first-child {
+	 opacity: 0;
+}
+.filelist td:nth-child(3).size span:last-child {
+	 opacity: 1;
+}
+.filelist td:last-child{
+position:relative;
+}
+.filelist td:last-child div{
+	position: absolute;
+	left: 0;
+	width: 100%;
+	-webkit-transition: opacity 1s ease-in-out 0s;
+	-moz-transition: opacity 1s ease-in-out 0s;
+	transition: opacity 1s ease-in-out 0s;
+}
+.filelist td:last-child.message div:last-child {
+	 opacity: 0;
+}
+.filelist td:last-child.message div:first-child-child {
+	 opacity: 1;
+}
+.filelist td:last-child.description div:first-child {
+	 opacity: 0;
+}
+.filelist td:last-child.description div:last-child {
+	 opacity: 1;
 }

@@ -56,7 +56,8 @@ fs = require 'fs'
 http = require 'http'
 querystring = require 'querystring'
 config = {}
-config = require('./config_parser').parse ".docas/conf"
+try
+  config = require('./config_parser').parse ".docas/conf"
 
 #### Main Documentation Generation Functions
 
@@ -71,7 +72,7 @@ generate_documentation = (source, callback) ->
     {description, sections} = parse source, code
     highlight source, sections, ->
       if /[^_]_$/.exec path.extname source
-        if sections.length > 0
+        if sections.length > 0 and sections[0].code_text[0..1] is '#!'
           code_html = sections[0].code_text.split(' ') \
             .map((x) -> "<span>#{x}</span>").join(' ')
           sections[0].code_html = "<div class=\"highlight shebang\"><pre>#{code_html}</pre></div>"

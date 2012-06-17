@@ -115,7 +115,7 @@ directories.each do |directory|
         email = log.author.email.gsub '|', '||'
         date = log.date.strftime '%s'
         description = ''
-        message = log.message.gsub '|', '||'
+        message = log.message.gsub('|', '||').gsub("\n", ' ')
 
         # Folder specific fields.
         if type == 'd'
@@ -137,7 +137,6 @@ directories.each do |directory|
 
           size = humanize_number size
           document = "#{options[:working]}/ghpages/#{directory}/#{get_document_name name}"
-          puts document
           if (type == 'f') && (File.exists? document)
             sloc = 0
             file.each_line { |line| sloc += 1 unless /\S/ !~ line.encode!('UTF-8', 'UTF-8', :invalid => :replace) }
@@ -154,16 +153,15 @@ directories.each do |directory|
               source.readline
               description_line = source.readline 
             end
-            puts description_line
             if source.eof? or source.readline.strip.size <= 1
-              description = description_line.match(/\S{1,3}\s{4}(.*)/)[1]
+              description = description_line.match(/^\S{1,3}\s{4}(.*)/)[1]
             end
           rescue
           end
 
         end
 
-        f.puts [
+        f << [
           type,
           name,
           action,
@@ -174,7 +172,7 @@ directories.each do |directory|
           date,
           description,
           message
-        ].join ' | '
+        ].join(' | ') + "\n"
 
       }
     end

@@ -125,7 +125,8 @@ source_dir = process.ARGV[0]
 target_dir = process.ARGV[1]
 [user, repo] = process.ARGV[2].split '/'
 config = {}
-config = require('./config_parser').parse "#{source_dir}/.docas/conf"
+try
+  config = require('./config_parser').parse "#{source_dir}/.docas/conf"
 console.log config
 target_file = target_dir + '/' + (config.project_page or 'index.html')
 ensure_directory path.dirname(target_file), ->

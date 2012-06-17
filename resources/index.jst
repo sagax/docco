@@ -22,19 +22,19 @@
 </tr>
 <tr>
 <td>
-<div class="readme"><%= readme %></div>
+<div class="markdown_browser"><%= readme %></div>
 </td>
 <td>
 <!--content-->
 <div class="content">
 <h2 id="language_statistics_heading">Language Statistics</h2>
-<table class="code_stats">
+<table id="code_stats">
 <% language_statistics.forEach(function(entry) { %>
 <tr>
 <td><%= entry.percent %></td>
 <td><%= entry.language %></td>
 <td><span data-lang="<%= entry.language %>"></span></td>
-<td style="width:400px;"><div><span data-lang="<%= entry.language %>" percent="<%= entry.percent %>" style="width:0%;"></span><span><%= entry.sloc %> sloc</span></div></td>
+<td style="width:400px;"><div><span data-lang="<%= entry.language %>" percent="<%= entry.percent %>" style="width:0%;"></span><span total="<%= entry.sloc %>"></span></div></td>
 </tr>
 <tr>
 <% }); %>
@@ -43,7 +43,7 @@
 <ol id="recent_commits">
 <% for (var i = 0, l = recent_commits.length; i < l; i++) { %>
 <% var entry = recent_commits[i]; %>
-<li><%= entry.subject %>, <%= entry.author %><span val="<%= entry.date %>"></span></li>
+<li><%= entry.subject %>, <%= entry.author %>, <span relative_date="<%= entry.date %>"></span></li>
 <% } %>
 </ol>
 <div id="filebrowser">
@@ -56,8 +56,7 @@
 </tbody>
 </table>
 </div>
-<script>docas={user:"<%= user %>",repo:"<%= repo %>"}</script>
-<script>document.write('<script src=' + ('__proto__' in {} ? 'http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js':'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js') + '><\/script>')</script>
+<script>docas={user:"<%= user %>",repo:"<%= repo %>"};document.write('<script src=' + ('__proto__' in {} ? 'http://cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js':'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js') + '><\/script>')</script>
 <script src="javascript/index.min.js"></script>
 </body>
 </html>
