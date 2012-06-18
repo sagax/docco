@@ -162,17 +162,17 @@ directories.each do |directory|
         end
 
         f << [
-          type,
-          name,
-          action,
-          size,
+          type.force_encoding("utf-8"),
+          name.force_encoding("utf-8"),
+          action.force_encoding("utf-8"),
+          size.force_encoding("utf-8"),
           sloc,
-          author,
-          email,
+          author.force_encoding("utf-8"),
+          email.force_encoding("utf-8"),
           date,
-          description,
-          message
-        ].join(' | '.to_s.force_encoding("UTF-8")) + "\n"
+          description.force_encoding("utf-8"),
+          message.force_encoding("utf-8")
+        ].join(' | ') + "\n"
 
       }
     end
