@@ -154,7 +154,7 @@ directories.each do |directory|
               description_line = source.readline 
             end
             if source.eof? or source.readline.strip.size <= 1
-              description = description_line.match(/^\S{1,3}\s{4}(.*)/)[1]
+              description = description_line.match(/^\S{0,3}\s{4}(.+)/)[1]
             end
           rescue
           end

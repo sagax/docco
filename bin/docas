@@ -95,7 +95,8 @@ fi
 
 storage_dir="$(echo $HOME)/docas-repos" && mkdir -p "$storage_dir" # && cd "$storage_dir" && storage_dir=$(pwd -P)
 sources_dir="$storage_dir/$repo"
-working_dir="$(mktemp -d /tmp/repo.$$.XXXXXXXXXX)" # && trap "rm -rf "$working_dir"; exit;" 0 SIGINT SIGTERM
+mkdir -p "$(echo $HOME)/docas-tmp"
+working_dir="$(mktemp -d $(echo $HOME)/docas-tmp/repo.$$.XXXXXXXXXX)" # && trap "rm -rf "$working_dir"; exit;" 0 SIGINT SIGTERM
 ghpages_dir="$working_dir/ghpages"
 
 # ### Step 1: Fetch (or Clone) from GitHub

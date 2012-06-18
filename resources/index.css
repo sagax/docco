@@ -841,22 +841,24 @@ font-weight: 300;
 color: #333;
 }
 .filelist a {
-	-webkit-transition: background-color 0.1s linear,color 0.1s linear;
-	-moz-transition: background-color 0.1s linear,color 0.1s linear;
-	transition: background-color 0.1s linear,color 0.1s linear;
+	-webkit-transition: background-color 0.1s linear,color 0.2s linear;
+	-moz-transition: background-color 0.1s linear,color 0.2s linear;
+	transition: background-color 0.1s linear,color 0.2s linear;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
 	padding: 3px 5px;
 }
-.filelist a:active {
-	background-color: #4183C4;
-	color: #183551;
-}
-.filelist .shown a {
-	background-color: #4183C4;
+.filelist .markdown a:hover {
+	background-color: #7eaad6;
 	color: #fff;
-	text-shadow:  0 1px 0 #183551;
+	text-shadow:0 1px 0 #183551
+}
+
+.filelist .shown a,.filelist .shown a:hover {
+	background-color:#4183C4;
+	color:#fff;
+	text-shadow:0 1px 0 #183551
 }
 .filelist a:hover{
 	text-decoration: none !important;
@@ -893,9 +895,9 @@ position:relative;
 	position: absolute;
 	left: 0;
 	width: 100%;
-	-webkit-transition: opacity 1s ease-in-out 0s;
-	-moz-transition: opacity 1s ease-in-out 0s;
-	transition: opacity 1s ease-in-out 0s;
+	-webkit-transition: opacity 0.3s ease-in-out 0s;
+	-moz-transition: opacity 0.3s ease-in-out 0s;
+	transition: opacity 0.3s ease-in-out 0s;
 }
 .filelist td:last-child.message div:last-child {
 	 opacity: 0;
