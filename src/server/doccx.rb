@@ -172,7 +172,7 @@ directories.each do |directory|
           date,
           description,
           message
-        ].join(' | ') + "\n"
+        ].join(' | '.to_s.force_encoding("UTF-8")) + "\n"
 
       }
     end
