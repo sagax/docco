@@ -855,7 +855,7 @@ color: #333;
 	text-shadow:0 1px 0 #183551
 }
 
-.filelist .shown a,.filelist .shown a:hover {
+.filelist .shown a[markdown="README.html"],.filelist .shown a[markdown="README.html"]:hover {
 	background-color:#4183C4;
 	color:#fff;
 	text-shadow:0 1px 0 #183551
@@ -878,12 +878,14 @@ color: #333;
 }
 .filelist td:nth-child(3).sloc span:last-child {
 	 opacity: 0;
+	 display:none;
 }
 .filelist td:nth-child(3).sloc span:first-child {
 	 opacity: 1;
 }
 .filelist td:nth-child(3).size span:first-child {
 	 opacity: 0;
+	 display:none;
 }
 .filelist td:nth-child(3).size span:last-child {
 	 opacity: 1;
@@ -901,13 +903,21 @@ position:relative;
 }
 .filelist td:last-child.message div:last-child {
 	 opacity: 0;
+	 display:none;
 }
 .filelist td:last-child.message div:first-child-child {
 	 opacity: 1;
 }
 .filelist td:last-child.description div:first-child {
 	 opacity: 0;
+	 display:none;
 }
 .filelist td:last-child.description div:last-child {
 	 opacity: 1;
 }
+
+
+.size,.sloc{ position:static !important;}
+.message,.description{ position:static !important;}
+.message>div,.description>div{ position:relative !important; text-overflow: ellipsis;max-width:350px; overflow-x: hidden;}
+
