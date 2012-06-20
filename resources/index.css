@@ -872,20 +872,26 @@ color: #333;
 .filelist td:nth-child(3) span{
 	/*position: absolute;
 	right: 20px;*/
-	-webkit-transition: opacity 1s ease-in-out 0s;
-	-moz-transition: opacity 1s ease-in-out 0s;
-	transition: opacity 1s ease-in-out 0s;
+	-webkit-transition: opacity 0.4s ease-in-out 0s;
+	-moz-transition: opacity 0.4s ease-in-out 0s;
+	transition: opacity 0.4s ease-in-out 0s;
 }
 .filelist td:nth-child(3).sloc span:last-child {
 	 opacity: 0;
-	 display:none;
+	 /*display:none;*/
+	 overflow: hidden;
+     position: absolute;
+     width: 0;
 }
 .filelist td:nth-child(3).sloc span:first-child {
 	 opacity: 1;
 }
 .filelist td:nth-child(3).size span:first-child {
 	 opacity: 0;
-	 display:none;
+	 /*display:none;*/
+	 overflow: hidden;
+     position: absolute;
+     width: 0;
 }
 .filelist td:nth-child(3).size span:last-child {
 	 opacity: 1;
@@ -903,14 +909,20 @@ position:relative;
 }
 .filelist td:last-child.message div:last-child {
 	 opacity: 0;
-	 display:none;
+	 /*display:none;*/
+	 overflow: hidden;
+     position: absolute;
+     width: 0;
 }
 .filelist td:last-child.message div:first-child-child {
 	 opacity: 1;
 }
 .filelist td:last-child.description div:first-child {
 	 opacity: 0;
-	 display:none;
+	 /*display:none;*/
+	 overflow: hidden;
+     position: absolute;
+     width: 0;
 }
 .filelist td:last-child.description div:last-child {
 	 opacity: 1;
@@ -924,4 +936,6 @@ position:relative;
 #filelists table tr td:nth-child(3){min-width:80px; max-width:80px; white-space:nowrap;}
 #filelists table tr td:nth-child(4){min-width:80px; max-width:80px; white-space:nowrap;}
 #filelists table tr td:nth-child(5){min-width:360px; max-width:500px; white-space:nowrap;}
+
+
 
