@@ -731,7 +731,7 @@ body{
 .filelist table tbody tr td:nth-child(5) div:first-child span:first-child {
      display: inline-block;
      float: left;
-     max-width: 370px;
+     max-width: 350px;
      overflow-x: hidden;
      text-overflow: ellipsis;
 }
@@ -855,7 +855,7 @@ color: #333;
 	text-shadow:0 1px 0 #183551
 }
 
-.filelist .shown a[markdown="README.html"],.filelist .shown a[markdown="README.html"]:hover {
+.filelist .shown a[markdown],.filelist .shown a[markdown]:hover {
 	background-color:#4183C4;
 	color:#fff;
 	text-shadow:0 1px 0 #183551
@@ -867,11 +867,11 @@ color: #333;
 	text-decoration: underline !important;
 }
 .filelist td:nth-child(3) {
-	position: relative;
+	/*position: relative;*/
 }
 .filelist td:nth-child(3) span{
-	position: absolute;
-	right: 20px;
+	/*position: absolute;
+	right: 20px;*/
 	-webkit-transition: opacity 1s ease-in-out 0s;
 	-moz-transition: opacity 1s ease-in-out 0s;
 	transition: opacity 1s ease-in-out 0s;
@@ -919,5 +919,9 @@ position:relative;
 
 .size,.sloc{ position:static !important;}
 .message,.description{ position:static !important;}
-.message>div,.description>div{ position:relative !important; text-overflow: ellipsis;max-width:350px; overflow-x: hidden;}
+.message>div,.description>div{ position:relative !important; max-width: 350px; overflow-x: hidden; text-overflow: ellipsis;}
+#filelists table tr td:nth-child(2){min-width:150px; max-width:150px; white-space:nowrap;}
+#filelists table tr td:nth-child(3){min-width:80px; max-width:80px; white-space:nowrap;}
+#filelists table tr td:nth-child(4){min-width:80px; max-width:80px; white-space:nowrap;}
+#filelists table tr td:nth-child(5){min-width:360px; max-width:500px; white-space:nowrap;}
 
