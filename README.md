@@ -1,5 +1,7 @@
-Docas automatically documents your repo on GitHub pages. Every time you push
-to GitHub, docas keeps the `master` and `gh-pages` branch in sync.
+Docas.io automatically documents your GitHub repo on GitHub pages.
+
+Every time you push new commits to GitHub, docas keeps the `master` branch
+(the source codes) and `gh-pages` branch (the documentation) in sync.
 
 ## Alpha Release
 
@@ -9,7 +11,7 @@ to GitHub, docas keeps the `master` and `gh-pages` branch in sync.
 That's done. Test it with any push. The initial build may takes longer than
 following pushes.
 
-Feature request and feedbacks are appreciated.
+Both feature requests and bug reports are hearted!
 
 ## How docas.io Works
 
