@@ -1,4 +1,4 @@
-#    Client script designed specifically for index.html
+#    Browser-side script used by index.html
 
 # ## Widget A: Languages Stats
 #
@@ -202,5 +202,5 @@ $ ->
 $('[relative_date]').forEach (el) ->
   $(el).html moment(new Date 1 * $(el).attr('relative_date')).fromNow()
 
-# Regist repo browser's events.
+# Regist the initial repo browser's events.
 post_render $('.repo_nav'), []
