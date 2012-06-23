@@ -35,7 +35,7 @@ with source automatically. So the documents will be always up-to-date.
 * Classic Method
 
   1. Add `docas` as your collaborator.
-  2. Add the service hook at `http://docas.io` from the [admin panel] of your repo.
+  2. Add the service hook at `htto://alpha.docas.io` from the [admin panel] of your repo.
   3. You are done.
 
 [admin panel]: https://help.github.com/articles/post-receive-hooks
