@@ -903,6 +903,7 @@ position:relative;
 	position: absolute;
 	left: 0;
 	width: 100%;
+	overflow-y: hidden;
 	-webkit-transition: opacity 0.3s ease-in-out 0s;
 	-moz-transition: opacity 0.3s ease-in-out 0s;
 	transition: opacity 0.3s ease-in-out 0s;
