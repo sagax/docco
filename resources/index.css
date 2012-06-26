@@ -896,9 +896,6 @@ color: #333;
 .filelist td:nth-child(3).size span:last-child {
 	 opacity: 1;
 }
-.filelist td:last-child{
-position:relative;
-}
 .filelist td:last-child div{
 	position: absolute;
 	left: 0;
