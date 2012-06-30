@@ -199,7 +199,7 @@ $ ->
   $('.repo_nav tr > :nth-child(5)').attr('class', $.cookie('message'))
 
 # Calculate relative date.
-$('[relative_date]').forEach (el) ->
+$.each $('[relative_date]'), (el) ->
   $(el).html moment(new Date 1 * $(el).attr('relative_date')).fromNow()
 
 # Regist the initial repo browser's events.
