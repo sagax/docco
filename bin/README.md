@@ -1,6 +1,11 @@
-    Guess what's in this file?
+    Hold 3 executable scripts: docas, docci, and docco
 
-## What's This Folder For?
+## Executables
 
-Introduce each folder by authoring a `README.md` in each folder. Docas
-will render the markdown into html like this.
+Besides the `docco` executable, `docas` introduces another 2 executables:
+
+  1. `docas`: Main shell scripts to accomplish the task of documenting a GitHub
+  repo.
+
+  2. `docci`: Node.js shebang script for generating a project cover page using
+  `src/server/docci.coffee`.
