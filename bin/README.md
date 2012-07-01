@@ -1,8 +1,9 @@
-    Hold 3 executable scripts: docas, docci, and docco
+    Include 3 executable scripts: docas, docci, and docco.
 
 ## Executables
 
-Besides the `docco` executable, `docas` introduces another 2 executables:
+Besides the `docco` executable, `docas` introduces another 2 executables in the
+`bin` folder:
 
   1. `docas`: Main shell scripts to accomplish the task of documenting a GitHub
   repo.
