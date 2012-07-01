@@ -23,7 +23,7 @@ index_entry_segments = [
   "message"
 ]
 
-process_index = (index) ->
+process_index = (index, index_path, repo) ->
   lines = index.split '\n'
   lines.pop()
   entries = []
@@ -47,6 +47,11 @@ process_index = (index) ->
     entry.modified = if typeof moment is 'undefined' then entry.date * 1 else moment(new Date entry.date * 1000).fromNow()
     if entry.type is 'f' and entry.name[entry.name.length-3...entry.name.length] is '.md'
       entry.is_markdown = on
+    if entry.name is 'README.md'
+      if index_path.length
+        entry.description = 'README.md for directory ' + index_path[index_path.length - 1] 
+      else
+        entry.description = 'README.md for project ' + repo
     entries.push entry
   entries.sort (a, b) ->
     is_file = (type) -> if type is 'f' then 1 else 0

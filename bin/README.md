@@ -1,6 +1,6 @@
     Include 3 executable scripts: docas, docci, and docco.
 
-## Executables
+## Executable Scripts
 
 Besides the `docco` executable, `docas` introduces another 2 executables in the
 `bin` folder:

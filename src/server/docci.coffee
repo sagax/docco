@@ -47,8 +47,7 @@ generate_index = ->
           index_path : []
           size       : 'size'
           message    : 'message'
-          entries    : process_index repo_index
-      console.log process_index repo_index
+          entries    : process_index(repo_index, [], repo)
       fs.writeFileSync target_file, index_html
 
 # ## Get GitHub Repo Data

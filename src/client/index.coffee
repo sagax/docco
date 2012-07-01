@@ -146,7 +146,7 @@ render_tree_browser = (index_path) ->
         user       : user
         repo       : repo
         index_path : index_path
-        entries    : process_index index
+        entries    : process_index(index, index_path, repo)
         size       : $.cookie 'size'
         message    : $.cookie 'message'
 
