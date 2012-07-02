@@ -196,7 +196,8 @@ generate_html = (source, css, sections, description, depth) ->
   title = title_segments[title_segments.length - 1]
   dest  = destination source
   depth = source.split('/').length - 1
-  if depth then root_dir = [0..depth-1].map(-> '..').join('/') + '/' else prefix = ''
+  if depth then root_dir = [0..depth-1].map(-> '..').join('/') + '/' else root_dir = ''
+
   javascripts = []
   for pattern, javascript of config.page_javascripts
     if match = real_source.match new RegExp "^#{pattern.replace('*', '(.*)')}$"
@@ -207,10 +208,11 @@ generate_html = (source, css, sections, description, depth) ->
   for pattern, stylesheet of config.page_stylesheets
     if match = real_source.match new RegExp "^#{pattern.replace('*', '(.*)')}$"
       stylesheet = stylesheet.replace('[1]', (match[1] or '')).replace('[2]', (match[2] or '')).replace('[3]', (match[3] or ''))
-      stylesheets.push stylesheet
+      stylesheets.push root_dir + 'docas/' + stylesheet
 
   html  = docco_template {
     head_title: head_title
+    root: root_dir + (config.project_page or 'index.html')
     title: title
     sections: sections
     css: css
