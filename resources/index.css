@@ -937,7 +937,3 @@ color: #333;
 #filelists table tr td:nth-child(5){min-width:360px; max-width:360px; white-space:nowrap;}
 
 .markdown_browser > pre:first-child {display: none; }
-#container>table>tbody>tr:first-child>td:first-child>pre{ display:none;}
-
-
-

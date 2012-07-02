@@ -252,3 +252,5 @@ body .shebang pre > span:last-child { opacity: 1 }
     margin:0;
     padding:0;
 }
+
+#container>table>tbody>tr:first-child>td:first-child>pre{ display:none;}
