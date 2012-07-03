@@ -254,3 +254,30 @@ body .shebang pre > span:last-child { opacity: 1 }
 }
 
 #container>table>tbody>tr:first-child>td:first-child>pre{ display:none;}
+
+/*·µ»ØÊ×Ò³*/
+#home:before {
+    background-image: url("http://twitter.github.com/bootstrap/assets/img/glyphicons-halflings.png");
+    background-position: 0 -24px;
+    content: "BACK";
+    display: inline-block;
+    font-family: arial;
+    font-size: 12px;
+    height: 14px;
+    left: -46px;
+    line-height: 15px;
+    opacity: 0.35;
+    position: absolute;
+    text-indent: 16px;
+    top: 10px;
+    white-space: nowrap;
+    width: 14px;
+    visibility: hidden;
+}
+
+#home {
+    position: relative;
+}
+.docs:hover #home {
+     visibility: visible;
+}
