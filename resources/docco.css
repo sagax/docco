@@ -254,6 +254,7 @@ body .shebang pre > span:last-child { opacity: 1 }
 }
 
 #container>table>tbody>tr:first-child>td:first-child>pre{ display:none;}
+#container>table>tbody>tr:first-child>td:first-child>*+pre{ display:block;}
 
 /*·µ»ØÊ×Ò³*/
 #home:before {
