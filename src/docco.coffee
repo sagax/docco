@@ -209,7 +209,7 @@ getLanguage = (source) -> languages[path.extname(source)]
 
 # Ensure that the destination directory exists.
 ensureDirectory = (dir, callback) ->
-  exec "mkdir -p #{dir}", -> callback()
+  fs.mkdir dir, -> callback()
 
 # Micro-templating, originally by John Resig, borrowed by way of
 # [Underscore.js](http://documentcloud.github.com/underscore/).
