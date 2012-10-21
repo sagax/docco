@@ -9,7 +9,7 @@
 #
 #     docco src/*.coffee
 #
-# ...will generate an HTML documentation page for each of the named source files, 
+# ...will generate an HTML documentation page for each of the named source files,
 # with a menu linking to the other pages, saving it into a `docs` folder.
 #
 # The [source for Docco](http://github.com/jashkenas/docco) is available on GitHub,
@@ -27,27 +27,27 @@
 #
 #### Partners in Crime:
 #
-# * If **Node.js** doesn't run on your platform, or you'd prefer a more 
-# convenient package, get [Ryan Tomayko](http://github.com/rtomayko)'s 
-# [Rocco](http://rtomayko.github.com/rocco/rocco.html), the Ruby port that's 
-# available as a gem. 
-# 
+# * If **Node.js** doesn't run on your platform, or you'd prefer a more
+# convenient package, get [Ryan Tomayko](http://github.com/rtomayko)'s
+# [Rocco](http://rtomayko.github.com/rocco/rocco.html), the Ruby port that's
+# available as a gem.
+#
 # * If you're writing shell scripts, try
 # [Shocco](http://rtomayko.github.com/shocco/), a port for the **POSIX shell**,
 # also by Mr. Tomayko.
-# 
-# * If Python's more your speed, take a look at 
-# [Nick Fitzgerald](http://github.com/fitzgen)'s [Pycco](http://fitzgen.github.com/pycco/). 
 #
-# * For **Clojure** fans, [Fogus](http://blog.fogus.me/)'s 
-# [Marginalia](http://fogus.me/fun/marginalia/) is a bit of a departure from 
+# * If Python's more your speed, take a look at
+# [Nick Fitzgerald](http://github.com/fitzgen)'s [Pycco](http://fitzgen.github.com/pycco/).
+#
+# * For **Clojure** fans, [Fogus](http://blog.fogus.me/)'s
+# [Marginalia](http://fogus.me/fun/marginalia/) is a bit of a departure from
 # "quick-and-dirty", but it'll get the job done.
 #
-# * **Lua** enthusiasts can get their fix with 
+# * **Lua** enthusiasts can get their fix with
 # [Robert Gieseke](https://github.com/rgieseke)'s [Locco](http://rgieseke.github.com/locco/).
-# 
+#
 # * And if you happen to be a **.NET**
-# aficionado, check out [Don Wilson](https://github.com/dontangg)'s 
+# aficionado, check out [Don Wilson](https://github.com/dontangg)'s
 # [Nocco](http://dontangg.github.com/nocco/).
 
 #### Main Documentation Generation Functions
@@ -115,17 +115,17 @@ pygmentsHighlight = (source, sections, callback) ->
     '-O', 'encoding=utf-8,tabsize=2'
   ]
   output   = ''
-  
+
   pygments.stderr.on 'data',  (error)  ->
     console.error error.toString() if error
-    
+
   pygments.stdin.on 'error',  (error)  ->
     console.error 'Could not use Pygments to highlight the source.'
     process.exit 1
-    
+
   pygments.stdout.on 'data', (result) ->
     output += result if result
-    
+
   pygments.on 'exit', ->
     output = output.replace(highlightStart, '').replace(highlightEnd, '')
     fragments = output.split language.dividerHtml
@@ -133,12 +133,12 @@ pygmentsHighlight = (source, sections, callback) ->
       section.codeHtml = highlightStart + fragments[i] + highlightEnd
       section.docsHtml = showdown.makeHtml section.docsText
     callback()
-    
+
   if pygments.stdin.writable
     text = (section.codeText for section in sections)
     pygments.stdin.write text.join language.dividerText
     pygments.stdin.end()
-    
+
 # Highlights a single chunk of code, using **Highlight.js**,
 # and runs the text of its corresponding comment through **Markdown**, using
 # [Showdown.js](http://attacklab.net/showdown/).
@@ -149,31 +149,31 @@ highlightJsHighlight = (source, sections, callback) ->
   hljs.LANGUAGES['coffee-script'] = hljs.LANGUAGES['coffeescript'] # Compatibility with highlightJS naming scheme
   language = getLanguage source
   output = ""
-  
+
   text = (hljs.highlight(language.name, section.codeText).value.trim() for section in sections)
-  
+
   output = output.replace(highlightStart, "").replace(highlightEnd, "")
   for section, i in sections
     section.codeHtml = highlightStart + text[i] + highlightEnd
     section.docsHtml = showdown.makeHtml(section.docsText)
   callback()
-  
+
 # Once all of the code is finished highlighting, we can generate the HTML file by
-# passing the completed sections into the template, and then writing the file to 
+# passing the completed sections into the template, and then writing the file to
 # the specified output path.
 generateHtml = (source, sections, config) ->
   destination = (filepath) ->
     if config.prettyname and path.dirname(filepath) isnt '.'
       path.join(config.output, path.dirname(filepath).replace(/\//g, '_') + '_' + path.basename(filepath, path.extname(filepath)) + '.html')
     else
-      path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html') 
+      path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html')
   title = path.basename source
   dest  = destination source
   html  = config.doccoTemplate {
-    title      : title, 
-    sections   : sections, 
-    sources    : config.sources, 
-    path       : path, 
+    title      : title,
+    sections   : sections,
+    sources    : config.sources,
+    path       : path,
     destination: destination
     css        : path.basename(config.css)
   }
@@ -229,7 +229,7 @@ ensureDirectory = (dir, callback) ->
 # Checks to see if the system has **Pygments** available so that we can
 # fall back on hightlightJS if we need to
 hasProgram = (program, callback) ->
-  exec "command -v " + program + " >/dev/null 2>&1 || { echo >&2 exit 1; }", (error, stdout, stderr) -> 
+  exec "command -v " + program + " >/dev/null 2>&1 || { echo >&2 exit 1; }", (error, stdout, stderr) ->
     callback(!stderr)
 
 # Micro-templating, originally by John Resig, borrowed by way of
@@ -260,14 +260,18 @@ version = JSON.parse(fs.readFileSync("#{__dirname}/../package.json")).version
 defaults =
   highlight  : "pygments"
   template   : "#{__dirname}/../resources/docco.jst"
+  itemplate  : "#{__dirname}/../resources/index.jst"
   css        : "#{__dirname}/../resources/docco.css"
   output     : "docs/"
+  index      : "index.html"
+  makeindex  : false
 
+generatedFiles = []
 
 # ### Run from Commandline
-  
-# Run Docco from a set of command line arguments.  
-#  
+
+# Run Docco from a set of command line arguments.
+#
 # 1. Parse command line using [Commander JS](https://github.com/visionmedia/commander.js).
 # 2. Document sources, or print the usage help if none are specified.
 run = (args=process.argv) ->
@@ -278,6 +282,8 @@ run = (args=process.argv) ->
     .option("-t, --template [file]","use a custom .jst template",defaults.template)
     .option("-h, --highlight [highlighter]","choose between \"pygments\" or \"highlightjs\"",defaults.highlight)
     .option("-p, --prettyname","use pretty-name")
+    .option("-m, --makeindex", "make index file",defaults.makeindex)
+    .option("-i, --indexfile", "index file name",defaults.index)
     .parse(args)
     .name = "docco"
   if commander.args.length
@@ -288,11 +294,11 @@ run = (args=process.argv) ->
 # ### Document Sources
 
 # Run Docco over a list of `sources` with the given `options`.
-#  
+#
 # 1. Construct config to use by taking `defaults` first, then  merging in `options`
 # 2. Generate the resolved source list, filtering out unknown types.
 # 3. Load the specified template and css files.
-# 4. Ensure the output path is created, write out the CSS file, 
+# 4. Ensure the output path is created, write out the CSS file,
 # document each source, and invoke the completion callback if it is specified.
 document = (sources, options = {}, callback = null) ->
   config = {}
@@ -302,18 +308,34 @@ document = (sources, options = {}, callback = null) ->
   resolved = []
   resolved = resolved.concat(resolveSource(src)) for src in sources
   config.sources = resolved.filter((source) -> getLanguage source).sort()
-  console.log "docco: skipped unknown type (#{m})" for m in resolved when m not in config.sources  
-  
+  console.log "docco: skipped unknown type (#{m})" for m in resolved when m not in config.sources
+
   config.doccoTemplate = template fs.readFileSync(config.template).toString()
+  config.indexTemplate = template fs.readFileSync(config.itemplate).toString()
   doccoStyles = fs.readFileSync(config.css).toString()
 
   ensureDirectory config.output, ->
     fs.writeFileSync path.join(config.output,path.basename(config.css)), doccoStyles
     files = config.sources.slice()
-    nextFile = -> 
+    nextFile = ->
       callback() if callback? and not files.length
       generateDocumentation files.shift(), config, nextFile if files.length
     nextFile()
+
+    destination = (filepath) ->
+      if config.prettyname and path.dirname(filepath) isnt '.'
+        path.join(config.output, path.dirname(filepath).replace(/\//g, '_') + '_' + path.basename(filepath, path.extname(filepath)) + '.html')
+      else
+        path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html')
+
+    html  = config.indexTemplate {
+      title      : "title",
+      sources    : config.sources,
+      path       : path,
+      destination: destination
+      css        : path.basename(config.css)
+    }
+    fs.writeFileSync(path.join(config.output,config.index),html)
 
 # ### Resolve Wildcard Source Inputs
 
