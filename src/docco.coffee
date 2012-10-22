@@ -327,8 +327,8 @@ document = (sources, options = {}, callback = null) ->
     if config.makeindex
       destinationFn = destination config
       html  = config.indexTemplate {
-        title      : "title",
-        sources    : config.sources.sort(),
+        title      : config.indextitle,
+        sources    : config.sources,
         path       : path,
         destination: destinationFn
         css        : path.basename(config.css)
