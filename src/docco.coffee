@@ -158,17 +158,18 @@ highlightJsHighlight = (source, sections, callback) ->
     section.docsHtml = showdown.makeHtml(section.docsText)
   callback()
 
-destination = (config, filepath) ->
-  if config.prettyname and path.dirname(filepath) isnt '.'
-    path.join(config.output, path.dirname(filepath).replace(/\//g, '_') + '_' + path.basename(filepath, path.extname(filepath)) + '.html')
-  else
-    path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html')
+destination = (config) ->
+  (filepath) =>
+    if config.prettyname and path.dirname(filepath) isnt '.'
+      path.join(config.output, path.dirname(filepath).replace(/\//g, '_') + '_' + path.basename(filepath, path.extname(filepath)) + '.html')
+    else
+      path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html')
 
 # Once all of the code is finished highlighting, we can generate the HTML file by
 # passing the completed sections into the template, and then writing the file to
 # the specified output path.
 generateHtml = (source, sections, config) ->
-  configuredDestination = destination.bind(this, config)
+  configuredDestination = destination config
   title = path.basename source
   dest  = configuredDestination source
   html  = config.doccoTemplate {
@@ -266,8 +267,7 @@ defaults =
   css        : "#{__dirname}/../resources/docco.css"
   output     : "docs/"
   index      : "index.html"
-
-generatedFiles = []
+  indextitle : "File index"
 
 # ### Run from Commandline
 
@@ -285,6 +285,7 @@ run = (args=process.argv) ->
     .option("-p, --prettyname","use pretty-name")
     .option("-m, --makeindex", "make index file")
     .option("-i, --indexfile", "index file name",defaults.index)
+    .option("-l, --indextitle", "title for the index",defaults.indextitle)
     .parse(args)
     .name = "docco"
   if commander.args.length
@@ -324,12 +325,12 @@ document = (sources, options = {}, callback = null) ->
     nextFile()
 
     if config.makeindex
-      destination = destination.bind(this, config)
+      destinationFn = destination config
       html  = config.indexTemplate {
         title      : "title",
-        sources    : config.sources,
+        sources    : config.sources.sort(),
         path       : path,
-        destination: destination
+        destination: destinationFn
         css        : path.basename(config.css)
       }
       fs.writeFileSync(path.join(config.output,config.index),html)
