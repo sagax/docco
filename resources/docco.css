@@ -328,3 +328,43 @@ pre .chunk {
 pre .tex .formula {
   opacity: 0.5;
 }
+
+.file-index {
+  margin: 20px;
+}
+
+.file-list {
+  list-style-type: none;
+  text-indent: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.file-list li {
+  background: #F5F5FF;
+  border-radius: 4px;
+  padding: 5px;
+  margin: 5px 10px 5px 0;
+  width: 400px;
+  float: left;
+}
+
+.file-list li:hover {
+  background: #efefef;
+}
+
+.file-list a {
+  text-decoration: none;
+}
+
+.file-list p {
+  margin: 0;
+}
+
+.source-file {
+  font-family: 'Arial';
+  font-weight: 100;
+  font-size: 150%;
+  font-variant: small-caps;
+}
