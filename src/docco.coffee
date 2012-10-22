@@ -284,8 +284,8 @@ run = (args=process.argv) ->
     .option("-h, --highlight [highlighter]","choose between \"pygments\" or \"highlightjs\"",defaults.highlight)
     .option("-p, --prettyname","use pretty-name")
     .option("-m, --makeindex", "make index file")
-    .option("-i, --indexfile", "index file name",defaults.index)
-    .option("-l, --indextitle", "title for the index",defaults.indextitle)
+    .option("-i, --indexfile [index]", "index file name",defaults.index)
+    .option("-l, --indextitle [indextitle]", "title for the index",defaults.indextitle)
     .parse(args)
     .name = "docco"
   if commander.args.length
