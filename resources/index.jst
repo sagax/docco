@@ -10,8 +10,11 @@
   <div id="container" class="file-index">
     <h1><%= title %></h1>
     <ul class="file-list">
+      <% var ss = sources.sort(function(a, b){if(path.basename(a) < path.basename(b)){ return -1; }
+                                              if(path.basename(b) < path.basename(a)){ return 1; }
+                                              return 0;}); %>
       <% for (var i=0, l=sources.length; i<l; i++) { %>
-      <% var source = sources[i]; %>
+      <% var source = ss[i]; %>
       <li>
         <a class="generated-file" href="<%= path.basename(destination(source)) %>">
           <p class="source-file"><%= path.basename(source) %></p>
