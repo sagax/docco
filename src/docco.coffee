@@ -158,23 +158,25 @@ highlightJsHighlight = (source, sections, callback) ->
     section.docsHtml = showdown.makeHtml(section.docsText)
   callback()
 
+destination = (config, filepath) ->
+  if config.prettyname and path.dirname(filepath) isnt '.'
+    path.join(config.output, path.dirname(filepath).replace(/\//g, '_') + '_' + path.basename(filepath, path.extname(filepath)) + '.html')
+  else
+    path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html')
+
 # Once all of the code is finished highlighting, we can generate the HTML file by
 # passing the completed sections into the template, and then writing the file to
 # the specified output path.
 generateHtml = (source, sections, config) ->
-  destination = (filepath) ->
-    if config.prettyname and path.dirname(filepath) isnt '.'
-      path.join(config.output, path.dirname(filepath).replace(/\//g, '_') + '_' + path.basename(filepath, path.extname(filepath)) + '.html')
-    else
-      path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html')
+  configuredDestination = destination.bind(this, config)
   title = path.basename source
-  dest  = destination source
+  dest  = configuredDestination source
   html  = config.doccoTemplate {
     title      : title,
     sections   : sections,
     sources    : config.sources,
     path       : path,
-    destination: destination
+    destination: configuredDestination
     css        : path.basename(config.css)
   }
   console.log "docco: #{source} -> #{dest}"
@@ -264,7 +266,6 @@ defaults =
   css        : "#{__dirname}/../resources/docco.css"
   output     : "docs/"
   index      : "index.html"
-  makeindex  : false
 
 generatedFiles = []
 
@@ -282,7 +283,7 @@ run = (args=process.argv) ->
     .option("-t, --template [file]","use a custom .jst template",defaults.template)
     .option("-h, --highlight [highlighter]","choose between \"pygments\" or \"highlightjs\"",defaults.highlight)
     .option("-p, --prettyname","use pretty-name")
-    .option("-m, --makeindex", "make index file",defaults.makeindex)
+    .option("-m, --makeindex", "make index file")
     .option("-i, --indexfile", "index file name",defaults.index)
     .parse(args)
     .name = "docco"
@@ -322,20 +323,16 @@ document = (sources, options = {}, callback = null) ->
       generateDocumentation files.shift(), config, nextFile if files.length
     nextFile()
 
-    destination = (filepath) ->
-      if config.prettyname and path.dirname(filepath) isnt '.'
-        path.join(config.output, path.dirname(filepath).replace(/\//g, '_') + '_' + path.basename(filepath, path.extname(filepath)) + '.html')
-      else
-        path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html')
-
-    html  = config.indexTemplate {
-      title      : "title",
-      sources    : config.sources,
-      path       : path,
-      destination: destination
-      css        : path.basename(config.css)
-    }
-    fs.writeFileSync(path.join(config.output,config.index),html)
+    if config.makeindex
+      destination = destination.bind(this, config)
+      html  = config.indexTemplate {
+        title      : "title",
+        sources    : config.sources,
+        path       : path,
+        destination: destination
+        css        : path.basename(config.css)
+      }
+      fs.writeFileSync(path.join(config.output,config.index),html)
 
 # ### Resolve Wildcard Source Inputs
 
