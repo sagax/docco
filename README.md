@@ -8,7 +8,7 @@
     \/___/      \/___/      \/____/     \/____/     \/___/ 
 
 </pre>
-[![Build Status](https://travis-ci.org/justindujardin/docco.png)](https://travis-ci.org/justindujardin/docco)
+[![Build Status](https://travis-ci.org/justindujardin/docco.png?branch=master)](https://travis-ci.org/justindujardin/docco)
 
 Docco is a quick-and-dirty, hundred-line-long, literate-programming-style
 documentation generator. For more information, see:
