@@ -93,7 +93,7 @@ runTests = (Docco) ->
       console.log "  #{error.stack}"
       console.log "  #{jsFilename}: line #{line ? 'unknown'}, column #{col ? 'unknown'}"
       console.log "  #{error.source}" if error.source
-    process.exit if failures.length > 0 then 0 else 1
+    process.exit if failures.length > 0 then 1 else 0
 
   # Run every test in the `test` folder, recording failures.
   files = fs.readdirSync 'test'
