@@ -103,4 +103,4 @@ test "url references", ->
       Docco.document [sourceFile], output: outPath, ->
         contents = fs.readFileSync(outFile).toString()
         count = contents.match ///<a\shref="http://www.google.com">Google</a>///g
-        eq count.length, 2, "find expected (2) resolved url references"
+        equal count.length, 2, "find expected (2) resolved url references"
