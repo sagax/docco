@@ -34,7 +34,7 @@ task 'doc', 'rebuild the Docco documentation', ->
 task 'test', 'run the Docco test suite', ->
   runTests()
     
-# Simple test runner, borrowed from [CoffeeScript](http://coffeescript.org/).
+# Simple test runner, adapted from [CoffeeScript](http://coffeescript.org/).
 runTests = () ->
   startTime     = Date.now()
   currentFile   = null
@@ -45,7 +45,7 @@ runTests = () ->
   failedAssert  = 0
   failures      = []
 
-  # The assert module API for NodeJS is stable and locked.  There
+  # Wrap each assert function in a try/catch block to report passed/failed assertions.
   wrapAssert = (func,name) ->
     return () -> 
       try
