@@ -114,12 +114,6 @@ highlight = (source, sections, callback) ->
   code = (section.codeText for section in sections).join language.codeSplitText
   docs = (section.docsText for section in sections).join language.docsSplitText
   
-  pygments.stderr.on 'data',  (error)  ->
-    console.error error.toString() if error
-   
-  pygments.stdin.on 'error',  (error)  ->
-    console.error 'Could not highlight code, using plaintext'
-    
   pygments.stdout.on 'data', (result) ->
     output += result if result
     
@@ -128,7 +122,7 @@ highlight = (source, sections, callback) ->
     if output is ''
       codeFragments = (htmlEscape section.codeText for section in sections)
     else
-      codeFragments = output.split language.codeSplitHtml
+    codeFragments = output.split language.codeSplitHtml
     docsFragments = showdown.makeHtml(docs).split language.docsSplitHtml
     
     for section, i in sections
@@ -339,12 +333,12 @@ resolveSource = (source) ->
 
 # Information about docco, and functions for programatic usage.
 exports[key] = value for key, value of {
-  run            : run
-  document       : document
-  parse          : parse
-  resolveSource  : resolveSource
-  version        : version
-  defaults       : defaults
-  languages      : languages
+  run           : run
+  document      : document
+  parse         : parse
+  resolveSource : resolveSource
+  version       : version
+  defaults      : defaults
+  languages     : languages
   ensureDirectory: ensureDirectory
 }
