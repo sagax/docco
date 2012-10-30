@@ -35,18 +35,19 @@ task 'doc', 'rebuild the Docco documentation', ->
 task 'test', 'run the Docco test suite', ->
   runTests()
     
-# Simple test runner, borrowed from [CoffeeScript](http://coffeescript.org/).
+# Simple test runner, adapted from [CoffeeScript](http://coffeescript.org/).
 runTests = () ->
-  startTime     = Date.now()
-  currentFile   = null
+  startTime   = Date.now()
+  currentFile = null
   currentTest   = null
   currentSource = null
-  passedTests   = 0
+  passedTests = 0
   passedAssert  = 0
   failedAssert  = 0
-  failures      = []
+  failures    = []
+  done          = false
 
-  # The assert module API for NodeJS is stable and locked.  There
+  # Wrap each assert function in a try/catch block to report passed/failed assertions.
   wrapAssert = (func,name) ->
     return () -> 
       try
@@ -78,10 +79,12 @@ runTests = () ->
       e.description = description if description?
       e.source      = fn.toString() if fn.toString?
       failures.push filename: currentFile, error: e 
-
+      
   # When all the tests have run, collect and print errors.
   # If a stacktrace is available, output the compiled function source.
   process.on 'exit', ->
+    return if done
+    done = true
     time = ((Date.now() - startTime) / 1000).toFixed(2)
     for fail in failures
       {error, filename}  = fail
@@ -100,7 +103,7 @@ runTests = () ->
     console.log "  #{passedTests} tests passed, #{failures.length} failed"
     console.log "  #{passedAssert} asserts passed, #{failedAssert} failed"
     console.log "--------------------------------------------------------"
-    return if failures.length > 0 then 1 else 0
+    process.exit if failures.length > 0 then 1 else 0
 
   # Run every test in the `test` folder, recording failures.
   files = fs.readdirSync 'test'
