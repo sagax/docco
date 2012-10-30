@@ -114,6 +114,8 @@ highlight = (source, sections, callback) ->
   code = (section.codeText for section in sections).join language.codeSplitText
   docs = (section.docsText for section in sections).join language.docsSplitText
   
+  pygments.stderr.on 'data', ->
+  pygments.stdin.on 'error', ->
   pygments.stdout.on 'data', (result) ->
     output += result if result
     
@@ -122,7 +124,7 @@ highlight = (source, sections, callback) ->
     if output is ''
       codeFragments = (htmlEscape section.codeText for section in sections)
     else
-    codeFragments = output.split language.codeSplitHtml
+      codeFragments = output.split language.codeSplitHtml
     docsFragments = showdown.makeHtml(docs).split language.docsSplitHtml
     
     for section, i in sections
