@@ -25,7 +25,7 @@
   "bin": {
     "docco":      "./bin/docco"
   },
-  "scripts": {
+  "scripts" : {
     "test":       "cake test"
   }
 }

@@ -15,14 +15,19 @@ documentation generator. For more information, see:
 
 [http://jashkenas.github.com/docco/]()
 
-    $ docco 
+Usage: docco [options] <filePattern ...>
 
-     Usage: docco [options] <filePattern ...>
+  Options:
 
-      Options:
+    -h, --help             output usage information
+    -V, --version          output the version number
+    -c, --css [file]       use a custom css file
+    -o, --output [path]    use a custom output path
+    -t, --template [file]  use a custom .jst template
 
-        -h, --help             output usage information
-        -V, --version          output the version number
-        -c, --css [file]       use a custom css file
-        -o, --output [path]    use a custom output path
-        -t, --template [file]  use a custom .jst template
+Building and Testing:
+
+  npm install
+  cake build
+  cake test
+  
