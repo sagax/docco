@@ -31,3 +31,4 @@ Building and Testing:
   cake build
   cake test
   
+For code syntax highlighting, install Python Pygments with `sudo easy_install pygments`
