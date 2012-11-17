@@ -97,6 +97,24 @@ parse = (source, code) ->
   save docsText, codeText
   sections
 
+# #### Build Documentation Outline
+
+# Build an outline of the documentation, based on heading elements in
+# the parsed markdown documentation.  The root level for the outline is
+# determined by the first heading element that is used in a section.
+buildOutline = (sections) ->
+  outline = []
+  for section, index in sections
+    for line in section.docsText.split '\n'
+      heading = line.match /^\s*(#+)\s*(.*)$/
+      continue if not heading
+      root = heading[1].length if not root
+      outline.push 
+        size: Math.max(heading[1].length - root, 0) + 1
+        text: heading[2]
+        href: "#section-#{index+1}"
+  outline
+
 # Highlights parsed sections of code, using **Pygments** over stdio,
 # and runs the text of their corresponding comments through **Markdown**, using
 # [Showdown.js](http://attacklab.net/showdown/).  If Pygments is not present
@@ -158,6 +176,7 @@ generateHtml = (source, sections, config) ->
   title = path.basename source
   dest  = destination source
   html  = config.doccoTemplate {
+    outline    : buildOutline(sections)
     title      : title, 
     sections   : sections, 
     sources    : config.sources, 
