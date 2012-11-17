@@ -183,9 +183,6 @@ ul.sections > li > div {
   text-decoration: none;
   border-top: 1px solid #eee;
 }
-#nav_page .item.heading_1:hover {
-  background: #e5e5ee;
-}
 
 #nav_page .item.heading_2 {
   padding: 8px 25px;
