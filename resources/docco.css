@@ -173,29 +173,64 @@ ul.sections > li > div {
   display: block;
   text-decoration: none;
   border-top: 1px solid #eee;
+  
 }
-#nav_page .item:hover {
-  background: #f5f5ff;
+#nav_page .item {
+  background: #e5e5ff;
+  border-top: 1px solid #eee;
+  text-decoration: none;
+}
+
+#nav_page .item.heading_1, 
+#nav_page .item.heading_3, 
+#nav_page .item.heading_5 {
+  background-color: white;
+}
+#nav_page .item.heading_1:hover, 
+#nav_page .item.heading_3:hover, 
+#nav_page .item.heading_5:hover {
+  background-color: #f5f5ff;
+}
+
+#nav_page .item.heading_2, 
+#nav_page .item.heading_4, 
+#nav_page .item.heading_6 {
+  background-color: #f5f5ff;
+  color: #369;
+}
+#nav_page .item.heading_2:hover, 
+#nav_page .item.heading_4:hover, 
+#nav_page .item.heading_6:hover {
+  background-color: #e5e5ff;
 }
 
 #nav_page .item.heading_1 {
-  padding: 10px;
-  text-decoration: none;
-  border-top: 1px solid #eee;
+  padding: 10px 10px;
 }
-
 #nav_page .item.heading_2 {
-  padding: 8px 25px;
+  padding: 8px 20px;
+  font-size: 13px;
+}
+#nav_page .item.heading_3 {
+  padding: 8px 30px;
   font-size: 13px;
   color: #369;
-  font-weight: normal;
-  background: #f5f5ff;
 }
-#nav_page .item.heading_2:hover {
-  background: #e5e5ff;
+#nav_page .item.heading_4 {
+  padding: 6px 40px;
+  font-size: 11px;
+  color: #369;
 }
-
-
+#nav_page .item.heading_5 {
+  padding: 6px 50px;
+  font-size: 11px;
+  color: #369;
+}
+#nav_page .item.heading_6 {
+  padding: 6px 60px;
+  font-size: 11px;
+  color: #369;
+}
 
 /*---------------------- Low resolutions (> 320px) ---------------------*/
 @media only screen and (min-width: 320px) {
