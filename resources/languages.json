@@ -40,6 +40,8 @@
     {"name" : "text", "symbol" : ""},
   ".less":
     {"name" : "scss", "symbol": "//"},
+  ".properties":
+    {"name" : ".properties", "symbol": "#"},
   ".m":
     {"name" : "objc", "symbol": "//"}
 }
