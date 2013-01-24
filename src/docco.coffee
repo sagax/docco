@@ -78,11 +78,12 @@ generateDocumentation = (source, config, callback) ->
 #     }
 #
 parse = (source, code, blocks=false) ->
+  param    = ''
   lines    = code.split '\n'
   sections = []
   language = getLanguage source
   hasCode  = docsText = codeText = ''
-  in_block = false
+  in_block = 0
 
   save = (docsText, codeText) ->
     sections.push {docsText, codeText}
@@ -90,12 +91,14 @@ parse = (source, code, blocks=false) ->
   # Iterate over the source lines, and separate out single/block
   # comments from code chunks.
   for line in lines
+    if in_block
+      ++in_block
     
     # If we're not in a block comment, and find a match for the start 
     # of one, eat the tokens, and note that we're now in a block.
-    if not in_block and blocks and language.blocks and line.match(language.enter)
-      line = line.replace(language.enter, '')
-      in_block = true
+    if not in_block and blocks and language.blocks and line.match(language.commentEnter)
+      line = line.replace(language.commentEnter, '')
+      in_block = 1
       
     # Process the line, marking it as docs if we're in a block comment, 
     # or we find a single-line comment marker.
@@ -111,11 +114,18 @@ parse = (source, code, blocks=false) ->
       # If there's a single comment, and we're not in a block, eat the
       # comment token.
       line = line.replace(language.commentMatcher, '') if not in_block
+	
+      if in_block > 1
+        line = line.replace(/^\s*[\*]\s?/, '');
+      if language.commentParam
+        param = line.match(language.commentParam);
+        if param
+          line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
 
       # If we're in a block, and we find the end of it in the line, eat
       # the end token, and note that we're no longer in the block.
-      if in_block and line.match(language.exit)
-        line = line.replace(language.exit, '')
+      if in_block and line.match(language.commentExit)
+        line = line.replace(language.commentExit, '')
         in_block = false        
       
       docsText += line + '\n'
@@ -228,7 +238,12 @@ for ext, l of languages
   l.commentMatcher = ///^\s*#{l.symbol}\s?///
 
   # Support block comment parsing?
-  l.blocks = (l.enter and l.exit)
+  if l.enter and l.exit
+    l.blocks = true
+    l.commentEnter = new RegExp(l.enter)
+    l.commentExit = new RegExp(l.exit)
+  if l.param
+    l.commentParam = new RegExp(l.param)
 
   # Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_(Unix\))
   # and interpolations...
