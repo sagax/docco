@@ -12,9 +12,26 @@ documentation generator. For more information, see:
 
 http://jashkenas.github.com/docco/
 
+Usage
+-----
+
+Usage: docco [options] <filePattern ...>
+
+  Options:
+
+    -h, --help             output usage information
+    -V, --version          output the version number
+    -c, --css [file]       use a custom css file
+    -o, --output [path]    use a custom output path
+    -t, --template [file]  use a custom .jst template
+
+
 ---
 
-Install:
+Building and Testing
+--------------------
+
+Install (on Ubuntu 12):
 
 ( as root )
 	apt-get install python-setuptools
@@ -28,3 +45,15 @@ Install:
 	cake.coffeescript doc
 
 ( contrary to the original docs, there is no `cake test` i.e. `cake.coffeescript test` )
+
+
+Building and Testing (original, outdated info):
+-----------------------------------------------
+
+  npm install
+  cake build
+  cake test
+  
+For code syntax highlighting, install Python Pygments with `sudo easy_install pygments`
+
+
