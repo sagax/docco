@@ -49,5 +49,7 @@
   ".sh":
     { "name": "bash", "symbol": "#" },
   ".mak":
-    { "name": "basemake", "symbol": "#" }
+    { "name": "basemake", "symbol": "#" },
+  ".jison":
+    {"name" : "jison", "symbol" : "//" }
 }
