@@ -37,14 +37,14 @@ task 'test', 'run the Docco test suite', ->
     
 # Simple test runner, adapted from [CoffeeScript](http://coffeescript.org/).
 runTests = () ->
-  startTime     = Date.now()
-  currentFile   = null
+  startTime   = Date.now()
+  currentFile = null
   currentTest   = null
   currentSource = null
-  passedTests   = 0
+  passedTests = 0
   passedAssert  = 0
   failedAssert  = 0
-  failures      = []
+  failures    = []
   done          = false
 
   # Wrap each assert function in a try/catch block to report passed/failed assertions.
@@ -79,7 +79,7 @@ runTests = () ->
       e.description = description if description?
       e.source      = fn.toString() if fn.toString?
       failures.push filename: currentFile, error: e 
-
+      
   # When all the tests have run, collect and print errors.
   # If a stacktrace is available, output the compiled function source.
   process.on 'exit', ->
