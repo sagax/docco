@@ -15,7 +15,7 @@
   ".latex":
     {"name" : "tex", "symbol" : "%"},
   ".js":
-    {"name" : "javascript", "symbol" : "//"},
+    {"name" : "javascript", "symbol" : "//", "enter": "/\\*\\+", "exit": "\\*\\+/", "param": "@([a-zA-Z]+)" },
   ".sass":
     {"name" : "sass", "symbol" : "//"},
   ".scss":

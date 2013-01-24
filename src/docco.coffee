@@ -88,21 +88,24 @@ parse = (source, code) ->
     sections.push {docsText, codeText}
 
   for line in lines
-    if line.match(language.comment_enter)
+    if language.comment_enter and line.match(language.comment_enter)
       incomment = true
     if (incomment or line.match(language.commentMatcher)) and not line.match(language.commentFilter)
       if hasCode
         save docsText, codeText
         hasCode = docsText = codeText = ''
-      if line.match(language.comment_exit)
+      if language.comment_exit and line.match(language.comment_exit)
         incomment = false
-      line = line.replace(language.comment_exit, '')
-      line = line.replace(language.comment_enter, '')
+      if language.comment_exit 
+        line = line.replace(language.comment_exit, '')
+      if language.comment_enter
+        line = line.replace(language.comment_enter, '')
       line = line.replace(language.commentMatcher, '') + '\n'
       line = line.replace(/^ *[\*] */, '');
-      param = line.match(language.param);
-      if param
-        line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
+      if language.comment_param
+        param = line.match(language.comment_param);
+        if param
+          line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
       docsText += line + '\n'
     else
       hasCode = yes
@@ -210,6 +213,8 @@ for ext, l of languages
   if l.enter and l.exit
      l.comment_enter = new RegExp('^\\s*' + l.enter)
      l.comment_exit = new RegExp(l.exit + '\\s*$')
+  if l.param
+     l.comment_param = new RegExp(l.param)
 
   # Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_(Unix\))
   # and interpolations...
