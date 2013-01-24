@@ -1,8 +1,8 @@
 // Single:1 - Block:2
 var world = "World!";
-/* 
+/*
 
- Comment 
+ Comment
 
  */
 console.log("Hello " + world);
