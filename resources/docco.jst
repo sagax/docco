@@ -10,6 +10,24 @@
 <body>
   <div id="container">
     <div id="background"></div>
+    <% if (outline.length > 0) { %>
+      <ul id="nav_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Outline &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="nav_wrapper">
+          <div id="nav_page">
+            <% for (var i=0, l=outline.length; i<l; i++) { %>
+              <% var heading = outline[i]; %>
+              <a class="item heading_<%= heading.size %>" href="<%= heading.href %>">
+                <%= heading.text %>
+              </a>
+            <% } %>
+          </div>
+        </li>
+      </ul>
+    <% } %>
+
     <% if (sources.length > 1) { %>
       <ul id="jump_to">
         <li>

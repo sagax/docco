@@ -1,3 +1,4 @@
+<pre>
  ____                                                      
 /\  _`\                                                    
 \ \ \/\ \        ___         ___         ___         ___   
@@ -6,11 +7,13 @@
    \ \____/    \ \____/    \ \____\    \ \____\    \ \____/
     \/___/      \/___/      \/____/     \/____/     \/___/ 
 
+</pre>
+[![Build Status](https://travis-ci.org/justindujardin/docco.png?branch=master)](https://travis-ci.org/justindujardin/docco)
 
 Docco is a quick-and-dirty, hundred-line-long, literate-programming-style
 documentation generator. For more information, see:
 
-http://jashkenas.github.com/docco/
+[http://jashkenas.github.com/docco/]()
 
 Usage: docco [options] <filePattern ...>
 
