@@ -1,21 +1,21 @@
 { ".coffee" :
-    {"name" : "coffee-script", "symbol" : "#"},
+    {"name" : "coffee-script", "symbol" : "#", enter: /^\s*#{3}(?!#)/, exit: /#{3}(?!#)\s*$/ },
   ".ls":
     {"name": "livescript", "symbol": "#"},
   ".rb":
-    {"name" : "ruby", "symbol" : "#"},
+    {"name" : "ruby", "symbol" : "#", enter: /^=begin$/, exit: /^=end$/ },
   ".py":
-    {"name": "python", "symbol" : "#"},
+    {"name": "python", "symbol" : "#", enter: /^\s*"""/, exit: /"""\s*$/ },
   ".feature":
     {"name" : "gherkin", "symbol" : "#"},
   ".yaml":
     {"name" : "yaml", "symbol" : "#"},
   ".tex":
-    {"name" : "tex", "symbol" : "%"},
+    {"name" : "tex", "symbol" : "%", enter: /\\begin{comment}/, exit: /\\end{comment}/ },
   ".latex":
-    {"name" : "tex", "symbol" : "%"},
+    {"name" : "tex", "symbol" : "%", enter: /\\begin{comment}/, exit: /\\end{comment}/ },
   ".js":
-    {"name" : "javascript", "symbol" : "//"},
+    {"name" : "javascript", "symbol" : "//", enter: /^\s*\/\*\s*/, exit: /\s*\*\/\s*$/ },
   ".sass":
     {"name" : "sass", "symbol" : "//"},
   ".scss":

@@ -61,7 +61,7 @@ generateDocumentation = (source, config, callback) ->
   fs.readFile source, (error, buffer) ->
     throw error if error
     code = buffer.toString()
-    sections = parse source, code
+    sections = parse source, code, config.blocks
     highlight source, sections, ->
       generateHtml source, sections, config
       callback()
