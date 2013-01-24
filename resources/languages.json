@@ -1,35 +1,37 @@
 { ".coffee" :
-    {"name" : "coffee-script", "symbol" : "#", enter: "^\\s*#{3}(?!#)", exit: "#{3}(?!#)\\s*$" },
+    {"name" : "coffee-script", "symbol" : "#", "enter": "^\\s*#{3}(?!#)", "exit": "#{3}(?!#)\\s*$" },
   ".ls":
     {"name" : "livescript", "symbol": "#"},
   ".rb":
-    {"name" : "ruby", "symbol" : "#", enter: "^=begin$", exit: "^=end$" },
+    {"name" : "ruby", "symbol" : "#", "enter": "^=begin$", "exit": "^=end$" },
   ".py":
-    {"name" : "python", "symbol" : "#", enter: "^\\s*\"\"\"", exit: "\"\"\"\\s*$" },
+    {"name" : "python", "symbol" : "#", "enter": "^\\s*\"\"\"", "exit": "\"\"\"\\s*$" },
   ".feature":
     {"name" : "gherkin", "symbol" : "#"},
   ".yaml":
     {"name" : "yaml", "symbol" : "#"},
   ".tex":
-    {"name" : "tex", "symbol" : "%", enter: "\\\\begin{comment}", exit: "\\\\end{comment}" },
+    {"name" : "tex", "symbol" : "%", "enter": "\\\\begin{comment}", "exit": "\\\\end{comment}" },
   ".latex":
-    {"name" : "tex", "symbol" : "%", enter: "\\\\begin{comment}", exit: "\\\\end{comment}" },
+    {"name" : "tex", "symbol" : "%", "enter": "\\\\begin{comment}", "exit": "\\\\end{comment}" },
   ".js":
-    {"name" : "javascript", "symbol" : "//", enter: "^\\s*\\/\\*\\s*", exit: "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" },
+    {"name" : "javascript", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" },
   ".sass":
-    {"name" : "sass", "symbol" : "//"},
+    {"name" : "sass", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$" },
   ".scss":
-    {"name" : "scss", "symbol" : "//"},
+    {"name" : "scss", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$" },
+  ".css":
+    {"name" : "css", "symbol" : "", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$" },
   ".c":
-    {"name" : "c", "symbol" : "//"},
+    {"name" : "c", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" },
   ".h":
-    {"name" : "c", "symbol" : "//"},
+    {"name" : "c", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" },
   ".cc":
-    {"name" : "cpp", "symbol" : "//"},
+    {"name" : "cpp", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" },
   ".cpp":
-    {"name" : "cpp", "symbol" : "//"},
+    {"name" : "cpp", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" },
   ".php":
-    {"name" : "php", "symbol" : "//"},
+    {"name" : "php", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" },
   ".hs":
     {"name" : "haskell", "symbol" : "--"},
   ".erl":
@@ -41,7 +43,7 @@
   ".markdown":
     {"name" : "text", "symbol" : ""},
   ".less":
-    {"name" : "scss", "symbol": "//"},
+    {"name" : "scss", "symbol": "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$" },
   ".m":
     {"name" : "objc", "symbol": "//"},
   ".scala":
@@ -51,5 +53,5 @@
   ".mak":
     { "name": "makefile", "symbol": "#" },
   ".jison":
-    {"name" : "jison", "symbol" : "//" }
+    {"name" : "jison", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" }
 }
