@@ -1,10 +1,10 @@
- ____                                                      
-/\  _`\                                                    
-\ \ \/\ \        ___         ___         ___         ___   
- \ \ \ \ \      / __`\      /'___\      /'___\      / __`\ 
+ ____
+/\  _`\
+\ \ \/\ \        ___         ___         ___         ___
+ \ \ \ \ \      / __`\      /'___\      /'___\      / __`\
   \ \ \_\ \    /\ \ \ \    /\ \__/     /\ \__/     /\ \ \ \
    \ \____/    \ \____/    \ \____\    \ \____\    \ \____/
-    \/___/      \/___/      \/____/     \/____/     \/___/ 
+    \/___/      \/___/      \/____/     \/____/     \/___/
 
 
 Docco is a quick-and-dirty, hundred-line-long, literate-programming-style
@@ -43,8 +43,8 @@ Install (on Ubuntu 12):
 ( See also: https://github.com/harvesthq/chosen/issues/508 )
 	cake.coffeescript build
 	cake.coffeescript doc
+  cake.coffeescript test
 
-( contrary to the original docs, there is no `cake test` i.e. `cake.coffeescript test` )
 
 
 Building and Testing (original, outdated info):
@@ -53,7 +53,7 @@ Building and Testing (original, outdated info):
   npm install
   cake build
   cake test
-  
+
 For code syntax highlighting, install Python Pygments with `sudo easy_install pygments`
 
 

@@ -53,5 +53,5 @@
   ".mak":
     { "name": "makefile", "symbol": "#" },
   ".jison":
-    {"name" : "jison", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" }
+    {"name" : "jison", "symbol" : "//", "enter": "^\\s*\\/\\*\\s+", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" }
 }
