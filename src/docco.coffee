@@ -2,7 +2,8 @@
 # documentation generator. It produces HTML
 # that displays your comments alongside your code. Comments are passed through
 # [Markdown](http://daringfireball.net/projects/markdown/syntax), and code is
-# passed through [Pygments](http://pygments.org/) syntax highlighting.
+# passed through [Pygments](http://pygments.org/) syntax highlighting, if it
+# is present on the system. 
 # This page is the result of running Docco against its own source file.
 #
 # If you install Docco, you can run it from the command-line:
@@ -17,12 +18,12 @@
 #
 # To install Docco, first make sure you have [Node.js](http://nodejs.org/),
 # [Pygments](http://pygments.org/) (install the latest dev version of Pygments
-# from [its Mercurial repo](http://dev.pocoo.org/hg/pygments-main)), and
+# from [its Mercurial repo](https://bitbucket.org/birkenfeld/pygments-main)), and
 # [CoffeeScript](http://coffeescript.org/). Then, with NPM:
 #
-#     sudo npm install docco
+#     sudo npm install -g docco
 #
-# Docco can be used to process CoffeeScript, JavaScript, Ruby or Python files.
+# Docco can be used to process CoffeeScript, JavaScript, Ruby, Python, or TeX files.
 # Only single-line comments are processed -- block comments are ignored.
 #
 #### Partners in Crime:
@@ -55,12 +56,13 @@
 # Generate the documentation for a source file by reading it in, splitting it
 # up into comment/code sections, highlighting them for the appropriate language,
 # and merging them into an HTML template.
-generate_documentation = (source, callback) ->
-  fs.readFile source, "utf-8", (error, code) ->
+generateDocumentation = (source, config, callback) ->
+  fs.readFile source, (error, buffer) ->
     throw error if error
+    code = buffer.toString()
     sections = parse source, code
     highlight source, sections, ->
-      generate_html source, sections
+      generateHtml source, sections, config
       callback()
 
 # Given a string of source code, parse out each comment and the code that
@@ -68,91 +70,116 @@ generate_documentation = (source, callback) ->
 # Sections take the form:
 #
 #     {
-#       docs_text: ...
-#       docs_html: ...
-#       code_text: ...
-#       code_html: ...
+#       docsText: ...
+#       docsHtml: ...
+#       codeText: ...
+#       codeHtml: ...
 #     }
 #
 parse = (source, code) ->
   param    = ''
   lines    = code.split '\n'
   sections = []
-  language = get_language source
-  has_code = docs_text = code_text = ''
+  language = getLanguage source
+  hasCode  = docsText = codeText = ''
   incomment = false
 
-  save = (docs, code) ->
-    sections.push docs_text: docs, code_text: code
+  save = (docsText, codeText) ->
+    sections.push {docsText, codeText}
 
   for line in lines
     if line.match(language.comment_enter)
       incomment = true
-    if not line.match(language.comment_filter) and (incomment or line.match(language.comment_matcher))
-      if has_code
-        save docs_text, code_text
-        has_code = docs_text = code_text = ''
+    if (incomment or line.match(language.commentMatcher)) and not line.match(language.commentFilter)
+      if hasCode
+        save docsText, codeText
+        hasCode = docsText = codeText = ''
       if line.match(language.comment_exit)
         incomment = false
       line = line.replace(language.comment_exit, '')
       line = line.replace(language.comment_enter, '')
-      line = line.replace(language.comment_matcher, '')
+      line = line.replace(language.commentMatcher, '') + '\n'
       line = line.replace(/^ *[\*] */, '');
       param = line.match(language.param);
       if param
         line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
-      docs_text += line + '\n'
+      docsText += line + '\n'
     else
-      has_code = yes
-      code_text += line + '\n'
-  save docs_text, code_text
+      hasCode = yes
+      codeText += line + '\n'
+  save docsText, codeText
   sections
 
-# Highlights a single chunk of CoffeeScript code, using **Pygments** over stdio,
-# and runs the text of its corresponding comment through **Markdown**, using
-# [Showdown.js](http://attacklab.net/showdown/).
+# Highlights parsed sections of code, using **Pygments** over stdio,
+# and runs the text of their corresponding comments through **Markdown**, using
+# [Showdown.js](https://github.com/coreyti/showdown).  If Pygments is not present
+# on the system, output the code in plain text.
 #
-# We process the entire file in a single call to Pygments by inserting little
-# marker comments between each section and then splitting the result string
-# wherever our markers occur.
+#
+# We process all sections with single calls to Pygments and Showdown, by 
+# inserting marker comments between them, and then splitting the result
+# string wherever the marker occurs.
 highlight = (source, sections, callback) ->
-  language = get_language source
-  pygments = spawn 'pygmentize', ['-l', language.name, '-f', 'html', '-O', 'encoding=utf-8,tabsize=2']
-  output   = ''
+  language = getLanguage source
+  pygments = spawn 'pygmentize', [
+    '-l', language.name,
+    '-f', 'html',
+    '-O', 'encoding=utf-8,tabsize=2'
+  ]
+  output = ''
+  code = (section.codeText for section in sections).join language.codeSplitText
+  docs = (section.docsText for section in sections).join language.docsSplitText
   
-  pygments.stderr.addListener 'data',  (error)  ->
-    console.error error.toString() if error
-    
-  pygments.stdin.addListener 'error',  (error)  ->
-    console.error "Could not use Pygments to highlight the source."
-    process.exit 1
-    
-  pygments.stdout.addListener 'data', (result) ->
+  pygments.stderr.on 'data', ->
+  pygments.stdin.on 'error', ->
+  pygments.stdout.on 'data', (result) ->
     output += result if result
     
-  pygments.addListener 'exit', ->
-    output = output.replace(highlight_start, '').replace(highlight_end, '')
-    fragments = output.split language.divider_html
+  pygments.on 'exit', ->
+    output = output.replace(highlightStart, '').replace(highlightEnd, '')
+    if output is ''
+      codeFragments = (htmlEscape section.codeText for section in sections)
+    else
+      codeFragments = output.split language.codeSplitHtml
+    docsFragments = showdown.makeHtml(docs).split language.docsSplitHtml
+    
     for section, i in sections
-      section.code_html = highlight_start + fragments[i] + highlight_end
-      section.docs_html = showdown.makeHtml section.docs_text
+      section.codeHtml = highlightStart + codeFragments[i] + highlightEnd
+      section.docsHtml = docsFragments[i]
     callback()
     
   if pygments.stdin.writable
-    pygments.stdin.write((section.code_text for section in sections).join(language.divider_text))
+    pygments.stdin.write code
     pygments.stdin.end()
   
-# Once all of the code is finished highlighting, we can generate the HTML file
-# and write out the documentation. Pass the completed sections into the template
-# found in `resources/docco.jst`
-generate_html = (source, sections) ->
+# Escape an html string, to produce valid non-highlighted output when pygments 
+# is not present on the system.
+htmlEscape = (string) -> 
+  string.replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g,'&#x2F;')
+
+# Once all of the code is finished highlighting, we can generate the HTML file by
+# passing the completed sections into the template, and then writing the file to 
+# the specified output path.
+generateHtml = (source, sections, config) ->
+  destination = (filepath) ->
+    path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html')   
   title = path.basename source
   dest  = destination source
-  html  = docco_template {
-    title: title, sections: sections, sources: sources, path: path, destination: destination
+  html  = config.doccoTemplate {
+    title      : title, 
+    sections   : sections, 
+    sources    : config.sources, 
+    path       : path, 
+    destination: destination
+    css        : path.basename(config.css)
   }
   console.log "docco: #{source} -> #{dest}"
-  fs.writeFile dest, html
+  fs.writeFileSync dest, html
 
 #### Helpers & Setup
 
@@ -162,25 +189,23 @@ fs       = require 'fs'
 path     = require 'path'
 showdown = require('./../vendor/showdown').Showdown
 {spawn, exec} = require 'child_process'
+commander = require 'commander'
 
-# A list of the languages that Docco supports, mapping the file extension to
-# the name of the Pygments lexer and the symbol that indicates a comment. To
-# add another language to Docco's repertoire, add it here.
-languages =
-  '.coffee':
-    name: 'coffee-script', symbol: '#'
-  '.js':
-    name: 'javascript', symbol: '//', enter: '/\\*\+', exit: '\\*\+/', param: /@([a-zA-Z]+)/
-  '.rb':
-    name: 'ruby', symbol: '#'
-  '.py':
-    name: 'python', symbol: '#'
+# Read resource file and return its content.
+getResource = (name) ->
+  fullPath = path.join __dirname, '..', 'resources', name
+  fs.readFileSync(fullPath).toString()
+
+# Languages are stored in JSON format in the file `resources/languages.json`
+# Each item maps the file extension to the name of the Pygments lexer and the
+# symbol that indicates a comment. To add a new language, modify the file.
+languages = JSON.parse getResource 'languages.json'
 
 # Build out the appropriate matchers and delimiters for each language.
 for ext, l of languages
 
   # Does the line begin with a comment?
-  l.comment_matcher = new RegExp('^\\s*' + l.symbol + '\\s?')
+  l.commentMatcher = ///^\s*#{l.symbol}\s?///
 
   if l.enter and l.exit
      l.comment_enter = new RegExp('^\\s*' + l.enter)
@@ -188,28 +213,37 @@ for ext, l of languages
 
   # Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_(Unix\))
   # and interpolations...
-  l.comment_filter = new RegExp('(^#![/]|^\\s*#\\{)')
+  l.commentFilter = /(^#![/]|^\s*#\{)/
 
   # The dividing token we feed into Pygments, to delimit the boundaries between
   # sections.
-  l.divider_text = '\n' + l.symbol + 'DIVIDER\n'
+  l.codeSplitText = "\n#{l.symbol}DIVIDER\n"
 
-  # The mirror of `divider_text` that we expect Pygments to return. We can split
+  # The mirror of `codeSplitText` that we expect Pygments to return. We can split
   # on this to recover the original sections.
   # Note: the class is "c" for Python and "c1" for the other languages
-  l.divider_html = new RegExp('\\n*<span class="c1?">' + l.symbol + 'DIVIDER<\\/span>\\n*')
+  l.codeSplitHtml = ///\n*<span\sclass="c1?">#{l.symbol}DIVIDER<\/span>\n*///
+
+  # The dividing token we feed into Showdown, to delimit the boundaries between
+  # sections.
+  l.docsSplitText = "\n##{l.name}DOCDIVIDER\n"
+
+  # The mirror of `docsSplitText` that we expect Showdown to return. We can split
+  # on this to recover the original sections.
+  l.docsSplitHtml = ///<h1>#{l.name}DOCDIVIDER</h1>///
 
 # Get the current language we're documenting, based on the extension.
-get_language = (source) -> languages[path.extname(source)]
-
-# Compute the destination HTML path for an input source file path. If the source
-# is `lib/example.coffee`, the HTML will be at `docs/example.html`
-destination = (filepath) ->
-  'docs/' + path.basename(filepath, path.extname(filepath)) + '.html'
+getLanguage = (source) -> languages[path.extname(source)]
 
 # Ensure that the destination directory exists.
-ensure_directory = (dir, callback) ->
-  exec "mkdir -p #{dir}", -> callback()
+ensureDirectory = (dir, cb, made=null) ->
+  mode = parseInt '0777', 8
+  fs.mkdir dir, mode, (er) ->
+    return cb null, made || dir if not er
+    if er.code == 'ENOENT'
+      return ensureDirectory path.dirname(dir), (er, made) ->
+        if er then cb er, made else ensureDirectory dir, cb, made
+    cb er, made
 
 # Micro-templating, originally by John Resig, borrowed by way of
 # [Underscore.js](http://documentcloud.github.com/underscore/).
@@ -226,25 +260,99 @@ template = (str) ->
        .split('%>').join("p.push('") +
        "');}return p.join('');"
 
-# Create the template that we will use to generate the Docco HTML page.
-docco_template  = template fs.readFileSync(__dirname + '/../resources/docco.jst').toString()
-
-# The CSS styles we'd like to apply to the documentation.
-docco_styles    = fs.readFileSync(__dirname + '/../resources/docco.css').toString()
-
 # The start of each Pygments highlight block.
-highlight_start = '<div class="highlight"><pre>'
+highlightStart = '<div class="highlight"><pre>'
 
 # The end of each Pygments highlight block.
-highlight_end   = '</pre></div>'
+highlightEnd   = '</pre></div>'
 
-# Run the script.
-# For each source file passed in as an argument, generate the documentation.
-sources = process.ARGV.sort()
-if sources.length
-  ensure_directory 'docs', ->
-    fs.writeFile 'docs/docco.css', docco_styles
-    files = sources.slice(0)
-    next_file = -> generate_documentation files.shift(), next_file if files.length
-    next_file()
+# Extract the docco version from `package.json`
+version = JSON.parse(fs.readFileSync("#{__dirname}/../package.json")).version
 
+# Default configuration options.
+defaults =
+  template: "#{__dirname}/../resources/docco.jst"
+  css     : "#{__dirname}/../resources/docco.css"
+  output  : "docs/"
+
+
+# ### Run from Commandline
+  
+# Run Docco from a set of command line arguments.  
+#  
+# 1. Parse command line using [Commander JS](https://github.com/visionmedia/commander.js).
+# 2. Document sources, or print the usage help if none are specified.
+run = (args=process.argv) ->
+  commander.version(version)
+    .usage("[options] <filePattern ...>")
+    .option("-c, --css [file]","use a custom css file",defaults.css)
+    .option("-o, --output [path]","use a custom output path",defaults.output)
+    .option("-t, --template [file]","use a custom .jst template",defaults.template)
+    .parse(args)
+    .name = "docco"
+  if commander.args.length
+    document(commander.args.slice(),commander)
+  else
+    console.log commander.helpInformation()
+
+# ### Document Sources
+
+# Run Docco over a list of `sources` with the given `options`.
+#  
+# 1. Construct config to use by taking `defaults` first, then  merging in `options`
+# 2. Generate the resolved source list, filtering out unknown types.
+# 3. Load the specified template and css files.
+# 4. Ensure the output path is created, write out the CSS file, 
+# document each source, and invoke the completion callback if it is specified.
+document = (sources, options = {}, callback = null) ->
+  config = {}
+  config[key] = defaults[key] for key,value of defaults
+  config[key] = value for key,value of options if key of defaults
+
+  resolved = []
+  resolved = resolved.concat(resolveSource(src)) for src in sources
+  config.sources = resolved.filter((source) -> getLanguage source).sort()
+  console.log "docco: skipped unknown type (#{m})" for m in resolved when m not in config.sources  
+  
+  config.doccoTemplate = template fs.readFileSync(config.template).toString()
+  doccoStyles = fs.readFileSync(config.css).toString()
+
+  ensureDirectory config.output, ->
+    fs.writeFileSync path.join(config.output,path.basename(config.css)), doccoStyles
+    files = config.sources.slice()
+    nextFile = -> 
+      callback() if callback? and not files.length
+      generateDocumentation files.shift(), config, nextFile if files.length
+    nextFile()
+
+# ### Resolve Wildcard Source Inputs
+
+# Resolve a wildcard `source` input to the files it matches.
+#
+# 1. If the input contains no wildcard characters, just return it.
+# 2. Convert the wildcard match to a regular expression, and return
+# an array of files in the path that match it.
+resolveSource = (source) ->
+  return source if not source.match(/([\*\?])/)
+  regex_str = path.basename(source)
+    .replace(/\./g, "\\$&")
+    .replace(/\*/,".*")
+    .replace(/\?/,".")
+  regex = new RegExp('^(' + regex_str + ')$')
+  file_path = path.dirname(source)
+  files = fs.readdirSync file_path
+  return (path.join(file_path,file) for file in files when file.match regex)
+
+# ### Exports
+
+# Information about docco, and functions for programatic usage.
+exports[key] = value for key, value of {
+  run           : run
+  document      : document
+  parse         : parse
+  resolveSource : resolveSource
+  version       : version
+  defaults      : defaults
+  languages     : languages
+  ensureDirectory: ensureDirectory
+}
