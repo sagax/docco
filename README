@@ -57,3 +57,17 @@ Building and Testing (original, outdated info):
 For code syntax highlighting, install Python Pygments with `sudo easy_install pygments`
 
 
+===================================================================
+
+This fork supports JSDoc style comments and highlights declared parameters.
+
+Example:
+
+/**
+ * @description Lolify someone's name
+ * @param {String} name A person's name
+ */
+function lolify(name) {
+   return 'OH HAI ' + name + ' KTHXBAI';
+}
+

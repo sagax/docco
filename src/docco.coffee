@@ -1,4 +1,4 @@
-# **Docco** is a quick-and-dirty, hundred-line-long, literate-programming-style
+# **Docco** is a quick-and-dirty, few-hundred-line-long, literate-programming-style
 # documentation generator. It produces HTML
 # that displays your comments alongside your code. Comments are passed through
 # [Markdown](http://daringfireball.net/projects/markdown/syntax), and code is
@@ -24,7 +24,8 @@
 #     sudo npm install -g docco
 #
 # Docco can be used to process CoffeeScript, JavaScript, Ruby, Python, or TeX files.
-# Only single-line comments are processed -- block comments are ignored.
+# By default only single-line comments are processed, block comments may be included
+# by passing the `-b` flag to Docco.
 #
 #### Partners in Crime:
 #
@@ -60,7 +61,7 @@ generateDocumentation = (source, config, callback) ->
   fs.readFile source, (error, buffer) ->
     throw error if error
     code = buffer.toString()
-    sections = parse source, code
+    sections = parse source, code, config.blocks
     highlight source, sections, ->
       generateHtml source, sections, config
       callback()
@@ -76,25 +77,64 @@ generateDocumentation = (source, config, callback) ->
 #       codeHtml: ...
 #     }
 #
-parse = (source, code) ->
+parse = (source, code, blocks=false) ->
+  param    = ''
   lines    = code.split '\n'
   sections = []
   language = getLanguage source
   hasCode  = docsText = codeText = ''
+  in_block = 0
 
   save = (docsText, codeText) ->
     sections.push {docsText, codeText}
 
+  # Iterate over the source lines, and separate out single/block
+  # comments from code chunks.
   for line in lines
-    if line.match(language.commentMatcher) and not line.match(language.commentFilter)
+    if in_block
+      ++in_block
+    
+    # If we're not in a block comment, and find a match for the start 
+    # of one, eat the tokens, and note that we're now in a block.
+    if not in_block and blocks and language.blocks and line.match(language.commentEnter)
+      line = line.replace(language.commentEnter, '')
+      in_block = 1
+      
+    # Process the line, marking it as docs if we're in a block comment, 
+    # or we find a single-line comment marker.
+    single = (line.match(language.commentMatcher) and not line.match(language.commentFilter))
+    if in_block or single
+      
+      # If we have code text, and we're entering a comment, store off
+      # the current docs and code, then start a new section.
       if hasCode
         save docsText, codeText
         hasCode = docsText = codeText = ''
-      docsText += line.replace(language.commentMatcher, '') + '\n'
+
+      # If there's a single comment, and we're not in a block, eat the
+      # comment token.
+      line = line.replace(language.commentMatcher, '') if not in_block
+	
+      if in_block > 1
+        line = line.replace(/^\s*[\*]\s?/, '');
+      if language.commentParam
+        param = line.match(language.commentParam);
+        if param
+          line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
+
+      # If we're in a block, and we find the end of it in the line, eat
+      # the end token, and note that we're no longer in the block.
+      if in_block and line.match(language.commentExit)
+        line = line.replace(language.commentExit, '')
+        in_block = false        
+      
+      docsText += line + '\n'
     else
       hasCode = yes
       codeText += line + '\n'
-  save docsText, codeText
+      
+  # Save the final section, if any, and return the sections array. 
+  save docsText, codeText   # if codeText != '' and docsText != ''
   sections
 
 # Highlights parsed sections of code, using **Pygments** over stdio,
@@ -153,8 +193,11 @@ htmlEscape = (string) ->
 # passing the completed sections into the template, and then writing the file to 
 # the specified output path.
 generateHtml = (source, sections, config) ->
+  # Compute the destination HTML path for an input source file path. If the source
+  # is `lib/example.coffee`, the HTML will be at `docs/example.html`
   destination = (filepath) ->
-    path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html')   
+    path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html')
+    
   title = path.basename source
   dest  = destination source
   html  = config.doccoTemplate {
@@ -193,6 +236,14 @@ for ext, l of languages
 
   # Does the line begin with a comment?
   l.commentMatcher = ///^\s*#{l.symbol}\s?///
+
+  # Support block comment parsing?
+  if l.enter and l.exit
+    l.blocks = true
+    l.commentEnter = new RegExp(l.enter)
+    l.commentExit = new RegExp(l.exit)
+  if l.param
+    l.commentParam = new RegExp(l.param)
 
   # Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_(Unix\))
   # and interpolations...
@@ -249,6 +300,28 @@ highlightStart = '<div class="highlight"><pre>'
 # The end of each Pygments highlight block.
 highlightEnd   = '</pre></div>'
 
+#### Public API
+
+# Docco exports a basic public API for usage in other applications.
+# A simple usage might look like this
+#
+#     Docco = require('docco')
+#     
+#     sources = 
+#       "src/index.coffee"
+#       "src/plugins/*.coffee"
+#       "src/web/*.py"
+#     
+#     options = 
+#       template : "src/templates/docs/myproject.jst"
+#       output   : "web/docs"
+#       css      : "src/templates/docs/myproject.docs.css"
+#       blocks   : true
+#     
+#     Docco.document sources, options, ->
+#       console.log("Docco documentation complete.")
+#     
+
 # Extract the docco version from `package.json`
 version = JSON.parse(fs.readFileSync("#{__dirname}/../package.json")).version
 
@@ -257,6 +330,7 @@ defaults =
   template: "#{__dirname}/../resources/docco.jst"
   css     : "#{__dirname}/../resources/docco.css"
   output  : "docs/"
+  blocks  : false
 
 
 # ### Run from Commandline
@@ -271,6 +345,7 @@ run = (args=process.argv) ->
     .option("-c, --css [file]","use a custom css file",defaults.css)
     .option("-o, --output [path]","use a custom output path",defaults.output)
     .option("-t, --template [file]","use a custom .jst template",defaults.template)
+    .option("-b, --blocks","parse block comments where available",defaults.blocks)
     .parse(args)
     .name = "docco"
   if commander.args.length
