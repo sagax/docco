@@ -102,7 +102,7 @@ parse = (source, code, blocks=false) ->
       
     # Process the line, marking it as docs if we're in a block comment, 
     # or we find a single-line comment marker.
-    single = (line.match(language.commentMatcher) and not line.match(language.commentFilter))
+    single = (language.commentMatcher and line.match(language.commentMatcher) and not line.match(language.commentFilter))
     if in_block or single
       
       # If we have code text, and we're entering a comment, store off
@@ -235,7 +235,8 @@ languages = JSON.parse getResource 'languages.json'
 for ext, l of languages
 
   # Does the line begin with a comment?
-  l.commentMatcher = ///^\s*#{l.symbol}\s?///
+  if (l.symbol)
+    l.commentMatcher = ///^\s*#{l.symbol}\s?///
 
   # Support block comment parsing?
   if l.enter and l.exit
