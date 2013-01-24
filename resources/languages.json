@@ -1,5 +1,7 @@
 { ".coffee" :
     {"name" : "coffee-script", "symbol" : "#"},
+  ".ls":
+    {"name": "livescript", "symbol": "#"},
   ".rb":
     {"name" : "ruby", "symbol" : "#"},
   ".py":
@@ -35,5 +37,9 @@
   ".md":
     {"name" : "text", "symbol" : ""},
   ".markdown":
-    {"name" : "text", "symbol" : ""}
+    {"name" : "text", "symbol" : ""},
+  ".less":
+    {"name" : "scss", "symbol": "//"},
+  ".m":
+    {"name" : "objc", "symbol": "//"}
 }

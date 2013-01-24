@@ -2,7 +2,8 @@
 # documentation generator. It produces HTML
 # that displays your comments alongside your code. Comments are passed through
 # [Markdown](http://daringfireball.net/projects/markdown/syntax), and code is
-# passed through [Pygments](http://pygments.org/) syntax highlighting.
+# passed through [Pygments](http://pygments.org/) syntax highlighting, if it
+# is present on the system. 
 # This page is the result of running Docco against its own source file.
 #
 # If you install Docco, you can run it from the command-line:
@@ -100,13 +101,14 @@ parse = (source, code) ->
   save docsText, codeText
   sections
 
-# Highlights a single chunk of CoffeeScript code, using **Pygments** over stdio,
-# and runs the text of its corresponding comment through **Markdown**, using
-# [Showdown.js](http://attacklab.net/showdown/).
+# Highlights parsed sections of code, using **Pygments** over stdio,
+# and runs the text of their corresponding comments through **Markdown**, using
+# [Showdown.js](https://github.com/coreyti/showdown).  If Pygments is not present
+# on the system, output the code in plain text.
 #
-# We process the entire file in a single call to Pygments by inserting little
-# marker comments between each section and then splitting the result string
-# wherever our markers occur.
+# We process all sections with single calls to Pygments and Showdown, by 
+# inserting marker comments between them, and then splitting the result
+# string wherever the marker occurs.
 pygmentsHighlight = (source, sections, callback) ->
   language = getLanguage source
   pygments = spawn 'pygmentize', [
@@ -114,31 +116,32 @@ pygmentsHighlight = (source, sections, callback) ->
     '-f', 'html',
     '-O', 'encoding=utf-8,tabsize=2'
   ]
-  output   = ''
-
-  pygments.stderr.on 'data',  (error)  ->
-    console.error error.toString() if error
-
-  pygments.stdin.on 'error',  (error)  ->
-    console.error 'Could not use Pygments to highlight the source.'
-    process.exit 1
-
+  output = ''
+  code = (section.codeText for section in sections).join language.codeSplitText
+  docs = (section.docsText for section in sections).join language.docsSplitText
+  
+  pygments.stderr.on 'data', ->
+  pygments.stdin.on 'error', ->
   pygments.stdout.on 'data', (result) ->
     output += result if result
 
   pygments.on 'exit', ->
     output = output.replace(highlightStart, '').replace(highlightEnd, '')
-    fragments = output.split language.dividerHtml
+    if output is ''
+      codeFragments = (htmlEscape section.codeText for section in sections)
+    else
+      codeFragments = output.split language.codeSplitHtml
+    docsFragments = showdown.makeHtml(docs).split language.docsSplitHtml
+    
     for section, i in sections
-      section.codeHtml = highlightStart + fragments[i] + highlightEnd
-      section.docsHtml = showdown.makeHtml section.docsText
+      section.codeHtml = highlightStart + codeFragments[i] + highlightEnd
+      section.docsHtml = docsFragments[i]
     callback()
 
   if pygments.stdin.writable
-    text = (section.codeText for section in sections)
-    pygments.stdin.write text.join language.dividerText
+    pygments.stdin.write code
     pygments.stdin.end()
-
+  
 # Highlights a single chunk of code, using **Highlight.js**,
 # and runs the text of its corresponding comment through **Markdown**, using
 # [Showdown.js](http://attacklab.net/showdown/).
@@ -164,6 +167,16 @@ destination = (config) ->
       path.join(config.output, path.dirname(filepath).replace(/\//g, '_') + '_' + path.basename(filepath, path.extname(filepath)) + '.html')
     else
       path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html')
+  
+# Escape an html string, to produce valid non-highlighted output when pygments 
+# is not present on the system.
+htmlEscape = (string) -> 
+  string.replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g,'&#x2F;')
 
 # Once all of the code is finished highlighting, we can generate the HTML file by
 # passing the completed sections into the template, and then writing the file to
@@ -215,19 +228,33 @@ for ext, l of languages
 
   # The dividing token we feed into Pygments, to delimit the boundaries between
   # sections.
-  l.dividerText = "\n#{l.symbol}DIVIDER\n"
+  l.codeSplitText = "\n#{l.symbol}DIVIDER\n"
 
-  # The mirror of `dividerText` that we expect Pygments to return. We can split
+  # The mirror of `codeSplitText` that we expect Pygments to return. We can split
   # on this to recover the original sections.
   # Note: the class is "c" for Python and "c1" for the other languages
-  l.dividerHtml = ///\n*<span\sclass="c1?">#{l.symbol}DIVIDER<\/span>\n*///
+  l.codeSplitHtml = ///\n*<span\sclass="c1?">#{l.symbol}DIVIDER<\/span>\n*///
+
+  # The dividing token we feed into Showdown, to delimit the boundaries between
+  # sections.
+  l.docsSplitText = "\n##{l.name}DOCDIVIDER\n"
+
+  # The mirror of `docsSplitText` that we expect Showdown to return. We can split
+  # on this to recover the original sections.
+  l.docsSplitHtml = ///<h1>#{l.name}DOCDIVIDER</h1>///
 
 # Get the current language we're documenting, based on the extension.
 getLanguage = (source) -> languages[path.extname(source)]
 
 # Ensure that the destination directory exists.
-ensureDirectory = (dir, callback) ->
-  exec "mkdir -p #{dir}", -> callback()
+ensureDirectory = (dir, cb, made=null) ->
+  mode = parseInt '0777', 8
+  fs.mkdir dir, mode, (er) ->
+    return cb null, made || dir if not er
+    if er.code == 'ENOENT'
+      return ensureDirectory path.dirname(dir), (er, made) ->
+        if er then cb er, made else ensureDirectory dir, cb, made
+    cb er, made
 
 # Checks to see if the system has **Pygments** available so that we can
 # fall back on hightlightJS if we need to
@@ -364,4 +391,5 @@ exports[key] = value for key, value of {
   version       : version
   defaults      : defaults
   languages     : languages
+  ensureDirectory: ensureDirectory
 }

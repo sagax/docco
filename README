@@ -32,3 +32,11 @@ $ docco
     -l, --indextitle [indextitle]  title that the index page will show in the
                                    <title> tag as well as in the <h1> tag. Default
                                    is "File index"
+
+Building and Testing:
+
+  npm install
+  cake build
+  cake test
+  
+For code syntax highlighting, install Python Pygments with `sudo easy_install pygments`
