@@ -15,23 +15,23 @@
   ".latex":
     {"name" : "tex", "symbol" : "%", "enter": "\\\\begin{comment}", "exit": "\\\\end{comment}" },
   ".js":
-    {"name" : "javascript", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" },
+    {"name" : "javascript", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
   ".sass":
-    {"name" : "sass", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$" },
+    {"name" : "sass", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
   ".scss":
-    {"name" : "scss", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$" },
+    {"name" : "scss", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
   ".css":
-    {"name" : "css", "symbol" : "", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$" },
+    {"name" : "css", "symbol" : "", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
   ".c":
-    {"name" : "c", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" },
+    {"name" : "c", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
   ".h":
-    {"name" : "c", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" },
+    {"name" : "c", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
   ".cc":
-    {"name" : "cpp", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" },
+    {"name" : "cpp", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
   ".cpp":
-    {"name" : "cpp", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" },
+    {"name" : "cpp", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
   ".php":
-    {"name" : "php", "symbol" : "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" },
+    {"name" : "php", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
   ".hs":
     {"name" : "haskell", "symbol" : "--"},
   ".erl":
@@ -43,7 +43,7 @@
   ".markdown":
     {"name" : "text", "symbol" : ""},
   ".less":
-    {"name" : "scss", "symbol": "//", "enter": "^\\s*\\/\\*\\s*", "exit": "\\s*\\*\\/\\s*$" },
+    {"name" : "scss", "symbol": "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
   ".m":
     {"name" : "objc", "symbol": "//"},
   ".scala":
@@ -53,5 +53,5 @@
   ".mak":
     { "name": "makefile", "symbol": "#" },
   ".jison":
-    {"name" : "jison", "symbol" : "//", "enter": "^\\s*\\/\\*\\s+", "exit": "\\s*\\*\\/\\s*$", "param": "@([a-zA-Z]+)" }
+    {"name" : "jison", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" }
 }

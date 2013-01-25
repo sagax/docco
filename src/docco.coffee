@@ -3,14 +3,14 @@
 # that displays your comments alongside your code. Comments are passed through
 # [Markdown](http://daringfireball.net/projects/markdown/syntax), and code is
 # passed through [Pygments](http://pygments.org/) syntax highlighting, if it
-# is present on the system. 
+# is present on the system.
 # This page is the result of running Docco against its own source file.
 #
 # If you install Docco, you can run it from the command-line:
 #
 #     docco src/*.coffee
 #
-# ...will generate an HTML documentation page for each of the named source files, 
+# ...will generate an HTML documentation page for each of the named source files,
 # with a menu linking to the other pages, saving it into a `docs` folder.
 #
 # The [source for Docco](http://github.com/jashkenas/docco) is available on GitHub,
@@ -29,27 +29,27 @@
 #
 #### Partners in Crime:
 #
-# * If **Node.js** doesn't run on your platform, or you'd prefer a more 
-# convenient package, get [Ryan Tomayko](http://github.com/rtomayko)'s 
-# [Rocco](http://rtomayko.github.com/rocco/rocco.html), the Ruby port that's 
-# available as a gem. 
-# 
+# * If **Node.js** doesn't run on your platform, or you'd prefer a more
+# convenient package, get [Ryan Tomayko](http://github.com/rtomayko)'s
+# [Rocco](http://rtomayko.github.com/rocco/rocco.html), the Ruby port that's
+# available as a gem.
+#
 # * If you're writing shell scripts, try
 # [Shocco](http://rtomayko.github.com/shocco/), a port for the **POSIX shell**,
 # also by Mr. Tomayko.
-# 
-# * If Python's more your speed, take a look at 
-# [Nick Fitzgerald](http://github.com/fitzgen)'s [Pycco](http://fitzgen.github.com/pycco/). 
 #
-# * For **Clojure** fans, [Fogus](http://blog.fogus.me/)'s 
-# [Marginalia](http://fogus.me/fun/marginalia/) is a bit of a departure from 
+# * If Python's more your speed, take a look at
+# [Nick Fitzgerald](http://github.com/fitzgen)'s [Pycco](http://fitzgen.github.com/pycco/).
+#
+# * For **Clojure** fans, [Fogus](http://blog.fogus.me/)'s
+# [Marginalia](http://fogus.me/fun/marginalia/) is a bit of a departure from
 # "quick-and-dirty", but it'll get the job done.
 #
-# * **Lua** enthusiasts can get their fix with 
+# * **Lua** enthusiasts can get their fix with
 # [Robert Gieseke](https://github.com/rgieseke)'s [Locco](http://rgieseke.github.com/locco/).
-# 
+#
 # * And if you happen to be a **.NET**
-# aficionado, check out [Don Wilson](https://github.com/dontangg)'s 
+# aficionado, check out [Don Wilson](https://github.com/dontangg)'s
 # [Nocco](http://dontangg.github.com/nocco/).
 
 #### Main Documentation Generation Functions
@@ -93,18 +93,18 @@ parse = (source, code, blocks=false) ->
   for line in lines
     if in_block
       ++in_block
-    
-    # If we're not in a block comment, and find a match for the start 
+
+    # If we're not in a block comment, and find a match for the start
     # of one, eat the tokens, and note that we're now in a block.
     if not in_block and blocks and language.blocks and line.match(language.commentEnter)
       line = line.replace(language.commentEnter, '')
       in_block = 1
-      
-    # Process the line, marking it as docs if we're in a block comment, 
+
+    # Process the line, marking it as docs if we're in a block comment,
     # or we find a single-line comment marker.
     single = (language.commentMatcher and line.match(language.commentMatcher) and not line.match(language.commentFilter))
     if in_block or single
-      
+
       # If we have code text, and we're entering a comment, store off
       # the current docs and code, then start a new section.
       if hasCode
@@ -114,9 +114,9 @@ parse = (source, code, blocks=false) ->
       # If there's a single comment, and we're not in a block, eat the
       # comment token.
       line = line.replace(language.commentMatcher, '') if not in_block
-	
-      if in_block > 1
-        line = line.replace(/^\s*[\*]\s?/, '');
+
+      if in_block > 1 and language.commentNext
+        line = line.replace(language.commentNext, '');
       if language.commentParam
         param = line.match(language.commentParam);
         if param
@@ -126,14 +126,14 @@ parse = (source, code, blocks=false) ->
       # the end token, and note that we're no longer in the block.
       if in_block and line.match(language.commentExit)
         line = line.replace(language.commentExit, '')
-        in_block = false        
-      
+        in_block = false
+
       docsText += line + '\n'
     else
       hasCode = yes
       codeText += line + '\n'
-      
-  # Save the final section, if any, and return the sections array. 
+
+  # Save the final section, if any, and return the sections array.
   save docsText, codeText   # if codeText != '' and docsText != ''
   sections
 
@@ -143,7 +143,7 @@ parse = (source, code, blocks=false) ->
 # on the system, output the code in plain text.
 #
 #
-# We process all sections with single calls to Pygments and Showdown, by 
+# We process all sections with single calls to Pygments and Showdown, by
 # inserting marker comments between them, and then splitting the result
 # string wherever the marker occurs.
 highlight = (source, sections, callback) ->
@@ -156,12 +156,12 @@ highlight = (source, sections, callback) ->
   output = ''
   code = (section.codeText for section in sections).join language.codeSplitText
   docs = (section.docsText for section in sections).join language.docsSplitText
-  
+
   pygments.stderr.on 'data', ->
   pygments.stdin.on 'error', ->
   pygments.stdout.on 'data', (result) ->
     output += result if result
-    
+
   pygments.on 'exit', ->
     output = output.replace(highlightStart, '').replace(highlightEnd, '')
     if output is ''
@@ -169,19 +169,19 @@ highlight = (source, sections, callback) ->
     else
       codeFragments = output.split language.codeSplitHtml
     docsFragments = showdown.makeHtml(docs).split language.docsSplitHtml
-    
+
     for section, i in sections
       section.codeHtml = highlightStart + codeFragments[i] + highlightEnd
       section.docsHtml = docsFragments[i]
     callback()
-    
+
   if pygments.stdin.writable
     pygments.stdin.write code
     pygments.stdin.end()
-  
-# Escape an html string, to produce valid non-highlighted output when pygments 
+
+# Escape an html string, to produce valid non-highlighted output when pygments
 # is not present on the system.
-htmlEscape = (string) -> 
+htmlEscape = (string) ->
   string.replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -190,21 +190,21 @@ htmlEscape = (string) ->
     .replace(/\//g,'&#x2F;')
 
 # Once all of the code is finished highlighting, we can generate the HTML file by
-# passing the completed sections into the template, and then writing the file to 
+# passing the completed sections into the template, and then writing the file to
 # the specified output path.
 generateHtml = (source, sections, config) ->
   # Compute the destination HTML path for an input source file path. If the source
   # is `lib/example.coffee`, the HTML will be at `docs/example.html`
   destination = (filepath) ->
     path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html')
-    
+
   title = path.basename source
   dest  = destination source
   html  = config.doccoTemplate {
-    title      : title, 
-    sections   : sections, 
-    sources    : config.sources, 
-    path       : path, 
+    title      : title,
+    sections   : sections,
+    sources    : config.sources,
+    path       : path,
     destination: destination
     css        : path.basename(config.css)
   }
@@ -243,6 +243,8 @@ for ext, l of languages
     l.blocks = true
     l.commentEnter = new RegExp(l.enter)
     l.commentExit = new RegExp(l.exit)
+    if (l.next)
+      l.commentNext = new RegExp(l.next)
   if l.param
     l.commentParam = new RegExp(l.param)
 
@@ -307,21 +309,21 @@ highlightEnd   = '</pre></div>'
 # A simple usage might look like this
 #
 #     Docco = require('docco')
-#     
-#     sources = 
+#
+#     sources =
 #       "src/index.coffee"
 #       "src/plugins/*.coffee"
 #       "src/web/*.py"
-#     
-#     options = 
+#
+#     options =
 #       template : "src/templates/docs/myproject.jst"
 #       output   : "web/docs"
 #       css      : "src/templates/docs/myproject.docs.css"
 #       blocks   : true
-#     
+#
 #     Docco.document sources, options, ->
 #       console.log("Docco documentation complete.")
-#     
+#
 
 # Extract the docco version from `package.json`
 version = JSON.parse(fs.readFileSync("#{__dirname}/../package.json")).version
@@ -335,9 +337,9 @@ defaults =
 
 
 # ### Run from Commandline
-  
-# Run Docco from a set of command line arguments.  
-#  
+
+# Run Docco from a set of command line arguments.
+#
 # 1. Parse command line using [Commander JS](https://github.com/visionmedia/commander.js).
 # 2. Document sources, or print the usage help if none are specified.
 run = (args=process.argv) ->
@@ -357,11 +359,11 @@ run = (args=process.argv) ->
 # ### Document Sources
 
 # Run Docco over a list of `sources` with the given `options`.
-#  
+#
 # 1. Construct config to use by taking `defaults` first, then  merging in `options`
 # 2. Generate the resolved source list, filtering out unknown types.
 # 3. Load the specified template and css files.
-# 4. Ensure the output path is created, write out the CSS file, 
+# 4. Ensure the output path is created, write out the CSS file,
 # document each source, and invoke the completion callback if it is specified.
 document = (sources, options = {}, callback = null) ->
   config = {}
@@ -371,15 +373,15 @@ document = (sources, options = {}, callback = null) ->
   resolved = []
   resolved = resolved.concat(resolveSource(src)) for src in sources
   config.sources = resolved.filter((source) -> getLanguage source).sort()
-  console.log "docco: skipped unknown type (#{m})" for m in resolved when m not in config.sources  
-  
+  console.log "docco: skipped unknown type (#{m})" for m in resolved when m not in config.sources
+
   config.doccoTemplate = template fs.readFileSync(config.template).toString()
   doccoStyles = fs.readFileSync(config.css).toString()
 
   ensureDirectory config.output, ->
     fs.writeFileSync path.join(config.output,path.basename(config.css)), doccoStyles
     files = config.sources.slice()
-    nextFile = -> 
+    nextFile = ->
       callback() if callback? and not files.length
       generateDocumentation files.shift(), config, nextFile if files.length
     nextFile()
