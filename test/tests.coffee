@@ -26,7 +26,7 @@ testDoccoRun = (testName,sources,options=null,callback=null) ->
       # then the number of files actually found in the output path.
       files       = []
       files       = files.concat(Docco.resolveSource(src)) for src in sources
-      expected    = files.length + 1
+      expected    = files.length + if options?.markdown then 2 else 1
       found       = fs.readdirSync(destPath).length
 
       # Check the expected number of files against the number of
@@ -35,6 +35,12 @@ testDoccoRun = (testName,sources,options=null,callback=null) ->
 
       # Trigger the completion callback if it's specified
       callback() if callback?
+
+# **Optional markdown output should be supported**
+test "markdown from docco", ->
+  testDoccoRun "markdown_output", 
+    ["#{testPath}/*.coffee"],
+    markdown: true
 
 # **Custom jst template files should be supported**
 test "custom JST template file", ->

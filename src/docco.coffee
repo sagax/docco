@@ -63,7 +63,7 @@ generateDocumentation = (source, config, callback) ->
     code = buffer.toString()
     sections = parse source, code, config.blocks
     highlight source, sections, ->
-      generateHtml source, sections, config
+      generateOutput source, sections, config
       callback()
 
 # Given a string of source code, parse out each comment and the code that
@@ -192,14 +192,20 @@ htmlEscape = (string) ->
 # Once all of the code is finished highlighting, we can generate the HTML file by
 # passing the completed sections into the template, and then writing the file to
 # the specified output path.
-generateHtml = (source, sections, config) ->
+generateOutput = (source, sections, config) ->
   # Compute the destination HTML path for an input source file path. If the source
   # is `lib/example.coffee`, the HTML will be at `docs/example.html`
-  destination = (filepath) ->
-    path.join(config.output, path.basename(filepath, path.extname(filepath)) + '.html')
-
+  destination = (filepath, ext) ->
+    path.join(config.output, path.basename(filepath, path.extname(filepath)) + ".#{ext}")
+  writeOutput = (source, dest, data) ->
+    console.log "docco: #{source} -> #{dest}"
+    fs.writeFileSync dest, data
+  if config.markdown
+    dest = destination source, "md"
+    markdown = sections.map( (section) -> section.docsText ).join "\n"
+    writeOutput source, dest, markdown
   title = path.basename source
-  dest  = destination source
+  dest  = destination source, 'html'
   html  = config.doccoTemplate {
     title      : title,
     sections   : sections,
@@ -208,8 +214,7 @@ generateHtml = (source, sections, config) ->
     destination: destination
     css        : path.basename(config.css)
   }
-  console.log "docco: #{source} -> #{dest}"
-  fs.writeFileSync dest, html
+  writeOutput source, dest, html
 
 #### Helpers & Setup
 
@@ -333,8 +338,8 @@ defaults =
   template: "#{__dirname}/../resources/docco.jst"
   css     : "#{__dirname}/../resources/docco.css"
   output  : "docs/"
-  blocks  : false
-
+  blocks  : false,
+  markdown: false
 
 # ### Run from Commandline
 
@@ -349,6 +354,7 @@ run = (args=process.argv) ->
     .option("-o, --output [path]","use a custom output path",defaults.output)
     .option("-t, --template [file]","use a custom .jst template",defaults.template)
     .option("-b, --blocks","parse block comments where available",defaults.blocks)
+    .option("-m, --markdown","output markdown",defaults.markdown)
     .parse(args)
     .name = "docco"
   if commander.args.length
