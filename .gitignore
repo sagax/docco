@@ -3,3 +3,7 @@ output
 docs
 test/data
 node_modules
+
+# editor backup files
+*~
+*.bak
