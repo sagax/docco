@@ -62,7 +62,7 @@ generateDocumentation = (source, config, callback) ->
     throw error if error
     code = buffer.toString()
     sections = parse source, code, config
-    highlight source, sections, ->
+    highlight source, sections, config, ->
       generateOutput source, sections, config
       callback()
 
@@ -141,7 +141,6 @@ parse = (source, code, config) ->
 # and runs the text of their corresponding comments through **Markdown**, using
 # [Showdown.js](https://github.com/coreyti/showdown).  If Pygments is not present
 # on the system, output the code in plain text.
-#
 #
 # We process all sections with single calls to Pygments and Showdown, by
 # inserting marker comments between them, and then splitting the result

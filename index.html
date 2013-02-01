@@ -65,9 +65,9 @@ and merging them into an HTML template.</p>
   <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span> <span class="nx">source</span><span class="p">,</span> <span class="nf">(error, buffer) -&gt;</span>
     <span class="k">throw</span> <span class="nx">error</span> <span class="k">if</span> <span class="nx">error</span>
     <span class="nv">code = </span><span class="nx">buffer</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span>
-    <span class="nv">sections = </span><span class="nx">parse</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">code</span><span class="p">,</span> <span class="nx">config</span><span class="p">.</span><span class="nx">blocks</span>
-    <span class="nx">highlight</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">sections</span><span class="p">,</span> <span class="o">-&gt;</span>
-      <span class="nx">generateHtml</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">sections</span><span class="p">,</span> <span class="nx">config</span>
+    <span class="nv">sections = </span><span class="nx">parse</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">code</span><span class="p">,</span> <span class="nx">config</span>
+    <span class="nx">highlight</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">sections</span><span class="p">,</span> <span class="nx">config</span><span class="p">,</span> <span class="o">-&gt;</span>
+      <span class="nx">generateOutput</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">sections</span><span class="p">,</span> <span class="nx">config</span>
       <span class="nx">callback</span><span class="p">()</span></pre></div></div>                      </li>                              <li id="section-4">             <div class="annotation">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>                           
 
 <p>Given a string of source code, parse out each comment and the code that
@@ -82,11 +82,11 @@ Sections take the form:</p>
 }
 </code></pre>
 
-             </div>                          <div class="content"><div class="highlight"><pre><span class="nv">parse = </span><span class="nf">(source, code, blocks=false) -&gt;</span>
+             </div>                          <div class="content"><div class="highlight"><pre><span class="nv">parse = </span><span class="nf">(source, code, config) -&gt;</span>
   <span class="nv">param    = </span><span class="s">&#39;&#39;</span>
   <span class="nv">lines    = </span><span class="nx">code</span><span class="p">.</span><span class="nx">split</span> <span class="s">&#39;\n&#39;</span>
   <span class="nv">sections = </span><span class="p">[]</span>
-  <span class="nv">language = </span><span class="nx">getLanguage</span> <span class="nx">source</span>
+  <span class="nv">language = </span><span class="nx">getLanguage</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">config</span>
   <span class="nv">hasCode  = docsText = codeText = </span><span class="s">&#39;&#39;</span>
   <span class="nv">in_block = </span><span class="mi">0</span>
 
@@ -103,7 +103,7 @@ comments from code chunks.</p>
 <p>If we're not in a block comment, and find a match for the start
 of one, eat the tokens, and note that we're now in a block.</p>
 
-             </div>                          <div class="content"><div class="highlight"><pre>    <span class="k">if</span> <span class="o">not</span> <span class="nx">in_block</span> <span class="o">and</span> <span class="nx">blocks</span> <span class="o">and</span> <span class="nx">language</span><span class="p">.</span><span class="nx">blocks</span> <span class="o">and</span> <span class="nx">line</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">language</span><span class="p">.</span><span class="nx">commentEnter</span><span class="p">)</span>
+             </div>                          <div class="content"><div class="highlight"><pre>    <span class="k">if</span> <span class="o">not</span> <span class="nx">in_block</span> <span class="o">and</span> <span class="nx">config</span><span class="p">.</span><span class="nx">blocks</span> <span class="o">and</span> <span class="nx">language</span><span class="p">.</span><span class="nx">blocks</span> <span class="o">and</span> <span class="nx">line</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">language</span><span class="p">.</span><span class="nx">commentEnter</span><span class="p">)</span>
       <span class="nv">line = </span><span class="nx">line</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">language</span><span class="p">.</span><span class="nx">commentEnter</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
       <span class="nv">in_block = </span><span class="mi">1</span></pre></div></div>                      </li>                              <li id="section-7">             <div class="annotation">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>                           
 
@@ -158,8 +158,8 @@ on the system, output the code in plain text.</p>
 inserting marker comments between them, and then splitting the result
 string wherever the marker occurs.</p>
 
-             </div>                          <div class="content"><div class="highlight"><pre><span class="nv">highlight = </span><span class="nf">(source, sections, callback) -&gt;</span>
-  <span class="nv">language = </span><span class="nx">getLanguage</span> <span class="nx">source</span>
+             </div>                          <div class="content"><div class="highlight"><pre><span class="nv">highlight = </span><span class="nf">(source, sections, config, callback) -&gt;</span>
+  <span class="nv">language = </span><span class="nx">getLanguage</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">config</span>
   <span class="nv">pygments = </span><span class="nx">spawn</span> <span class="s">&#39;pygmentize&#39;</span><span class="p">,</span> <span class="p">[</span>
     <span class="s">&#39;-l&#39;</span><span class="p">,</span> <span class="nx">language</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span>
     <span class="s">&#39;-f&#39;</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">,</span>
@@ -206,16 +206,22 @@ is not present on the system.</p>
 passing the completed sections into the template, and then writing the file to
 the specified output path.</p>
 
-             </div>                          <div class="content"><div class="highlight"><pre><span class="nv">generateHtml = </span><span class="nf">(source, sections, config) -&gt;</span></pre></div></div>                      </li>                              <li id="section-15">             <div class="annotation">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>                           
+             </div>                          <div class="content"><div class="highlight"><pre><span class="nv">generateOutput = </span><span class="nf">(source, sections, config) -&gt;</span></pre></div></div>                      </li>                              <li id="section-15">             <div class="annotation">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>                           
 
 <p>Compute the destination HTML path for an input source file path. If the source
 is <code>lib/example.coffee</code>, the HTML will be at <code>docs/example.html</code></p>
 
-             </div>                          <div class="content"><div class="highlight"><pre>  <span class="nv">destination = </span><span class="nf">(filepath) -&gt;</span>
-    <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">output</span><span class="p">,</span> <span class="nx">path</span><span class="p">.</span><span class="nx">basename</span><span class="p">(</span><span class="nx">filepath</span><span class="p">,</span> <span class="nx">path</span><span class="p">.</span><span class="nx">extname</span><span class="p">(</span><span class="nx">filepath</span><span class="p">))</span> <span class="o">+</span> <span class="s">&#39;.html&#39;</span><span class="p">)</span>
-
+             </div>                          <div class="content"><div class="highlight"><pre>  <span class="nv">destination = </span><span class="nf">(filepath, ext) -&gt;</span>
+    <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">output</span><span class="p">,</span> <span class="nx">path</span><span class="p">.</span><span class="nx">basename</span><span class="p">(</span><span class="nx">filepath</span><span class="p">,</span> <span class="nx">path</span><span class="p">.</span><span class="nx">extname</span><span class="p">(</span><span class="nx">filepath</span><span class="p">))</span> <span class="o">+</span> <span class="s">&quot;.</span><span class="si">#{</span><span class="nx">ext</span><span class="si">}</span><span class="s">&quot;</span><span class="p">)</span>
+  <span class="nv">writeOutput = </span><span class="nf">(source, dest, data) -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&quot;docco: </span><span class="si">#{</span><span class="nx">source</span><span class="si">}</span><span class="s"> -&gt; </span><span class="si">#{</span><span class="nx">dest</span><span class="si">}</span><span class="s">&quot;</span>
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="nx">dest</span><span class="p">,</span> <span class="nx">data</span>
+  <span class="k">if</span> <span class="nx">config</span><span class="p">.</span><span class="nx">markdown</span>
+    <span class="nv">dest = </span><span class="nx">destination</span> <span class="nx">source</span><span class="p">,</span> <span class="s">&quot;md&quot;</span>
+    <span class="nv">markdown = </span><span class="nx">sections</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span> <span class="nf">(section) -&gt;</span> <span class="nx">section</span><span class="p">.</span><span class="nx">docsText</span> <span class="p">).</span><span class="nx">join</span> <span class="s">&quot;\n&quot;</span>
+    <span class="nx">writeOutput</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">dest</span><span class="p">,</span> <span class="nx">markdown</span>
   <span class="nv">title = </span><span class="nx">path</span><span class="p">.</span><span class="nx">basename</span> <span class="nx">source</span>
-  <span class="nv">dest  = </span><span class="nx">destination</span> <span class="nx">source</span>
+  <span class="nv">dest  = </span><span class="nx">destination</span> <span class="nx">source</span><span class="p">,</span> <span class="s">&#39;html&#39;</span>
   <span class="nv">html  = </span><span class="nx">config</span><span class="p">.</span><span class="nx">doccoTemplate</span> <span class="p">{</span>
     <span class="nv">title      : </span><span class="nx">title</span><span class="p">,</span>
     <span class="nv">sections   : </span><span class="nx">sections</span><span class="p">,</span>
@@ -224,8 +230,7 @@ is <code>lib/example.coffee</code>, the HTML will be at <code>docs/example.html<
     <span class="nv">destination: </span><span class="nx">destination</span>
     <span class="nv">css        : </span><span class="nx">path</span><span class="p">.</span><span class="nx">basename</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">css</span><span class="p">)</span>
   <span class="p">}</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&quot;docco: </span><span class="si">#{</span><span class="nx">source</span><span class="si">}</span><span class="s"> -&gt; </span><span class="si">#{</span><span class="nx">dest</span><span class="si">}</span><span class="s">&quot;</span>
-  <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span> <span class="nx">dest</span><span class="p">,</span> <span class="nx">html</span></pre></div></div>                      </li>                              <li id="section-16">             <div class="annotation">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>                           
+  <span class="nx">writeOutput</span> <span class="nx">source</span><span class="p">,</span> <span class="nx">dest</span><span class="p">,</span> <span class="nx">html</span></pre></div></div>                      </li>                              <li id="section-16">             <div class="annotation">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>                           
 
 <h3>Helpers &amp; Setup</h3>
 
@@ -300,7 +305,11 @@ on this to recover the original sections.</p>
 
 <p>Get the current language we're documenting, based on the extension.</p>
 
-             </div>                          <div class="content"><div class="highlight"><pre><span class="sr">getLanguage = (source) -&gt; languages[path.extname(source)]</span></pre></div></div>                      </li>                              <li id="section-29">             <div class="annotation">               <div class="pilwrap">                 <a class="pilcrow" href="#section-29">&#182;</a>               </div>                           
+             </div>                          <div class="content"><div class="highlight"><pre><span class="sr">getLanguage = (source, config) -&gt;</span>
+<span class="sr">  if config?.forceExt?</span>
+<span class="sr">    languages[config.forceExt]</span>
+<span class="sr">  else</span>
+<span class="sr">    languages[path.extname(source)]</span></pre></div></div>                      </li>                              <li id="section-29">             <div class="annotation">               <div class="pilwrap">                 <a class="pilcrow" href="#section-29">&#182;</a>               </div>                           
 
 <p>Ensure that the destination directory exists.</p>
 
@@ -373,7 +382,9 @@ Docco.document sources, options, -&gt;
 <span class="sr">  template: &quot;</span><span class="c1">#{__dirname}/../resources/docco.jst&quot;</span>
   <span class="sr">css     : &quot;</span><span class="c1">#{__dirname}/../resources/resources/docco.css&quot;</span>
   <span class="sr">output  : &quot;docs/&quot;</span>
-<span class="sr">  blocks  : false</span></pre></div></div>                      </li>                              <li id="section-37">             <div class="annotation">               <div class="pilwrap">                 <a class="pilcrow" href="#section-37">&#182;</a>               </div>                           
+<span class="sr">  forceExt: null,</span>
+<span class="sr">  blocks  : false,</span>
+<span class="sr">  markdown: false</span></pre></div></div>                      </li>                              <li id="section-37">             <div class="annotation">               <div class="pilwrap">                 <a class="pilcrow" href="#section-37">&#182;</a>               </div>                           
 
 <h3>Run from Commandline</h3>
 
@@ -393,6 +404,8 @@ Docco.document sources, options, -&gt;
 <span class="sr">    .option(&quot;-o, --output [path]&quot;,&quot;use a custom output path&quot;,defaults.output)</span>
 <span class="sr">    .option(&quot;-t, --template [file]&quot;,&quot;use a custom .jst template&quot;,defaults.template)</span>
 <span class="sr">    .option(&quot;-b, --blocks&quot;,&quot;parse block comments where available&quot;,defaults.blocks)</span>
+<span class="sr">    .option(&quot;-m, --markdown&quot;,&quot;output markdown&quot;,defaults.markdown)</span>
+<span class="sr">    .option(&quot;--force-ext &lt;ext&gt;&quot;,&quot;treat the target files as if they have a specific extension&quot;,defaults.forceExt)</span>
 <span class="sr">    .parse(args)</span>
 <span class="sr">    .name = &quot;docco&quot;</span>
 <span class="sr">  if commander.args.length</span>
@@ -421,7 +434,7 @@ document each source, and invoke the completion callback if it is specified.</li
 
 <span class="sr">  resolved = []</span>
 <span class="sr">  resolved = resolved.concat(resolveSource(src)) for src in sources</span>
-<span class="sr">  config.sources = resolved.filter((source) -&gt; getLanguage source).sort()</span>
+<span class="sr">  config.sources = resolved.filter((source) -&gt; getLanguage source, config).sort()</span>
 <span class="sr">  console.log &quot;docco: skipped unknown type (</span><span class="c1">#{m})&quot; for m in resolved when m not in config.sources</span>
 
   <span class="sr">config.doccoTemplate = template fs.readFileSync(config.template).toString()</span>
