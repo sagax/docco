@@ -49,6 +49,12 @@ Install (on Ubuntu 12):
   cake.coffeescript test
 
 
+When you run
+  cake.coffeescript install
+you must make sure to install the commander package as well:
+  npm install commander -g
+
+
 
 Building and Testing (original, outdated info):
 -----------------------------------------------
