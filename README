@@ -38,8 +38,6 @@ Building and Testing
 Install (on Ubuntu 12):
 
 ( as root )
-    apt-get install python-setuptools
-    easy_install pygments
     apt-get install coffeescript
 
 ( as user )
@@ -64,7 +62,6 @@ Building and Testing (original, outdated info):
     cake build
     cake test
 
-For code syntax highlighting, install Python Pygments with `sudo easy_install pygments`
 
 
 ===================================================================
