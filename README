@@ -37,31 +37,31 @@ Building and Testing
 Install (on Ubuntu 12):
 
 ( as root )
-	apt-get install python-setuptools
-	easy_install pygments
-	apt-get install coffeescript
+    apt-get install python-setuptools
+    easy_install pygments
+    apt-get install coffeescript
 
 ( as user )
-	npm install
+    npm install
 ( See also: https://github.com/harvesthq/chosen/issues/508 )
-	cake.coffeescript build
-	cake.coffeescript doc
-  cake.coffeescript test
+    cake.coffeescript build
+    cake.coffeescript doc
+    cake.coffeescript test
 
 
 When you run
-  cake.coffeescript install
+    cake.coffeescript install
 you must make sure to install the commander package as well:
-  npm install commander -g
+    npm install commander -g
 
 
 
 Building and Testing (original, outdated info):
 -----------------------------------------------
 
-  npm install
-  cake build
-  cake test
+    npm install
+    cake build
+    cake test
 
 For code syntax highlighting, install Python Pygments with `sudo easy_install pygments`
 
