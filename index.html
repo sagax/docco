@@ -24,10 +24,6 @@
 
       
         
-        
-        
-      
-        
         <p><strong>Docco</strong> is a quick-and-dirty documentation generator, written in
 <a href="http://coffeescript.org/#literate">Literate CoffeeScript</a>.
 It produces an HTML document that displays your comments intermingled with your
@@ -36,152 +32,69 @@ code. All prose is passed through
 passed through <a href="http://highlightjs.org/">Highlight.js</a> syntax highlighting.
 This page is the result of running Docco against its own
 <a href="https://github.com/jashkenas/docco/blob/master/docco.litcoffee">source file</a>.</p>
-
-        
-      
-        
-        <ol>
-<li>Install Docco with <strong>npm</strong>: <code>sudo npm install -g docco</code></li>
+<ol>
+<li><p>Install Docco with <strong>npm</strong>: <code>sudo npm install -g docco</code></p>
+</li>
+<li><p>Run it against your code: <code>docco src/*.coffee</code></p>
+</li>
 </ol>
-
-        
-      
-        
-        <ol>
-<li>Run it against your code: <code>docco src/*.coffee</code></li>
-</ol>
-
-        
-      
-        
-        <p>There is no &quot;Step 3&quot;. This will generate an HTML page for each of the named
+<p>There is no &quot;Step 3&quot;. This will generate an HTML page for each of the named
 source files, with a menu linking to the other pages, saving the whole mess
 into a <code>docs</code> folder (configurable).</p>
-
-        
-      
-        
-        <p>The <a href="http://github.com/jashkenas/docco">Docco source</a> is available on GitHub,
+<p>The <a href="http://github.com/jashkenas/docco">Docco source</a> is available on GitHub,
 and is released under the <a href="http://opensource.org/licenses/MIT">MIT license</a>.</p>
-
-        
-      
-        
-        <p>Docco can be used to process code written in any programming language. If it
+<p>Docco can be used to process code written in any programming language. If it
 doesn&#39;t handle your favorite yet, feel free to
 <a href="https://github.com/jashkenas/docco/blob/master/resources/languages.json">add it to the list</a>.
 Finally, the <a href="http://coffeescript.org/#literate">&quot;literate&quot; style</a> of <em>any</em>
 language is also supported � just tack an <code>.md</code> extension on the end:
 <code>.coffee.md</code>, <code>.py.md</code>, and so on.</p>
-
-        
-      
-        
-        <p>By default only single-line comments are processed, block comments may be included
+<p>By default only single-line comments are processed, block comments may be included
 by passing the <code>-b</code> flag to Docco.</p>
+<h2>Partners in Crime:</h2>
 
-        
-      
-        
-        <h2>Partners in Crime:</h2>
-
-        
-      
-        
-        
         
       
         
         <ul>
-<li>If <strong>Node.js</strong> doesn&#39;t run on your platform, or you&#39;d prefer a more
+<li><p>If <strong>Node.js</strong> doesn&#39;t run on your platform, or you&#39;d prefer a more
 convenient package, get <a href="http://github.com/rtomayko">Ryan Tomayko</a>&#39;s
 <a href="http://rtomayko.github.com/rocco/rocco.html">Rocco</a>, the Ruby port that&#39;s
-available as a gem.</li>
-</ul>
-
-        
-      
-        
-        <ul>
-<li>If you&#39;re writing shell scripts, try
+available as a gem.</p>
+</li>
+<li><p>If you&#39;re writing shell scripts, try
 <a href="http://rtomayko.github.com/shocco/">Shocco</a>, a port for the <strong>POSIX shell</strong>,
-also by Mr. Tomayko.</li>
-</ul>
-
-        
-      
-        
-        <ul>
-<li>If <strong>Python</strong> is more your speed, take a look at
-<a href="http://github.com/fitzgen">Nick Fitzgerald</a>&#39;s <a href="http://fitzgen.github.com/pycco/">Pycco</a>.</li>
-</ul>
-
-        
-      
-        
-        <ul>
-<li>For <strong>Clojure</strong> fans, <a href="http://blog.fogus.me/">Fogus</a>&#39;s
+also by Mr. Tomayko.</p>
+</li>
+<li><p>If <strong>Python</strong> is more your speed, take a look at
+<a href="http://github.com/fitzgen">Nick Fitzgerald</a>&#39;s <a href="http://fitzgen.github.com/pycco/">Pycco</a>.</p>
+</li>
+<li><p>For <strong>Clojure</strong> fans, <a href="http://blog.fogus.me/">Fogus</a>&#39;s
 <a href="http://fogus.me/fun/marginalia/">Marginalia</a> is a bit of a departure from
-&quot;quick-and-dirty&quot;, but it&#39;ll get the job done.</li>
-</ul>
-
-        
-      
-        
-        <ul>
-<li>There&#39;s a <strong>Go</strong> port called <a href="http://nikhilm.github.com/gocco/">Gocco</a>,
-written by <a href="https://github.com/nikhilm">Nikhil Marathe</a>.</li>
-</ul>
-
-        
-      
-        
-        <ul>
-<li>Your all you <strong>PHP</strong> buffs out there, Fredi Bach&#39;s
+&quot;quick-and-dirty&quot;, but it&#39;ll get the job done.</p>
+</li>
+<li><p>There&#39;s a <strong>Go</strong> port called <a href="http://nikhilm.github.com/gocco/">Gocco</a>,
+written by <a href="https://github.com/nikhilm">Nikhil Marathe</a>.</p>
+</li>
+<li><p>Your all you <strong>PHP</strong> buffs out there, Fredi Bach&#39;s
 <a href="http://jquery-jkit.com/sourcemakeup/">sourceMakeup</a> (we&#39;ll let the faux pas
-with respect to our naming scheme slide), should do the trick nicely.</li>
-</ul>
-
-        
-      
-        
-        <ul>
-<li><strong>Lua</strong> enthusiasts can get their fix with
-<a href="https://github.com/rgieseke">Robert Gieseke</a>&#39;s <a href="http://rgieseke.github.com/locco/">Locco</a>.</li>
-</ul>
-
-        
-      
-        
-        <ul>
-<li>And if you happen to be a <strong>.NET</strong>
+with respect to our naming scheme slide), should do the trick nicely.</p>
+</li>
+<li><p><strong>Lua</strong> enthusiasts can get their fix with
+<a href="https://github.com/rgieseke">Robert Gieseke</a>&#39;s <a href="http://rgieseke.github.com/locco/">Locco</a>.</p>
+</li>
+<li><p>And if you happen to be a <strong>.NET</strong>
 aficionado, check out <a href="https://github.com/dontangg">Don Wilson</a>&#39;s
-<a href="http://dontangg.github.com/nocco/">Nocco</a>.</li>
-</ul>
-
-        
-      
-        
-        <ul>
-<li>Going further afield from the quick-and-dirty, <a href="http://nevir.github.com/groc/">Groc</a>
+<a href="http://dontangg.github.com/nocco/">Nocco</a>.</p>
+</li>
+<li><p>Going further afield from the quick-and-dirty, <a href="http://nevir.github.com/groc/">Groc</a>
 is a <strong>CoffeeScript</strong> fork of Docco that adds a searchable table of contents,
-and aims to gracefully handle large projects with complex hierarchies of code.</li>
+and aims to gracefully handle large projects with complex hierarchies of code.</p>
+</li>
 </ul>
+<p>Note that not all ports will support all Docco features ... yet.</p>
+<h2>Main Documentation Generation Functions</h2>
 
-        
-      
-        
-        <p>Note that not all ports will support all Docco features ... yet.</p>
-
-        
-      
-        
-        <h2>Main Documentation Generation Functions</h2>
-
-        
-      
-        
-        
         
       
         
@@ -324,15 +237,11 @@ name of the source file.</p>
         
       
         
-        
-        
-      
-        
         <p>Default configuration <strong>options</strong>. All of these may be overriden by command-line
 options.</p>
 
         
-          <div class='highlight'><pre>
+          <div class='highlight'><pre> 
 config =
   layout:     <span class="string">'parallel'</span>
   output:     <span class="string">'docs'</span>
@@ -372,10 +281,6 @@ source files for languages for which we have definitions.</p>
         
         <h2>Helpers &amp; Initial Setup</h2>
 
-        
-      
-        
-        
         
       
         
@@ -453,10 +358,6 @@ version = JSON.parse(fs.readFileSync(path.join(__dirname, <span class="string">'
         
         <h2>Command Line Interface</h2>
 
-        
-      
-        
-        
         
       
         
