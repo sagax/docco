@@ -119,6 +119,8 @@ parse = (source, code) ->
   sections = []
   lang     = getLanguage source
   hasCode  = docsText = codeText = ''
+  param    = ''
+  in_block = 0
 
   save = ->
     sections.push {docsText, codeText}
@@ -137,16 +139,53 @@ parse = (source, code) ->
       else
         lang.symbol + ' ' + line
 
+  # Iterate over the source lines, and separate out single/block
+  # comments from code chunks.
   for line in lines
-    if line.match(lang.commentMatcher) and not line.match(lang.commentFilter)
+    if in_block
+      ++in_block
+
+    # If we're not in a block comment, and find a match for the start
+    # of one, eat the tokens, and note that we're now in a block.
+    if not in_block and config.blocks and lang.blocks and line.match(lang.commentEnter)
+      line = line.replace(lang.commentEnter, '')
+      in_block = 1
+
+    # Process the line, marking it as docs if we're in a block comment,
+    # or we find a single-line comment marker.
+    single = (lang.commentMatcher and line.match(lang.commentMatcher) and not line.match(lang.commentFilter))
+    if in_block or single
+
+      # If we have code text, and we're entering a comment, store off
+      # the current docs and code, then start a new section.
       save() if hasCode
-      docsText += (line = line.replace(lang.commentMatcher, '')) + '\n'
+
+      # If there's a single comment, and we're not in a block, eat the
+      # comment token.
+      line = line.replace(lang.commentMatcher, '') if not in_block
+
+      if in_block > 1 and lang.commentNext
+        line = line.replace(lang.commentNext, '');
+      if lang.commentParam
+        param = line.match(lang.commentParam);
+        if param
+          line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
+
+      # If we're in a block, and we find the end of it in the line, eat
+      # the end token, and note that we're no longer in the block.
+      if in_block and line.match(lang.commentExit)
+        line = line.replace(lang.commentExit, '')
+        in_block = false
+
+      docsText += line + '\n'
       save() if /^(---+|===+)$/.test line
       prev = 'text'
     else
       hasCode = yes
       codeText += line + '\n'
       prev = 'code'
+
+  # Save the final section, if any, and return the sections array.
   save()
 
   sections
@@ -247,12 +286,21 @@ languages = JSON.parse fs.readFileSync(path.join(__dirname, 'resources', 'langua
 
 for ext, l of languages
 
-# Does the line begin with a comment?
+  # Does the line begin with a comment?
+  if (l.symbol)
+    l.commentMatcher = ///^\s*#{l.symbol}\s?///
 
-  l.commentMatcher = ///^\s*#{l.symbol}\s?///
+  # Support block comment parsing?
+  if l.enter and l.exit
+    l.blocks = true
+    l.commentEnter = new RegExp(l.enter)
+    l.commentExit = new RegExp(l.exit)
+    if (l.next)
+      l.commentNext = new RegExp(l.next)
+  if l.param
+    l.commentParam = new RegExp(l.param)
 
-# Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_(Unix\)) and interpolations...
-
+  # Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_(Unix\)) and interpolations...
   l.commentFilter = /(^#![/]|^\s*#\{)/
 
 # A function to get the current language we're documenting, based on the
