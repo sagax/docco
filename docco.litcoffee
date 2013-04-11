@@ -28,6 +28,9 @@ Finally, the ["literate" style](http://coffeescript.org/#literate) of *any*
 language is also supported — just tack an `.md` extension on the end:
 `.coffee.md`, `.py.md`, and so on.
 
+By default only single-line comments are processed, block comments may be included
+by passing the `-b` flag to Docco.
+
 
 Partners in Crime:
 ------------------
@@ -195,6 +198,8 @@ options.
       template:   null
       css:        null
       extension:  null
+      blocks:     false
+      markdown:   false
 
 **Configure** this particular run of Docco. We might use a passed-in external
 template, or one of the built-in **layouts**. We only attempt to process
@@ -281,6 +286,8 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
         .option('-o, --output [path]',    'output to a given folder', c.output)
         .option('-c, --css [file]',       'use a custom css file', c.css)
         .option('-t, --template [file]',  'use a custom .jst template', c.template)
+        .option('-b, --blocks',           'parse block comments where available', c.blocks)
+        .option('-m, --markdown',         'output markdown', c.markdown)
         .option('-e, --extension [ext]',  'assume a file extension for all inputs', c.extension)
         .parse(args)
         .name = "docco"
