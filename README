@@ -26,7 +26,7 @@ Usage: docco [options] <filePattern ...>
     -t, --template [file]  use a custom .jst template
     -b, --blocks           parse block comments where available
     -m, --markdown         output markdown
-    --force-ext <ext>      treat the target files as if they have a specific extension
+    -e, --extension <ext>  use the given file extension for all inputs
 
 
 ---

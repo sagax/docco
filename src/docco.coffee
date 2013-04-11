@@ -139,10 +139,11 @@ parse = (source, code, config) ->
 
 # Highlights parsed sections of code, using **Pygments** over stdio,
 # and runs the text of their corresponding comments through **Markdown**, using
-# [Showdown.js](https://github.com/coreyti/showdown).  If Pygments is not present
+# [Marked](https://github.com/chjj/marked).  If Pygments is not present
 # on the system, output the code in plain text.
 #
-# We process all sections with single calls to Pygments and Showdown, by
+#
+# We process all sections with single calls to Pygments and Marked, by
 # inserting marker comments between them, and then splitting the result
 # string wherever the marker occurs.
 highlight = (source, sections, config, callback) ->
@@ -167,7 +168,7 @@ highlight = (source, sections, config, callback) ->
       codeFragments = (htmlEscape section.codeText for section in sections)
     else
       codeFragments = output.split language.codeSplitHtml
-    docsFragments = showdown.makeHtml(docs).split language.docsSplitHtml
+    docsFragments = marked(docs).split language.docsSplitHtml
 
     for section, i in sections
       section.codeHtml = highlightStart + codeFragments[i] + highlightEnd
@@ -217,13 +218,12 @@ generateOutput = (source, sections, config) ->
 
 #### Helpers & Setup
 
-# Require our external dependencies, including **Showdown.js**
-# (the JavaScript implementation of Markdown).
-fs       = require 'fs'
-path     = require 'path'
-showdown = require('./../vendor/showdown').Showdown
+# Require our external dependencies.
+fs            = require 'fs'
+path          = require 'path'
+marked        = require 'marked'
 {spawn, exec} = require 'child_process'
-commander = require 'commander'
+commander     = require 'commander'
 
 # Read resource file and return its content.
 getResource = (name) ->
@@ -265,20 +265,16 @@ for ext, l of languages
   # Note: the class is "c" for Python and "c1" for the other languages
   l.codeSplitHtml = ///\n*<span\sclass="c1?">#{l.symbol}DIVIDER<\/span>\n*///
 
-  # The dividing token we feed into Showdown, to delimit the boundaries between
+  # The dividing token we feed into markdown, to delimit the boundaries between
   # sections.
   l.docsSplitText = "\n##{l.name}DOCDIVIDER\n"
 
-  # The mirror of `docsSplitText` that we expect Showdown to return. We can split
+  # The mirror of `docsSplitText` that we expect markdown to return. We can split
   # on this to recover the original sections.
   l.docsSplitHtml = ///<h1>#{l.name}DOCDIVIDER</h1>///
 
 # Get the current language we're documenting, based on the extension.
-getLanguage = (source, config) ->
-  if config?.forceExt?
-    languages[config.forceExt]
-  else
-    languages[path.extname(source)]
+getLanguage = (source, config) -> languages[config.extension or path.extname(source)]
 
 # Ensure that the destination directory exists.
 ensureDirectory = (dir, cb, made=null) ->
@@ -338,10 +334,10 @@ version = JSON.parse(fs.readFileSync("#{__dirname}/../package.json")).version
 
 # Default configuration options.
 defaults =
-  template: "#{__dirname}/../resources/docco.jst"
-  css     : "#{__dirname}/../resources/docco.css"
-  output  : "docs/"
-  forceExt: null,
+  template : "#{__dirname}/../resources/docco.jst"
+  css      : "#{__dirname}/../resources/docco.css"
+  output   : "docs/"
+  extension: null,
   blocks  : false,
   markdown: false
 
@@ -359,7 +355,7 @@ run = (args=process.argv) ->
     .option("-t, --template [file]","use a custom .jst template",defaults.template)
     .option("-b, --blocks","parse block comments where available",defaults.blocks)
     .option("-m, --markdown","output markdown",defaults.markdown)
-    .option("--force-ext <ext>","treat the target files as if they have a specific extension",defaults.forceExt)
+    .option("-e, --extension <ext>","use the given file extension for all inputs",defaults.extension)
     .parse(args)
     .name = "docco"
   if commander.args.length
