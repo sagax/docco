@@ -15,18 +15,19 @@ http://jashkenas.github.com/docco/
 Usage
 -----
 
-Usage: docco [options] <filePattern ...>
+Usage: docco [options] FILES
 
   Options:
 
     -h, --help             output usage information
     -V, --version          output the version number
+    -l, --layout [layout]  choose a built-in layouts (parallel, linear)
     -c, --css [file]       use a custom css file
     -o, --output [path]    use a custom output path
     -t, --template [file]  use a custom .jst template
     -b, --blocks           parse block comments where available
     -m, --markdown         output markdown
-    -e, --extension <ext>  use the given file extension for all inputs
+    -e, --extension [ext]  use the given file extension for all inputs
 
 
 ---

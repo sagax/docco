@@ -1,5 +1,10 @@
-{ ".coffee" :
-    {"name" : "coffee-script", "symbol" : "#", "enter": "^\\s*#{3}(?!#)", "exit": "#{3}(?!#)\\s*$" },
+{ 
+  ".coffee" :
+    {"name" : "coffeescript", "symbol" : "#", "enter": "^\\s*#{3}(?!#)", "exit": "#{3}(?!#)\\s*$" },
+  ".litcoffee" :
+    {"name" : "coffeescript", "symbol" : "#", "literate": true, "enter": "^\\s*#{3}(?!#)", "exit": "#{3}(?!#)\\s*$" },
+  "Cakefile":
+    {"name": "coffeescript", "symbol": "#"},
   ".ls":
     {"name" : "livescript", "symbol": "#"},
   ".rb":
@@ -41,19 +46,85 @@
   ".hrl":
     {"name" : "erlang", "symbol" : "%"},
   ".md":
-    {"name" : "text", "symbol" : ""},
+    {"name" : "markdown", "symbol" : ""},
   ".markdown":
-    {"name" : "text", "symbol" : ""},
+    {"name" : "markdown", "symbol" : ""},
   ".less":
     {"name" : "scss", "symbol": "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
   ".m":
-    {"name" : "objc", "symbol": "//"},
+    {"name" : "objectivec", "symbol": "//"},
+  ".mm":
+    {"name" : "objectivec", "symbol": "//"},
   ".scala":
     {"name" : "scala", "symbol": "//"},
+  ".cs":
+    {"name" : "csharp", "symbol": "//"},
+  ".as":
+    {"name" : "actionscript", "symbol": "//"},
+  ".scpt":
+    {"name": "applescript", "symbol": "--"},
+  ".applescript":
+    {"name": "applescript", "symbol": "--"},
   ".sh":
     { "name": "bash", "symbol": "#" },
   ".mak":
     { "name": "makefile", "symbol": "#" },
   ".jison":
-    {"name" : "jison", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" }
+    {"name" : "jison", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".clj":
+    {"name": "clojure", "symbol": ";"},
+  ".cmake":
+    {"name": "cmake", "symbol": "#"},
+  ".d":
+    {"name": "d", "symbol": "//"},
+  ".p":
+    {"name": "delphi", "symbol": "//"},
+  ".pp":
+    {"name": "delphi", "symbol": "//"},
+  ".pas":
+    {"name": "delphi", "symbol": "//"},
+  ".bat":
+    {"name": "dos", "symbol": "@?rem"},
+  ".btm":
+    {"name": "dos", "symbol": "@?rem"},
+  ".cmd":
+    {"name": "dos", "symbol": "@?rem"},
+  ".go":
+    {"name": "go", "symbol": "//"},
+  ".ini":
+    {"name": "ini", "symbol": ";"},
+  ".lisp":
+    {"name": "lisp", "symbol": ";"},
+  ".mel":
+    {"name": "mel", "symbol": "//"},
+  ".pl":
+    {"name": "perl", "symbol": "#"},
+  ".pm":
+    {"name": "perl", "symbol": "#"},
+  ".pod":
+    {"name": "perl", "symbol": "#"},
+  ".t":
+    {"name": "perl", "symbol": "#"},
+  ".r":
+    {"name": "r", "symbol": "#"},
+  ".rc":
+    {"name": "rust", "symbol": "//"},
+  ".rs":
+    {"name": "rust", "symbol": "//"},
+  ".sql":
+    {"name": "sql", "symbol": "--"},
+  ".vala":
+    {"name": "vala", "symbol": "//"},
+  ".vapi":
+    {"name": "vala", "symbol": "//"},
+  ".vbe":
+    {"name": "vbscript", "symbol": "'"},
+  ".vbs":
+    {"name": "vbscript", "symbol": "'"},
+  ".wsc":
+    {"name": "vbscript", "symbol": "'"},
+  ".wsf":
+    {"name": "vbscript", "symbol": "'"},
+  ".vhdl":
+    {"name": "vhdl", "symbol": "--"}
 }
