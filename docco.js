@@ -54,11 +54,13 @@
   };
 
   parse = function(source, code) {
-    var codeText, docsText, hasCode, i, lang, line, lines, match, prev, save, sections, _i, _j, _len, _len1;
+    var codeText, docsText, hasCode, i, in_block, lang, line, lines, match, param, prev, save, sections, single, _i, _j, _len, _len1;
     lines = code.split('\n');
     sections = [];
     lang = getLanguage(source);
     hasCode = docsText = codeText = '';
+    param = '';
+    in_block = 0;
     save = function() {
       sections.push({
         docsText: docsText,
@@ -74,11 +76,35 @@
     }
     for (_j = 0, _len1 = lines.length; _j < _len1; _j++) {
       line = lines[_j];
-      if (line.match(lang.commentMatcher) && !line.match(lang.commentFilter)) {
+      if (in_block) {
+        ++in_block;
+      }
+      if (!in_block && config.blocks && lang.blocks && line.match(lang.commentEnter)) {
+        line = line.replace(lang.commentEnter, '');
+        in_block = 1;
+      }
+      single = lang.commentMatcher && line.match(lang.commentMatcher) && !line.match(lang.commentFilter);
+      if (in_block || single) {
         if (hasCode) {
           save();
         }
-        docsText += (line = line.replace(lang.commentMatcher, '')) + '\n';
+        if (!in_block) {
+          line = line.replace(lang.commentMatcher, '');
+        }
+        if (in_block > 1 && lang.commentNext) {
+          line = line.replace(lang.commentNext, '');
+        }
+        if (lang.commentParam) {
+          param = line.match(lang.commentParam);
+          if (param) {
+            line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
+          }
+        }
+        if (in_block && line.match(lang.commentExit)) {
+          line = line.replace(lang.commentExit, '');
+          in_block = false;
+        }
+        docsText += line + '\n';
         if (/^(---+|===+)$/.test(line)) {
           save();
         }
@@ -178,7 +204,20 @@
 
   for (ext in languages) {
     l = languages[ext];
-    l.commentMatcher = RegExp("^\\s*" + l.symbol + "\\s?");
+    if (l.symbol) {
+      l.commentMatcher = RegExp("^\\s*" + l.symbol + "\\s?");
+    }
+    if (l.enter && l.exit) {
+      l.blocks = true;
+      l.commentEnter = new RegExp(l.enter);
+      l.commentExit = new RegExp(l.exit);
+      if (l.next) {
+        l.commentNext = new RegExp(l.next);
+      }
+    }
+    if (l.param) {
+      l.commentParam = new RegExp(l.param);
+    }
     l.commentFilter = /(^#![/]|^\s*#\{)/;
   }
 

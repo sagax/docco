@@ -148,6 +148,8 @@ individual <strong>section</strong> for it. Each section is an object with <code
   sections = []
   lang     = getLanguage source
   hasCode  = docsText = codeText = <span class="string">''</span>
+  param    = <span class="string">''</span>
+  in_block = <span class="number">0</span>
 
   <span class="function"><span class="title">save</span></span> = -&gt;
     sections.push {docsText, codeText}
@@ -168,19 +170,84 @@ normal below.</p>
       <span class="keyword">else</span> <span class="keyword">if</span> match = (<span class="regexp">/^([ ]{4}|\t)/</span>).exec line
         line[match[<span class="number">0</span>].length..]
       <span class="keyword">else</span>
-        lang.symbol + <span class="string">' '</span> + line
+        lang.symbol + <span class="string">' '</span> + line</pre></div>
+        
+      
+        
+        <p>Iterate over the source lines, and separate out single/block
+comments from code chunks.</p>
 
-  <span class="keyword">for</span> line <span class="keyword">in</span> lines
-    <span class="keyword">if</span> line.match(lang.commentMatcher) <span class="keyword">and</span> <span class="keyword">not</span> line.match(lang.commentFilter)
-      save() <span class="keyword">if</span> hasCode
-      docsText += (line = line.replace(lang.commentMatcher, <span class="string">''</span>)) + <span class="string">'\n'</span>
+        
+          <div class='highlight'><pre>  <span class="keyword">for</span> line <span class="keyword">in</span> lines
+    <span class="keyword">if</span> in_block
+      ++in_block</pre></div>
+        
+      
+        
+        <p>If we&#39;re not in a block comment, and find a match for the start
+of one, eat the tokens, and note that we&#39;re now in a block.</p>
+
+        
+          <div class='highlight'><pre>    <span class="keyword">if</span> <span class="keyword">not</span> in_block <span class="keyword">and</span> config.blocks <span class="keyword">and</span> lang.blocks <span class="keyword">and</span> line.match(lang.commentEnter)
+      line = line.replace(lang.commentEnter, <span class="string">''</span>)
+      in_block = <span class="number">1</span></pre></div>
+        
+      
+        
+        <p>Process the line, marking it as docs if we&#39;re in a block comment,
+or we find a single-line comment marker.</p>
+
+        
+          <div class='highlight'><pre>    single = (lang.commentMatcher <span class="keyword">and</span> line.match(lang.commentMatcher) <span class="keyword">and</span> <span class="keyword">not</span> line.match(lang.commentFilter))
+    <span class="keyword">if</span> in_block <span class="keyword">or</span> single</pre></div>
+        
+      
+        
+        <p>If we have code text, and we&#39;re entering a comment, store off
+the current docs and code, then start a new section.</p>
+
+        
+          <div class='highlight'><pre>      save() <span class="keyword">if</span> hasCode</pre></div>
+        
+      
+        
+        <p>If there&#39;s a single comment, and we&#39;re not in a block, eat the
+comment token.</p>
+
+        
+          <div class='highlight'><pre>      line = line.replace(lang.commentMatcher, <span class="string">''</span>) <span class="keyword">if</span> <span class="keyword">not</span> in_block
+
+      <span class="keyword">if</span> in_block &gt; <span class="number">1</span> <span class="keyword">and</span> lang.commentNext
+        line = line.replace(lang.commentNext, <span class="string">''</span>);
+      <span class="keyword">if</span> lang.commentParam
+        param = line.match(lang.commentParam);
+        <span class="keyword">if</span> param
+          line = line.replace(param[<span class="number">0</span>], <span class="string">'\n'</span> + <span class="string">'&lt;b&gt;'</span> + param[<span class="number">1</span>] + <span class="string">'&lt;/b&gt;'</span>);</pre></div>
+        
+      
+        
+        <p>If we&#39;re in a block, and we find the end of it in the line, eat
+the end token, and note that we&#39;re no longer in the block.</p>
+
+        
+          <div class='highlight'><pre>      <span class="keyword">if</span> in_block <span class="keyword">and</span> line.match(lang.commentExit)
+        line = line.replace(lang.commentExit, <span class="string">''</span>)
+        in_block = <span class="literal">false</span>
+
+      docsText += line + <span class="string">'\n'</span>
       save() <span class="keyword">if</span> <span class="regexp">/^(---+|===+)$/</span>.test line
       prev = <span class="string">'text'</span>
     <span class="keyword">else</span>
       hasCode = <span class="literal">yes</span>
       codeText += line + <span class="string">'\n'</span>
-      prev = <span class="string">'code'</span>
-  save()
+      prev = <span class="string">'code'</span></pre></div>
+        
+      
+        
+        <p>Save the final section, if any, and return the sections array.</p>
+
+        
+          <div class='highlight'><pre>  save()
 
   sections</pre></div>
         
@@ -319,16 +386,29 @@ languages = JSON.parse fs.readFileSync(path.join(__dirname, <span class="string"
         <p>Does the line begin with a comment?</p>
 
         
-          <div class='highlight'><pre>
-  l.commentMatcher = <span class="regexp">///^\s*<span class="comment">#{l.symbol}\s?///</span></pre></div>
+          <div class='highlight'><pre>  <span class="keyword">if</span> (l.symbol)
+    l.commentMatcher = <span class="regexp">///^\s*<span class="comment">#{l.symbol}\s?///</span></pre></div>
+        
+      
+        
+        <p>Support block comment parsing?</p>
+
+        
+          <div class='highlight'><pre>  <span class="keyword">if</span> l.enter <span class="keyword">and</span> l.exit
+    l.blocks = <span class="literal">true</span>
+    l.commentEnter = <span class="keyword">new</span> RegExp(l.enter)
+    l.commentExit = <span class="keyword">new</span> RegExp(l.exit)
+    <span class="keyword">if</span> (l.next)
+      l.commentNext = <span class="keyword">new</span> RegExp(l.next)
+  <span class="keyword">if</span> l.param
+    l.commentParam = <span class="keyword">new</span> RegExp(l.param)</pre></div>
         
       
         
         <p>Ignore <a href="http://en.wikipedia.org/wiki/Shebang_(Unix\">hashbangs</a>) and interpolations...</p>
 
         
-          <div class='highlight'><pre>
-  l.commentFilter = <span class="regexp">/(^#![/]|^\s*#\{)/</span></pre></div>
+          <div class='highlight'><pre>  l.commentFilter = <span class="regexp">/(^#![/]|^\s*#\{)/</span></pre></div>
         
       
         
