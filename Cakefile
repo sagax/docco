@@ -26,7 +26,7 @@ task 'install', 'install the `docco` command into /usr/local (or --prefix)', (op
 task 'doc', 'rebuild the Docco documentation', (options) ->
   layout = options.layout or 'linear'
   exec([
-    "bin/docco --layout #{layout} docco.litcoffee"
+    "bin/docco --layout #{layout} docco.coffee"
     "sed \"s/docco.css/resources\\/#{layout}\\/docco.css/\" < docs/docco.html > index.html"
     'rm -r docs'
   ].join(' && '), (err) ->
@@ -34,6 +34,6 @@ task 'doc', 'rebuild the Docco documentation', (options) ->
   )
 
 task 'loc', 'count the lines of code in Docco', ->
-  code = fs.readFileSync('docco.litcoffee').toString()
+  code = fs.readFileSync('docco.coffee').toString()
   lines = code.split('\n').filter (line) -> /^    /.test line
   console.log "Docco LOC: #{lines.length}"
