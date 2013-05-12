@@ -53,21 +53,21 @@ by passing the <code>-b</code> flag to Docco.</p>
         <ul>
 <li><p>If <strong>Node.js</strong> doesn&#39;t run on your platform, or you&#39;d prefer a more
 convenient package, get <a href="http://github.com/rtomayko">Ryan Tomayko</a>&#39;s
-<a href="http://rtomayko.github.com/rocco/rocco.html">Rocco</a>, the Ruby port that&#39;s
+<a href="http://rtomayko.github.io/rocco/rocco.html">Rocco</a>, the <strong>Ruby</strong> port that&#39;s
 available as a gem.</p>
 </li>
 <li><p>If you&#39;re writing shell scripts, try
-<a href="http://rtomayko.github.com/shocco/">Shocco</a>, a port for the <strong>POSIX shell</strong>,
+<a href="http://rtomayko.github.io/shocco/">Shocco</a>, a port for the <strong>POSIX shell</strong>,
 also by Mr. Tomayko.</p>
 </li>
 <li><p>If <strong>Python</strong> is more your speed, take a look at
-<a href="http://github.com/fitzgen">Nick Fitzgerald</a>&#39;s <a href="http://fitzgen.github.com/pycco/">Pycco</a>.</p>
+<a href="http://github.com/fitzgen">Nick Fitzgerald</a>&#39;s <a href="http://fitzgen.github.io/pycco/">Pycco</a>.</p>
 </li>
 <li><p>For <strong>Clojure</strong> fans, <a href="http://blog.fogus.me/">Fogus</a>&#39;s
 <a href="http://fogus.me/fun/marginalia/">Marginalia</a> is a bit of a departure from
 &quot;quick-and-dirty&quot;, but it&#39;ll get the job done.</p>
 </li>
-<li><p>There&#39;s a <strong>Go</strong> port called <a href="http://nikhilm.github.com/gocco/">Gocco</a>,
+<li><p>There&#39;s a <strong>Go</strong> port called <a href="http://nikhilm.github.io/gocco/">Gocco</a>,
 written by <a href="https://github.com/nikhilm">Nikhil Marathe</a>.</p>
 </li>
 <li><p>Your all you <strong>PHP</strong> buffs out there, Fredi Bach&#39;s
@@ -75,13 +75,13 @@ written by <a href="https://github.com/nikhilm">Nikhil Marathe</a>.</p>
 with respect to our naming scheme slide), should do the trick nicely.</p>
 </li>
 <li><p><strong>Lua</strong> enthusiasts can get their fix with
-<a href="https://github.com/rgieseke">Robert Gieseke</a>&#39;s <a href="http://rgieseke.github.com/locco/">Locco</a>.</p>
+<a href="https://github.com/rgieseke">Robert Gieseke</a>&#39;s <a href="http://rgieseke.github.io/locco/">Locco</a>.</p>
 </li>
 <li><p>And if you happen to be a <strong>.NET</strong>
 aficionado, check out <a href="https://github.com/dontangg">Don Wilson</a>&#39;s
-<a href="http://dontangg.github.com/nocco/">Nocco</a>.</p>
+<a href="http://dontangg.github.io/nocco/">Nocco</a>.</p>
 </li>
-<li><p>Going further afield from the quick-and-dirty, <a href="http://nevir.github.com/groc/">Groc</a>
+<li><p>Going further afield from the quick-and-dirty, <a href="http://nevir.github.io/groc/">Groc</a>
 is a <strong>CoffeeScript</strong> fork of Docco that adds a searchable table of contents,
 and aims to gracefully handle large projects with complex hierarchies of code.</p>
 </li>
@@ -98,7 +98,7 @@ out in an HTML template.</p>
 
           <div class='highlight'><pre>
 <span class="function"><span class="title">document</span></span> = (options = {}, callback) -&gt;
-  configure options
+  config = configure options
 
   fs.mkdirs config.output, -&gt;
 
@@ -119,9 +119,9 @@ out in an HTML template.</p>
         <span class="keyword">return</span> callback error <span class="keyword">if</span> error
 
         code = buffer.toString()
-        sections = parse source, code
-        format source, sections
-        write source, sections
+        sections = parse source, code, config
+        format source, sections, config
+        write source, sections, config
         <span class="keyword">if</span> files.length <span class="keyword">then</span> nextFile() <span class="keyword">else</span> complete()
 
     nextFile()</pre></div>
@@ -134,10 +134,10 @@ individual <strong>section</strong> for it. Each section is an object with <code
 
 
           <div class='highlight'><pre>
-<span class="function"><span class="title">parse</span></span> = (source, code) -&gt;
+<span class="function"><span class="title">parse</span></span> = (source, code, config = {}) -&gt;
   lines    = code.split <span class="string">'\n'</span>
   sections = []
-  lang     = getLanguage source
+  lang     = getLanguage source, config
   hasCode  = docsText = codeText = <span class="string">''</span>
   param    = <span class="string">''</span>
   in_block = <span class="number">0</span>
@@ -154,12 +154,15 @@ normal below.</p>
 
           <div class='highlight'><pre>
   <span class="keyword">if</span> lang.literate
+    isText = maybeCode = <span class="literal">yes</span>
     <span class="keyword">for</span> line, i <span class="keyword">in</span> lines
-      lines[i] = <span class="keyword">if</span> <span class="regexp">/^\s*$/</span>.test line
-        <span class="string">''</span>
-      <span class="keyword">else</span> <span class="keyword">if</span> match = (<span class="regexp">/^([ ]{4}|\t)/</span>).exec line
+      lines[i] = <span class="keyword">if</span> maybeCode <span class="keyword">and</span> match = <span class="regexp">/^([ ]{4}|[ ]{0,3}\t)/</span>.exec line
+        isText = <span class="literal">no</span>
         line[match[<span class="number">0</span>].length..]
+      <span class="keyword">else</span> <span class="keyword">if</span> maybeCode = <span class="regexp">/^\s*$/</span>.test line
+        <span class="keyword">if</span> isText <span class="keyword">then</span> lang.symbol <span class="keyword">else</span> <span class="string">''</span>
       <span class="keyword">else</span>
+        isText = <span class="literal">yes</span>
         lang.symbol + <span class="string">' '</span> + line</pre></div>
 
 
@@ -220,11 +223,9 @@ the end token, and note that we&#39;re no longer in the block.</p>
 
       docsText += line + <span class="string">'\n'</span>
       save() <span class="keyword">if</span> <span class="regexp">/^(---+|===+)$/</span>.test line
-      prev = <span class="string">'text'</span>
     <span class="keyword">else</span>
       hasCode = <span class="literal">yes</span>
-      codeText += line + <span class="string">'\n'</span>
-      prev = <span class="string">'code'</span></pre></div>
+      codeText += line + <span class="string">'\n'</span></pre></div>
 
 
         <p>Save the final section, if any, and return the sections array.</p>
@@ -241,8 +242,8 @@ over stdio, and run the text of their corresponding comments through
 
 
           <div class='highlight'><pre>
-<span class="function"><span class="title">format</span></span> = (source, sections) -&gt;
-  language = getLanguage source
+<span class="function"><span class="title">format</span></span> = (source, sections, config) -&gt;
+  language = getLanguage source, config
   <span class="keyword">for</span> section, i <span class="keyword">in</span> sections
     code = highlight(language.name, section.codeText).value
     code = code.replace(<span class="regexp">/\s+$/</span>, <span class="string">''</span>)
@@ -256,7 +257,7 @@ and rendering it to the specified output path.</p>
 
 
           <div class='highlight'><pre>
-<span class="function"><span class="title">write</span></span> = (source, sections) -&gt;
+<span class="function"><span class="title">write</span></span> = (source, sections, config) -&gt;
 
   <span class="function"><span class="title">destination</span></span> = (file) -&gt;
     path.join(config.output, path.basename(file, path.extname(file)) + <span class="string">'.html'</span>)</pre></div>
@@ -281,12 +282,12 @@ name of the source file.</p>
         <h2>Configuration</h2>
 
 
-        <p>Default configuration <strong>options</strong>. All of these may be overriden by command-line
-options.</p>
+        <p>Default configuration <strong>options</strong>. All of these may be extended by
+user-specified options.</p>
 
 
           <div class='highlight'><pre>
-config =
+defaults =
   layout:     <span class="string">'parallel'</span>
   output:     <span class="string">'docs'</span>
   template:   <span class="literal">null</span>
@@ -303,7 +304,7 @@ source files for languages for which we have definitions.</p>
 
           <div class='highlight'><pre>
 <span class="function"><span class="title">configure</span></span> = (options) -&gt;
-  _.extend config, _.pick(options, _.keys(config)...)
+  config = _.extend {}, defaults, _.pick(options, _.keys(defaults)...)
 
   <span class="keyword">if</span> options.template
     config.layout = <span class="literal">null</span>
@@ -318,7 +319,9 @@ source files for languages for which we have definitions.</p>
     lang = getLanguage source, config
     console.warn <span class="string">"docco: skipped unknown type (<span class="subst">#{path.basename source}</span>)"</span> <span class="keyword">unless</span> lang
     lang
-  ).sort()</pre></div>
+  ).sort()
+
+  config</pre></div>
 
 
         <h2>Helpers &amp; Initial Setup</h2>
@@ -373,7 +376,7 @@ languages = JSON.parse fs.readFileSync(path.join(__dirname, <span class="string"
     l.commentParam = <span class="keyword">new</span> RegExp(l.param)</pre></div>
 
 
-        <p>Ignore <a href="http://en.wikipedia.org/wiki/Shebang_(Unix\">hashbangs</a>) and interpolations...</p>
+        <p>Ignore <a href="http://en.wikipedia.org/wiki/Shebang_%28Unix%29">hashbangs</a> and interpolations...</p>
 
 
           <div class='highlight'><pre>  l.commentFilter = <span class="regexp">/(^#![/]|^\s*#\{)/</span></pre></div>
@@ -384,7 +387,7 @@ file extension. Detect and tag &quot;literate&quot; <code>.ext.md</code> variant
 
 
           <div class='highlight'><pre>
-<span class="function"><span class="title">getLanguage</span></span> = (source) -&gt;
+<span class="function"><span class="title">getLanguage</span></span> = (source, config) -&gt;
   ext  = config.extension <span class="keyword">or</span> path.extname(source) <span class="keyword">or</span> path.basename(source)
   lang = languages[ext]
   <span class="keyword">if</span> lang <span class="keyword">and</span> lang.name <span class="keyword">is</span> <span class="string">'markdown'</span>
@@ -410,7 +413,7 @@ Parse options using <a href="https://github.com/visionmedia/commander.js">Comman
 
           <div class='highlight'><pre>
 <span class="function"><span class="title">run</span></span> = (args = process.argv) -&gt;
-  c = config
+  c = defaults
   commander.version(version)
     .usage(<span class="string">'[options] files'</span>)
     .option(<span class="string">'-l, --layout [name]'</span>,    <span class="string">'choose a layout (parallel, linear or classic)'</span>, c.layout)
