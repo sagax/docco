@@ -25,7 +25,7 @@ Docco can be used to process code written in any programming language. If it
 doesn't handle your favorite yet, feel free to
 [add it to the list](https://github.com/jashkenas/docco/blob/master/resources/languages.json).
 Finally, the ["literate" style](http://coffeescript.org/#literate) of *any*
-language is also supported — just tack an `.md` extension on the end:
+language is also supported â€” just tack an `.md` extension on the end:
 `.coffee.md`, `.py.md`, and so on.
 
 By default only single-line comments are processed, block comments may be included
@@ -35,23 +35,23 @@ by passing the `-b` flag to Docco.
 Partners in Crime:
 ------------------
 
-* If **Node.js** doesn't run on your platform, or you'd prefer a more
+* If Node.js doesn't run on your platform, or you'd prefer a more
 convenient package, get [Ryan Tomayko](http://github.com/rtomayko)'s
-[Rocco](http://rtomayko.github.com/rocco/rocco.html), the Ruby port that's
+[Rocco](http://rtomayko.github.io/rocco/rocco.html), the **Ruby** port that's
 available as a gem.
 
 * If you're writing shell scripts, try
-[Shocco](http://rtomayko.github.com/shocco/), a port for the **POSIX shell**,
+[Shocco](http://rtomayko.github.io/shocco/), a port for the **POSIX shell**,
 also by Mr. Tomayko.
 
 * If **Python** is more your speed, take a look at
-[Nick Fitzgerald](http://github.com/fitzgen)'s [Pycco](http://fitzgen.github.com/pycco/).
+[Nick Fitzgerald](http://github.com/fitzgen)'s [Pycco](http://fitzgen.github.io/pycco/).
 
 * For **Clojure** fans, [Fogus](http://blog.fogus.me/)'s
 [Marginalia](http://fogus.me/fun/marginalia/) is a bit of a departure from
 "quick-and-dirty", but it'll get the job done.
 
-* There's a **Go** port called [Gocco](http://nikhilm.github.com/gocco/),
+* There's a **Go** port called [Gocco](http://nikhilm.github.io/gocco/),
 written by [Nikhil Marathe](https://github.com/nikhilm).
 
 * Your all you **PHP** buffs out there, Fredi Bach's
@@ -59,13 +59,13 @@ written by [Nikhil Marathe](https://github.com/nikhilm).
 with respect to our naming scheme slide), should do the trick nicely.
 
 * **Lua** enthusiasts can get their fix with
-[Robert Gieseke](https://github.com/rgieseke)'s [Locco](http://rgieseke.github.com/locco/).
+[Robert Gieseke](https://github.com/rgieseke)'s [Locco](http://rgieseke.github.io/locco/).
 
 * And if you happen to be a **.NET**
 aficionado, check out [Don Wilson](https://github.com/dontangg)'s
-[Nocco](http://dontangg.github.com/nocco/).
+[Nocco](http://dontangg.github.io/nocco/).
 
-* Going further afield from the quick-and-dirty, [Groc](http://nevir.github.com/groc/)
+* Going further afield from the quick-and-dirty, [Groc](http://nevir.github.io/groc/)
 is a **CoffeeScript** fork of Docco that adds a searchable table of contents,
 and aims to gracefully handle large projects with complex hierarchies of code.
 
@@ -81,7 +81,7 @@ sections, highlighting each file in the appropriate language, and printing them
 out in an HTML template.
 
     document = (options = {}, callback) ->
-      configure options
+      config = configure options
 
       fs.mkdirs config.output, ->
 
@@ -102,22 +102,22 @@ out in an HTML template.
             return callback error if error
 
             code = buffer.toString()
-            sections = parse source, code
-            format source, sections
-            write source, sections
+            sections = parse source, code, config
+            format source, sections, config
+            write source, sections, config
             if files.length then nextFile() else complete()
 
         nextFile()
 
 Given a string of source code, **parse** out each block of prose and the code that
-follows it — by detecting which is which, line by line — and then create an
+follows it â€” by detecting which is which, line by line â€” and then create an
 individual **section** for it. Each section is an object with `docsText` and
 `codeText` properties, and eventually `docsHtml` and `codeHtml` as well.
 
-    parse = (source, code) ->
+    parse = (source, code, config = {}) ->
       lines    = code.split '\n'
       sections = []
-      lang     = getLanguage source
+      lang     = getLanguage source, config
       hasCode  = docsText = codeText = ''
       param    = ''
       in_block = 0
@@ -131,12 +131,15 @@ invert the prose and code relationship on a per-line basis, and then continue as
 normal below.
 
       if lang.literate
+        isText = maybeCode = yes
         for line, i in lines
-          lines[i] = if /^\s*$/.test line
-            ''
-          else if match = (/^([ ]{4}|\t)/).exec line
+          lines[i] = if maybeCode and match = /^([ ]{4}|[ ]{0,3}\t)/.exec line
+            isText = no
             line[match[0].length..]
+          else if maybeCode = /^\s*$/.test line
+            if isText then lang.symbol else ''
           else
+            isText = yes
             lang.symbol + ' ' + line
 
 Iterate over the source lines, and separate out single/block
@@ -185,11 +188,9 @@ the end token, and note that we're no longer in the block.
 
           docsText += line + '\n'
           save() if /^(---+|===+)$/.test line
-          prev = 'text'
         else
           hasCode = yes
           codeText += line + '\n'
-          prev = 'code'
 
 Save the final section, if any, and return the sections array.
 
@@ -201,8 +202,8 @@ To **format** and highlight the now-parsed sections of code, we use **Highlight.
 over stdio, and run the text of their corresponding comments through
 **Markdown**, using [Marked](https://github.com/chjj/marked).
 
-    format = (source, sections) ->
-      language = getLanguage source
+    format = (source, sections, config) ->
+      language = getLanguage source, config
       for section, i in sections
         code = highlight(language.name, section.codeText).value
         code = code.replace(/\s+$/, '')
@@ -213,7 +214,7 @@ Once all of the code has finished highlighting, we can **write** the resulting
 documentation file by passing the completed HTML sections into the template,
 and rendering it to the specified output path.
 
-    write = (source, sections) ->
+    write = (source, sections, config) ->
 
       destination = (file) ->
         path.join(config.output, path.basename(file, path.extname(file)) + '.html')
@@ -235,10 +236,10 @@ name of the source file.
 Configuration
 -------------
 
-Default configuration **options**. All of these may be overriden by command-line
-options.
+Default configuration **options**. All of these may be extended by
+user-specified options.
 
-    config =
+    defaults =
       layout:     'parallel'
       output:     'docs'
       template:   null
@@ -252,7 +253,7 @@ template, or one of the built-in **layouts**. We only attempt to process
 source files for languages for which we have definitions.
 
     configure = (options) ->
-      _.extend config, _.pick(options, _.keys(config)...)
+      config = _.extend {}, defaults, _.pick(options, _.keys(defaults)...)
 
       if options.template
         config.layout = null
@@ -268,6 +269,8 @@ source files for languages for which we have definitions.
         console.warn "docco: skipped unknown type (#{path.basename source})" unless lang
         lang
       ).sort()
+
+      config
 
 
 Helpers & Initial Setup
@@ -308,14 +311,14 @@ Support block comment parsing?
       if l.param
         l.commentParam = new RegExp(l.param)
 
-Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_(Unix\)) and interpolations...
+Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_%28Unix%29) and interpolations...
 
       l.commentFilter = /(^#![/]|^\s*#\{)/
 
 A function to get the current language we're documenting, based on the
 file extension. Detect and tag "literate" `.ext.md` variants.
 
-    getLanguage = (source) ->
+    getLanguage = (source, config) ->
       ext  = config.extension or path.extname(source) or path.basename(source)
       lang = languages[ext]
       if lang and lang.name is 'markdown'
@@ -336,7 +339,7 @@ Finally, let's define the interface to run Docco from the command line.
 Parse options using [Commander](https://github.com/visionmedia/commander.js).
 
     run = (args = process.argv) ->
-      c = config
+      c = defaults
       commander.version(version)
         .usage('[options] files')
         .option('-l, --layout [name]',    'choose a layout (parallel, linear or classic)', c.layout)
