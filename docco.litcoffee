@@ -297,6 +297,7 @@ Build out the appropriate matchers and delimiters for each language.
     for ext, l of languages
 
 Does the line begin with a comment?
+
       if (l.symbol)
         l.commentMatcher = ///^\s*#{l.symbol}\s?///
 
