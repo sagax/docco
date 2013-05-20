@@ -2,7 +2,5 @@
 
 var path = require('path');
 var fs = require('fs');
-var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
-
-process.ARGV = process.argv = process.argv.slice(2, process.argv.length);
-require(lib + '/docco.js');
+var dir = path.join(path.dirname(fs.realpathSync(__filename)), '../');
+require(dir + 'docco.js').run();
