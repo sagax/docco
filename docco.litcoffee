@@ -121,6 +121,7 @@ individual **section** for it. Each section is an object with `docsText` and
       hasCode  = docsText = codeText = ''
       param    = ''
       in_block = 0
+      ignore_this_block = 0
 
       save = ->
         sections.push {docsText, codeText}
@@ -149,28 +150,39 @@ comments from code chunks.
         if in_block
           ++in_block
 
+        raw_line = line
+
 If we're not in a block comment, and find a match for the start
 of one, eat the tokens, and note that we're now in a block.
 
         if not in_block and config.blocks and lang.blocks and line.match(lang.commentEnter)
           line = line.replace(lang.commentEnter, '')
+
+Make sure this is a comment that we actually want to process; if not, treat it as code
+
           in_block = 1
+          if lang.commentIgnore and line.match(lang.commentIgnore)
+            ignore_this_block = 1
 
 Process the line, marking it as docs if we're in a block comment,
 or we find a single-line comment marker.
 
         single = (not in_block and lang.commentMatcher and line.match(lang.commentMatcher) and not line.match(lang.commentFilter))
-        if in_block or single
-
-If we have code text, and we're entering a comment, store off
-the current docs and code, then start a new section.
-
-          save() if hasCode
 
 If there's a single comment, and we're not in a block, eat the
 comment token.
 
-          line = line.replace(lang.commentMatcher, '') if single
+        if single
+          line = line.replace(lang.commentMatcher, '')
+
+Make sure this is a comment that we actually want to process; if not, treat it as code
+
+          if lang.commentIgnore and line.match(lang.commentIgnore)
+            ignore_this_block = 1
+
+Prepare the line further when it is (part of) a comment line.
+
+        if in_block or single
 
 If we're in a block comment and we find the end of it in the line, eat
 the end token, and note that we're no longer in the block.
@@ -193,16 +205,29 @@ If we happen upon a JavaDoc @param parameter, then process that item.
             if param
               line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
 
+    if not ignore_this_block and (in_block or single)
+
+If we have code text, and we're entering a comment, store off
+the current docs and code, then start a new section.
+
+          save() if hasCode
+
           docsText += line + '\n'
           save() if /^(---+|===+)$/.test line or in_block == -1
 
-reset in_block when we have reached the end of the comment block
-
-          if in_block == -1
-            in_block = false
         else
           hasCode = yes
           codeText += line + '\n'
+
+Reset `in_block` when we have reached the end of the comment block.
+
+        if in_block == -1
+          in_block = 0
+
+Reset `ignore_this_block` when we have reached the end of the comment block or single comment line.
+
+        if not in_block
+          ignore_this_block = 0
 
 Save the final section, if any, and return the sections array.
 
