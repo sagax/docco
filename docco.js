@@ -88,13 +88,17 @@
         line = line.replace(lang.commentEnter, '');
         in_block = 1;
       }
-      single = lang.commentMatcher && line.match(lang.commentMatcher) && !line.match(lang.commentFilter);
+      single = !in_block && lang.commentMatcher && line.match(lang.commentMatcher) && !line.match(lang.commentFilter);
       if (in_block || single) {
         if (hasCode) {
           save();
         }
-        if (!in_block) {
+        if (single) {
           line = line.replace(lang.commentMatcher, '');
+        }
+        if (in_block && line.match(lang.commentExit)) {
+          line = line.replace(lang.commentExit, '');
+          in_block = -1;
         }
         if (in_block > 1 && lang.commentNext) {
           line = line.replace(lang.commentNext, '');
@@ -105,13 +109,12 @@
             line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
           }
         }
-        if (in_block && line.match(lang.commentExit)) {
-          line = line.replace(lang.commentExit, '');
-          in_block = false;
-        }
         docsText += line + '\n';
-        if (/^(---+|===+)$/.test(line)) {
+        if (/^(---+|===+)$/.test(line || in_block === -1)) {
           save();
+        }
+        if (in_block === -1) {
+          in_block = false;
         }
       } else {
         hasCode = true;
@@ -203,6 +206,19 @@
   commander = require('commander');
 
   highlight = require('highlight.js').highlight;
+
+  marked.setOptions({
+    gfm: true,
+    tables: true,
+    breaks: false,
+    pedantic: false,
+    sanitize: false,
+    smartLists: true,
+    langPrefix: 'language-',
+    highlight: function(code, lang) {
+      return code;
+    }
+  });
 
   languages = JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'languages.json')));
 
