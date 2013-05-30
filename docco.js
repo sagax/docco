@@ -207,7 +207,7 @@
   languages = JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'languages.json')));
 
   for (ext in languages) {
-    l = languages[ext];
+    l = languages[ext] || 'text';
     if (l.symbol) {
       l.commentMatcher = RegExp("^\\s*" + l.symbol + "\\s?");
     }
