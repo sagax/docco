@@ -422,7 +422,7 @@ file extension. Detect and tag &quot;literate&quot; <code>.ext.md</code> variant
           <div class='highlight'><pre>
 <span class="function"><span class="title">getLanguage</span></span> = (source, config) -&gt;
   ext  = config.extension <span class="keyword">or</span> path.extname(source) <span class="keyword">or</span> path.basename(source)
-  lang = languages[ext]
+  lang = languages[ext] || <span class="string">'text'</span>
   <span class="keyword">if</span> lang <span class="keyword">and</span> lang.name <span class="keyword">is</span> <span class="string">'markdown'</span>
     codeExt = path.extname(path.basename(source, ext))
     <span class="keyword">if</span> codeExt <span class="keyword">and</span> codeLang = languages[codeExt]
