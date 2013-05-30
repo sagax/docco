@@ -211,8 +211,6 @@ format = (source, sections, config) ->
     code = code.replace(/\s+$/, '')
     section.codeHtml = "<div class='highlight'><pre>#{code}</pre></div>"
     section.docsHtml = marked(section.docsText)
-    #docs = section.docsText
-    #section.docsHtml = "<div class='docs'><pre>#{docs}</pre></div>"
 
 # Once all of the code has finished highlighting, we can **write** the resulting
 # documentation file by passing the completed HTML sections into the template,
