@@ -150,6 +150,7 @@ individual <strong>section</strong> for it. Each section is an object with <code
   hasCode  = docsText = codeText = <span class="string">''</span>
   param    = <span class="string">''</span>
   in_block = <span class="number">0</span>
+  ignore_this_block = <span class="number">0</span>
 
   <span class="function"><span class="title">save</span></span> = -&gt;
     sections.push {docsText, codeText}
@@ -183,7 +184,9 @@ comments from code chunks.</p>
         
           <div class='highlight'><pre>  <span class="keyword">for</span> line <span class="keyword">in</span> lines
     <span class="keyword">if</span> in_block
-      ++in_block</pre></div>
+      ++in_block
+
+    raw_line = line</pre></div>
         
       
         
@@ -192,8 +195,16 @@ of one, eat the tokens, and note that we&#39;re now in a block.</p>
 
         
           <div class='highlight'><pre>    <span class="keyword">if</span> <span class="keyword">not</span> in_block <span class="keyword">and</span> config.blocks <span class="keyword">and</span> lang.blocks <span class="keyword">and</span> line.match(lang.commentEnter)
-      line = line.replace(lang.commentEnter, <span class="string">''</span>)
-      in_block = <span class="number">1</span></pre></div>
+      line = line.replace(lang.commentEnter, <span class="string">''</span>)</pre></div>
+        
+      
+        
+        <p>Make sure this is a comment that we actually want to process; if not, treat it as code</p>
+
+        
+          <div class='highlight'><pre>      in_block = <span class="number">1</span>
+      <span class="keyword">if</span> lang.commentIgnore <span class="keyword">and</span> line.match(lang.commentIgnore)
+        ignore_this_block = <span class="number">1</span></pre></div>
         
       
         
@@ -201,16 +212,7 @@ of one, eat the tokens, and note that we&#39;re now in a block.</p>
 or we find a single-line comment marker.</p>
 
         
-          <div class='highlight'><pre>    single = (<span class="keyword">not</span> in_block <span class="keyword">and</span> lang.commentMatcher <span class="keyword">and</span> line.match(lang.commentMatcher) <span class="keyword">and</span> <span class="keyword">not</span> line.match(lang.commentFilter))
-    <span class="keyword">if</span> in_block <span class="keyword">or</span> single</pre></div>
-        
-      
-        
-        <p>If we have code text, and we&#39;re entering a comment, store off
-the current docs and code, then start a new section.</p>
-
-        
-          <div class='highlight'><pre>      save() <span class="keyword">if</span> hasCode</pre></div>
+          <div class='highlight'><pre>    single = (<span class="keyword">not</span> in_block <span class="keyword">and</span> lang.commentMatcher <span class="keyword">and</span> line.match(lang.commentMatcher) <span class="keyword">and</span> <span class="keyword">not</span> line.match(lang.commentFilter))</pre></div>
         
       
         
@@ -218,7 +220,23 @@ the current docs and code, then start a new section.</p>
 comment token.</p>
 
         
-          <div class='highlight'><pre>      line = line.replace(lang.commentMatcher, <span class="string">''</span>) <span class="keyword">if</span> single</pre></div>
+          <div class='highlight'><pre>    <span class="keyword">if</span> single
+      line = line.replace(lang.commentMatcher, <span class="string">''</span>)</pre></div>
+        
+      
+        
+        <p>Make sure this is a comment that we actually want to process; if not, treat it as code</p>
+
+        
+          <div class='highlight'><pre>      <span class="keyword">if</span> lang.commentIgnore <span class="keyword">and</span> line.match(lang.commentIgnore)
+        ignore_this_block = <span class="number">1</span></pre></div>
+        
+      
+        
+        <p>Prepare the line further when it is (part of) a comment line.</p>
+
+        
+          <div class='highlight'><pre>    <span class="keyword">if</span> in_block <span class="keyword">or</span> single</pre></div>
         
       
         
@@ -250,19 +268,37 @@ a single &#39;*&#39;, for example).</p>
         <span class="keyword">if</span> param
           line = line.replace(param[<span class="number">0</span>], <span class="string">'\n'</span> + <span class="string">'&lt;b&gt;'</span> + param[<span class="number">1</span>] + <span class="string">'&lt;/b&gt;'</span>);
 
-      docsText += line + <span class="string">'\n'</span>
-      save() <span class="keyword">if</span> <span class="regexp">/^(---+|===+)$/</span>.test line <span class="keyword">or</span> in_block == -<span class="number">1</span></pre></div>
+    <span class="keyword">if</span> <span class="keyword">not</span> ignore_this_block <span class="keyword">and</span> (in_block <span class="keyword">or</span> single)</pre></div>
         
       
         
-        <p>reset in_block when we have reached the end of the comment block</p>
+        <p>If we have code text, and we&#39;re entering a comment, store off
+the current docs and code, then start a new section.</p>
 
         
-          <div class='highlight'><pre>      <span class="keyword">if</span> in_block == -<span class="number">1</span>
-        in_block = <span class="literal">false</span>
+          <div class='highlight'><pre>      save() <span class="keyword">if</span> hasCode
+
+      docsText += line + <span class="string">'\n'</span>
+      save() <span class="keyword">if</span> <span class="regexp">/^(---+|===+)$/</span>.test line <span class="keyword">or</span> in_block == -<span class="number">1</span>
     <span class="keyword">else</span>
       hasCode = <span class="literal">yes</span>
       codeText += line + <span class="string">'\n'</span></pre></div>
+        
+      
+        
+        <p>Reset <code>in_block</code> when we have reached the end of the comment block.</p>
+
+        
+          <div class='highlight'><pre>    <span class="keyword">if</span> in_block == -<span class="number">1</span>
+      in_block = <span class="number">0</span></pre></div>
+        
+      
+        
+        <p>Reset <code>ignore_this_block</code> when we have reached the end of the comment block or single comment line.</p>
+
+        
+          <div class='highlight'><pre>    <span class="keyword">if</span> <span class="keyword">not</span> in_block
+      ignore_this_block = <span class="number">0</span></pre></div>
         
       
         
@@ -288,12 +324,6 @@ over stdio, and run the text of their corresponding comments through
     code = code.replace(<span class="regexp">/\s+$/</span>, <span class="string">''</span>)
     section.codeHtml = <span class="string">"&lt;div class='highlight'&gt;&lt;pre&gt;<span class="subst">#{code}</span>&lt;/pre&gt;&lt;/div&gt;"</span>
     section.docsHtml = marked(section.docsText)</pre></div>
-        
-      
-        
-        <p>docs = section.docsText
-section.docsHtml = &quot;<div class='docs'><pre>#{docs}</pre></div>&quot;</p>
-
         
       
         
@@ -451,6 +481,13 @@ languages = JSON.parse fs.readFileSync(path.join(__dirname, <span class="string"
 
         
           <div class='highlight'><pre>  l.commentFilter = <span class="regexp">/(^#![/]|^\s*#\{)/</span></pre></div>
+        
+      
+        
+        <p>We ignore any comments which start with a colon &#39;:&#39; - these will be included in the code as is.</p>
+
+        
+          <div class='highlight'><pre>  l.commentIgnore = <span class="keyword">new</span> RegExp(<span class="regexp">/^:/</span>)</pre></div>
         
       
         

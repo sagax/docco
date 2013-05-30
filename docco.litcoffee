@@ -340,6 +340,10 @@ Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_%28Unix%29) and interpol
 
       l.commentFilter = /(^#![/]|^\s*#\{)/
 
+We ignore any comments which start with a colon ':' - these will be included in the code as is.
+
+      l.commentIgnore = new RegExp(/^:/)
+
 A function to get the current language we're documenting, based on the
 file extension. Detect and tag "literate" `.ext.md` variants.
 

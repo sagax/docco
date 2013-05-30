@@ -55,7 +55,7 @@
   };
 
   parse = function(source, code, config) {
-    var codeText, docsText, hasCode, i, in_block, isText, lang, line, lines, match, maybeCode, param, save, sections, single, _i, _j, _len, _len1;
+    var codeText, docsText, hasCode, i, ignore_this_block, in_block, isText, lang, line, lines, match, maybeCode, param, raw_line, save, sections, single, _i, _j, _len, _len1;
     if (config == null) {
       config = {};
     }
@@ -65,6 +65,7 @@
     hasCode = docsText = codeText = '';
     param = '';
     in_block = 0;
+    ignore_this_block = 0;
     save = function() {
       sections.push({
         docsText: docsText,
@@ -84,18 +85,22 @@
       if (in_block) {
         ++in_block;
       }
+      raw_line = line;
       if (!in_block && config.blocks && lang.blocks && line.match(lang.commentEnter)) {
         line = line.replace(lang.commentEnter, '');
         in_block = 1;
+        if (lang.commentIgnore && line.match(lang.commentIgnore)) {
+          ignore_this_block = 1;
+        }
       }
       single = !in_block && lang.commentMatcher && line.match(lang.commentMatcher) && !line.match(lang.commentFilter);
+      if (single) {
+        line = line.replace(lang.commentMatcher, '');
+        if (lang.commentIgnore && line.match(lang.commentIgnore)) {
+          ignore_this_block = 1;
+        }
+      }
       if (in_block || single) {
-        if (hasCode) {
-          save();
-        }
-        if (single) {
-          line = line.replace(lang.commentMatcher, '');
-        }
         if (in_block && line.match(lang.commentExit)) {
           line = line.replace(lang.commentExit, '');
           in_block = -1;
@@ -109,16 +114,24 @@
             line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
           }
         }
+      }
+      if (!ignore_this_block && (in_block || single)) {
+        if (hasCode) {
+          save();
+        }
         docsText += line + '\n';
         if (/^(---+|===+)$/.test(line || in_block === -1)) {
           save();
         }
-        if (in_block === -1) {
-          in_block = false;
-        }
       } else {
         hasCode = true;
         codeText += line + '\n';
+      }
+      if (in_block === -1) {
+        in_block = 0;
+      }
+      if (!in_block) {
+        ignore_this_block = 0;
       }
     }
     save();
@@ -239,6 +252,7 @@
       l.commentParam = new RegExp(l.param);
     }
     l.commentFilter = /(^#![/]|^\s*#\{)/;
+    l.commentIgnore = new RegExp(/^:/);
   }
 
   getLanguage = function(source, config) {
