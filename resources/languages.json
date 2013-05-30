@@ -95,6 +95,8 @@
     {"name": "ini", "symbol": ";"},
   ".lisp":
     {"name": "lisp", "symbol": ";"},
+  ".lua":
+    {"name": "lua", "symbol": "--"},
   ".mel":
     {"name": "mel", "symbol": "//"},
   ".pl":
