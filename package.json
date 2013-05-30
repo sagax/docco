@@ -16,7 +16,7 @@
     "marked":     ">= 0.2.7",
     "fs-extra":   ">= 0.6.0",
     "underscore": ">= 1.0.0",
-    "highlight.js": ">= 7.3.0"
+    "highlight.js": "git://github.com/GerHobbelt/highlight.js.git"
   },
   "main" :        "./docco",
   "bin": {
