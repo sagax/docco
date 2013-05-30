@@ -3,6 +3,7 @@ output
 docs
 test/data
 node_modules
+npm-debug.log
 
 # editor backup files
 *~
