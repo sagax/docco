@@ -156,7 +156,7 @@ parse = (source, code, config = {}) ->
 
     # Process the line, marking it as docs if we're in a block comment,
     # or we find a single-line comment marker.
-    single = (lang.commentMatcher and line.match(lang.commentMatcher) and not line.match(lang.commentFilter))
+    single = (not in_block and lang.commentMatcher and line.match(lang.commentMatcher) and not line.match(lang.commentFilter))
     if in_block or single
 
       # If we have code text, and we're entering a comment, store off
@@ -165,23 +165,32 @@ parse = (source, code, config = {}) ->
 
       # If there's a single comment, and we're not in a block, eat the
       # comment token.
-      line = line.replace(lang.commentMatcher, '') if not in_block
+      line = line.replace(lang.commentMatcher, '') if single
 
+      # If we're in a block comment and we find the end of it in the line, eat
+      # the end token, and note that we're no longer in the block.
+      if in_block and line.match(lang.commentExit)
+        line = line.replace(lang.commentExit, '')
+        in_block = -1
+
+      # If we're in a block comment and are processing comment line 2 or further, eat the
+      # optional comment prefix (for C style comments, that would generally be
+      # a single '*', for example).
       if in_block > 1 and lang.commentNext
         line = line.replace(lang.commentNext, '');
+
+      # If we happen upon a JavaDoc @param parameter, then process that item.
       if lang.commentParam
         param = line.match(lang.commentParam);
         if param
           line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
 
-      # If we're in a block, and we find the end of it in the line, eat
-      # the end token, and note that we're no longer in the block.
-      if in_block and line.match(lang.commentExit)
-        line = line.replace(lang.commentExit, '')
-        in_block = false
-
       docsText += line + '\n'
-      save() if /^(---+|===+)$/.test line
+      save() if /^(---+|===+)$/.test line or in_block == -1
+
+      # reset in_block when we have reached the end of the comment block
+      if in_block == -1
+        in_block = false
     else
       hasCode = yes
       codeText += line + '\n'
@@ -202,6 +211,8 @@ format = (source, sections, config) ->
     code = code.replace(/\s+$/, '')
     section.codeHtml = "<div class='highlight'><pre>#{code}</pre></div>"
     section.docsHtml = marked(section.docsText)
+    #docs = section.docsText
+    #section.docsHtml = "<div class='docs'><pre>#{docs}</pre></div>"
 
 # Once all of the code has finished highlighting, we can **write** the resulting
 # documentation file by passing the completed HTML sections into the template,
@@ -278,6 +289,18 @@ marked      = require 'marked'
 commander   = require 'commander'
 {highlight} = require 'highlight.js'
 
+marked.setOptions({
+  gfm: true,
+  tables: true,
+  breaks: false,
+  pedantic: false,
+  sanitize: false,
+  smartLists: true,
+  langPrefix: 'language-',
+  highlight: (code, lang) ->
+    code
+})
+
 # Languages are stored in JSON in the file `resources/languages.json`.
 # Each item maps the file extension to the name of the language and the
 # `symbol` that indicates a line comment. To add support for a new programming
@@ -311,7 +334,7 @@ for ext, l of languages
 
 getLanguage = (source, config) ->
   ext  = config.extension or path.extname(source) or path.basename(source)
-  lang = languages[ext]
+  lang = languages[ext] || 'text'
   if lang and lang.name is 'markdown'
     codeExt = path.extname(path.basename(source, ext))
     if codeExt and codeLang = languages[codeExt]

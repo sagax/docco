@@ -201,7 +201,7 @@ of one, eat the tokens, and note that we&#39;re now in a block.</p>
 or we find a single-line comment marker.</p>
 
         
-          <div class='highlight'><pre>    single = (lang.commentMatcher <span class="keyword">and</span> line.match(lang.commentMatcher) <span class="keyword">and</span> <span class="keyword">not</span> line.match(lang.commentFilter))
+          <div class='highlight'><pre>    single = (<span class="keyword">not</span> in_block <span class="keyword">and</span> lang.commentMatcher <span class="keyword">and</span> line.match(lang.commentMatcher) <span class="keyword">and</span> <span class="keyword">not</span> line.match(lang.commentFilter))
     <span class="keyword">if</span> in_block <span class="keyword">or</span> single</pre></div>
         
       
@@ -218,27 +218,48 @@ the current docs and code, then start a new section.</p>
 comment token.</p>
 
         
-          <div class='highlight'><pre>      line = line.replace(lang.commentMatcher, <span class="string">''</span>) <span class="keyword">if</span> <span class="keyword">not</span> in_block
-
-      <span class="keyword">if</span> in_block &gt; <span class="number">1</span> <span class="keyword">and</span> lang.commentNext
-        line = line.replace(lang.commentNext, <span class="string">''</span>);
-      <span class="keyword">if</span> lang.commentParam
-        param = line.match(lang.commentParam);
-        <span class="keyword">if</span> param
-          line = line.replace(param[<span class="number">0</span>], <span class="string">'\n'</span> + <span class="string">'&lt;b&gt;'</span> + param[<span class="number">1</span>] + <span class="string">'&lt;/b&gt;'</span>);</pre></div>
+          <div class='highlight'><pre>      line = line.replace(lang.commentMatcher, <span class="string">''</span>) <span class="keyword">if</span> single</pre></div>
         
       
         
-        <p>If we&#39;re in a block, and we find the end of it in the line, eat
+        <p>If we&#39;re in a block comment and we find the end of it in the line, eat
 the end token, and note that we&#39;re no longer in the block.</p>
 
         
           <div class='highlight'><pre>      <span class="keyword">if</span> in_block <span class="keyword">and</span> line.match(lang.commentExit)
         line = line.replace(lang.commentExit, <span class="string">''</span>)
-        in_block = <span class="literal">false</span>
+        in_block = -<span class="number">1</span></pre></div>
+        
+      
+        
+        <p>If we&#39;re in a block comment and are processing comment line 2 or further, eat the
+optional comment prefix (for C style comments, that would generally be
+a single &#39;*&#39;, for example).</p>
+
+        
+          <div class='highlight'><pre>      <span class="keyword">if</span> in_block &gt; <span class="number">1</span> <span class="keyword">and</span> lang.commentNext
+        line = line.replace(lang.commentNext, <span class="string">''</span>);</pre></div>
+        
+      
+        
+        <p>If we happen upon a JavaDoc @param parameter, then process that item.</p>
+
+        
+          <div class='highlight'><pre>      <span class="keyword">if</span> lang.commentParam
+        param = line.match(lang.commentParam);
+        <span class="keyword">if</span> param
+          line = line.replace(param[<span class="number">0</span>], <span class="string">'\n'</span> + <span class="string">'&lt;b&gt;'</span> + param[<span class="number">1</span>] + <span class="string">'&lt;/b&gt;'</span>);
 
       docsText += line + <span class="string">'\n'</span>
-      save() <span class="keyword">if</span> <span class="regexp">/^(---+|===+)$/</span>.test line
+      save() <span class="keyword">if</span> <span class="regexp">/^(---+|===+)$/</span>.test line <span class="keyword">or</span> in_block == -<span class="number">1</span></pre></div>
+        
+      
+        
+        <p>reset in_block when we have reached the end of the comment block</p>
+
+        
+          <div class='highlight'><pre>      <span class="keyword">if</span> in_block == -<span class="number">1</span>
+        in_block = <span class="literal">false</span>
     <span class="keyword">else</span>
       hasCode = <span class="literal">yes</span>
       codeText += line + <span class="string">'\n'</span></pre></div>
@@ -267,6 +288,12 @@ over stdio, and run the text of their corresponding comments through
     code = code.replace(<span class="regexp">/\s+$/</span>, <span class="string">''</span>)
     section.codeHtml = <span class="string">"&lt;div class='highlight'&gt;&lt;pre&gt;<span class="subst">#{code}</span>&lt;/pre&gt;&lt;/div&gt;"</span>
     section.docsHtml = marked(section.docsText)</pre></div>
+        
+      
+        
+        <p>docs = section.docsText
+section.docsHtml = &quot;<div class='docs'><pre>#{docs}</pre></div>&quot;</p>
+
         
       
         
@@ -363,7 +390,19 @@ fs          = require <span class="string">'fs-extra'</span>
 path        = require <span class="string">'path'</span>
 marked      = require <span class="string">'marked'</span>
 commander   = require <span class="string">'commander'</span>
-{highlight} = require <span class="string">'highlight.js'</span></pre></div>
+{highlight} = require <span class="string">'highlight.js'</span>
+
+marked.setOptions({
+  gfm: <span class="literal">true</span>,
+  tables: <span class="literal">true</span>,
+  breaks: <span class="literal">false</span>,
+  pedantic: <span class="literal">false</span>,
+  sanitize: <span class="literal">false</span>,
+  smartLists: <span class="literal">true</span>,
+  langPrefix: <span class="string">'language-'</span>,
+  highlight: (code, lang) -&gt;
+    code
+})</pre></div>
         
       
         
@@ -422,7 +461,7 @@ file extension. Detect and tag &quot;literate&quot; <code>.ext.md</code> variant
           <div class='highlight'><pre>
 <span class="function"><span class="title">getLanguage</span></span> = (source, config) -&gt;
   ext  = config.extension <span class="keyword">or</span> path.extname(source) <span class="keyword">or</span> path.basename(source)
-  lang = languages[ext]
+  lang = languages[ext] || <span class="string">'text'</span>
   <span class="keyword">if</span> lang <span class="keyword">and</span> lang.name <span class="keyword">is</span> <span class="string">'markdown'</span>
     codeExt = path.extname(path.basename(source, ext))
     <span class="keyword">if</span> codeExt <span class="keyword">and</span> codeLang = languages[codeExt]
