@@ -12,11 +12,11 @@
     "node":       ">=0.2.0"
   },
   "dependencies": {
-    "commander":  ">= 0.5.2",
-    "marked":     ">= 0.2.7",
-    "fs-extra":   ">= 0.6.0",
-    "underscore": ">= 1.0.0",
-    "highlight.js": "git://github.com/GerHobbelt/highlight.js.git"
+    "commander":  ">= 1.1.1",
+    "marked":     ">= 0.2.9",
+    "fs-extra":   ">= 0.6.1",
+    "underscore": ">= 1.4.4",
+    "highlight.js": ">=7.3.0"
   },
   "main" :        "./docco",
   "bin": {
