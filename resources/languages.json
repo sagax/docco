@@ -2,7 +2,7 @@
   ".coffee" :
     {"name" : "coffeescript", "symbol" : "#", "enter": "^\\s*#{3}(?!#)", "exit": "#{3}(?!#)\\s*$" },
   ".litcoffee" :
-    {"name" : "coffeescript", "symbol" : "#", "literate": true, "enter": "^\\s*#{3}(?!#)", "exit": "#{3}(?!#)\\s*$" },
+    {"name" : "coffeescript", "symbol" : "#", "literate": true, "enter": "^\\s*#{3}(?!#)", "exit": "#{3}(?!#)\\s*$", "source": ".coffee" },
   "Cakefile":
     {"name": "coffeescript", "symbol": "#"},
   ".ls":
