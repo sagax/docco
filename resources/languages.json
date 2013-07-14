@@ -81,6 +81,8 @@
     { "name": "makefile", "symbol": "#" },
   ".jison":
     {"name" : "jison", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".cfc":
+    {"name" : "coldfusion", "symbol" : "//"}
   ".clj":
     {"name": "clojure", "symbol": ";"},
   ".cmake":
