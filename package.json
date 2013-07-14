@@ -18,6 +18,10 @@
     "underscore": ">= 1.4.4",
     "highlight.js": ">=7.3.0"
   },
+  "devDependencies": {
+    "coffee":         ">= 0.0.1",
+    "coffee-script":  ">= 1.6.3"
+  },
   "main" :        "./docco",
   "bin": {
     "docco":      "./bin/docco"

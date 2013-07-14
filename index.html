@@ -48,7 +48,8 @@ doesn&#39;t handle your favorite yet, feel free to
 <a href="https://github.com/jashkenas/docco/blob/master/resources/languages.json">add it to the list</a>.
 Finally, the <a href="http://coffeescript.org/#literate">&quot;literate&quot; style</a> of <em>any</em>
 language is also supported � just tack an <code>.md</code> extension on the end:
-<code>.coffee.md</code>, <code>.py.md</code>, and so on.</p>
+<code>.coffee.md</code>, <code>.py.md</code>, and so on. Also get usable source code by adding the
+<code>--source</code> option while specifying a directory for the files.</p>
 <p>By default only single-line comments are processed, block comments may be included
 by passing the <code>-b</code> flag to Docco.</p>
 <h2>Partners in Crime:</h2>
@@ -100,39 +101,81 @@ and aims to gracefully handle large projects with complex hierarchies of code.</
         
         <p>Generate the documentation for our configured source file by copying over static
 assets, reading all the source files in, splitting them up into prose+code
-sections, highlighting each file in the appropriate language, and printing them
-out in an HTML template.</p>
+sections, highlighting each file in the appropriate language, printing them
+out in an HTML template, and writing plain code files where instructed.</p>
 
         
           <div class='highlight'><pre>
 <span class="function"><span class="title">document</span></span> = (options = {}, callback) -&gt;
   config = configure options
+  source_infos = []
 
-  fs.mkdirs config.output, -&gt;
+  fs.mkdirsSync config.output
+  fs.mkdirsSync config.source <span class="keyword">if</span> config.source
 
-    callback <span class="function"><span class="title">or</span></span>= (error) -&gt; <span class="keyword">throw</span> error <span class="keyword">if</span> error
-    <span class="function"><span class="title">copyAsset</span></span>  = (file, callback) -&gt;
-      fs.copy file, path.join(config.output, path.basename(file)), callback
-    <span class="function"><span class="title">complete</span></span>   = -&gt;
-      copyAsset config.css, (error) -&gt;
-        <span class="keyword">if</span> error <span class="keyword">then</span> callback error
-        <span class="keyword">else</span> <span class="keyword">if</span> fs.existsSync config.public <span class="keyword">then</span> copyAsset config.public, callback
-        <span class="keyword">else</span> callback()
+  callback <span class="function"><span class="title">or</span></span>= (error) -&gt; <span class="keyword">throw</span> error <span class="keyword">if</span> error
+  <span class="function"><span class="title">copyAsset</span></span>  = (file, callback) -&gt;
+    fs.copy file, path.join(config.output, path.basename(file)), callback
+  <span class="function"><span class="title">complete</span></span>   = -&gt;
+    copyAsset config.css, (error) -&gt;
+      <span class="keyword">if</span> error <span class="keyword">then</span> callback error
+      <span class="keyword">else</span> <span class="keyword">if</span> fs.existsSync config.public <span class="keyword">then</span> copyAsset config.public, callback
+      <span class="keyword">else</span> callback()
 
-    files = config.sources.slice()
+  files = config.sources.slice()
 
-    <span class="function"><span class="title">nextFile</span></span> = -&gt;
-      source = files.shift()
-      fs.readFile source, (error, buffer) -&gt;
-        <span class="keyword">return</span> callback error <span class="keyword">if</span> error
+  <span class="function"><span class="title">nextFile</span></span> = -&gt;
+    source = files.shift()
+    fs.readFile source, (error, buffer) -&gt;
+      <span class="keyword">return</span> callback error <span class="keyword">if</span> error
 
-        code = buffer.toString()
-        sections = parse source, code, config
-        format source, sections, config
-        write source, sections, config
-        <span class="keyword">if</span> files.length <span class="keyword">then</span> nextFile() <span class="keyword">else</span> complete()
+      code = buffer.toString()
+      sections = parse source, code, config
+      format source, sections, config</pre></div>
+        
+      
+        
+        <p>The <strong>title</strong> of the file is either the first heading in the prose, or the
+name of the source file.</p>
 
-    nextFile()</pre></div>
+        
+          <div class='highlight'><pre>
+      first = marked.lexer(sections[<span class="number">0</span>].docsText)[<span class="number">0</span>]
+      hasTitle = first <span class="keyword">and</span> first.type <span class="keyword">is</span> <span class="string">'heading'</span> <span class="keyword">and</span> first.depth <span class="keyword">is</span> <span class="number">1</span>
+      title = <span class="keyword">if</span> hasTitle <span class="keyword">then</span> first.text <span class="keyword">else</span> path.basename source
+
+      source_infos.push({
+        source: source,
+        hasTitle: hasTitle,
+        title: title,
+        sections: sections
+      })
+
+      <span class="keyword">if</span> files.length <span class="keyword">then</span> nextFile() <span class="keyword">else</span> outputFiles()</pre></div>
+        
+      
+        
+        <p>When we have finished all preparations (such as extracting a title for each file),
+we produce all output files.</p>
+<p>We have collected all titles before outputting the individual files to give the
+template access to all sources&#39; titles for rendering, e.g. when the template
+needs to produce a TOC with each file.</p>
+
+        
+          <div class='highlight'><pre>
+  <span class="function"><span class="title">outputFiles</span></span> = -&gt;
+    <span class="keyword">for</span> info, i <span class="keyword">in</span> source_infos
+      write info.source, i, source_infos, config
+      outputCode info.source, info.sections, config
+    complete()</pre></div>
+        
+      
+        
+        <p>Start processing all sources and producing the corresponding files for each:</p>
+
+        
+          <div class='highlight'><pre>
+  nextFile()</pre></div>
         
       
         
@@ -318,9 +361,29 @@ over stdio, and run the text of their corresponding comments through
         
           <div class='highlight'><pre>
 <span class="function"><span class="title">format</span></span> = (source, sections, config) -&gt;
-  language = getLanguage source, config
+  language = getLanguage source, config</pre></div>
+        
+      
+        
+        <p>Tell Marked how to highlight code blocks within comments, treating that code
+as either the language specified in the code block or the language of the file
+if not specified.</p>
+
+        
+          <div class='highlight'><pre>
+  marked.setOptions {
+    highlight: (code, lang) -&gt;
+      lang <span class="keyword">or</span>= language.name
+
+      <span class="keyword">if</span> highlightjs.LANGUAGES[lang]
+        highlightjs.highlight(lang, code).value
+      <span class="keyword">else</span>
+        console.warn <span class="string">"docco: couldn't highlight code block with unknown language '<span class="subst">#{lang}</span>' in <span class="subst">#{source}</span>"</span>
+        code
+  }
+
   <span class="keyword">for</span> section, i <span class="keyword">in</span> sections
-    code = highlight(language.name, section.codeText).value
+    code = highlightjs.highlight(language.name, section.codeText).value
     code = code.replace(<span class="regexp">/\s+$/</span>, <span class="string">''</span>)
     section.codeHtml = <span class="string">"&lt;div class='highlight'&gt;&lt;pre&gt;<span class="subst">#{code}</span>&lt;/pre&gt;&lt;/div&gt;"</span>
     section.docsHtml = marked(section.docsText)</pre></div>
@@ -333,27 +396,45 @@ and rendering it to the specified output path.</p>
 
         
           <div class='highlight'><pre>
-<span class="function"><span class="title">write</span></span> = (source, sections, config) -&gt;
+<span class="function"><span class="title">write</span></span> = (source, title_idx, source_infos, config) -&gt;
 
   <span class="function"><span class="title">destination</span></span> = (file) -&gt;
-    path.join(config.output, path.basename(file, path.extname(file)) + <span class="string">'.html'</span>)</pre></div>
-        
-      
-        
-        <p>The <strong>title</strong> of the file is either the first heading in the prose, or the
-name of the source file.</p>
+    path.join(config.output, path.basename(file, path.extname(file)) + <span class="string">'.html'</span>)
 
-        
-          <div class='highlight'><pre>
-  first = marked.lexer(sections[<span class="number">0</span>].docsText)[<span class="number">0</span>]
-  hasTitle = first <span class="keyword">and</span> first.type <span class="keyword">is</span> <span class="string">'heading'</span> <span class="keyword">and</span> first.depth <span class="keyword">is</span> <span class="number">1</span>
-  title = <span class="keyword">if</span> hasTitle <span class="keyword">then</span> first.text <span class="keyword">else</span> path.basename source
-
-  html = config.template {sources: config.sources, css: path.basename(config.css),
-    title, hasTitle, sections, path, destination,}
+  html = config.template {
+    sources: config.sources
+    titles: source_infos.map (info) -&gt;
+      info.title
+    css: path.basename(config.css)
+    title: source_infos[title_idx].title
+    hasTitle: source_infos[title_idx].hasTitle
+    sections: source_infos[title_idx].sections
+    path
+    destination
+  }
 
   console.log <span class="string">"docco: <span class="subst">#{source}</span> -&gt; <span class="subst">#{destination source}</span>"</span>
   fs.writeFileSync destination(source), html</pre></div>
+        
+      
+        
+        <p>Print out the consolidated code sections parsed from the source file in to another
+file. No documentation will be included in the new file.</p>
+
+        
+          <div class='highlight'><pre>
+<span class="function"><span class="title">outputCode</span></span> = (source, sections, config) -&gt;
+  lang = getLanguage source, config
+
+  <span class="function"><span class="title">destination</span></span> = (file) -&gt;
+    path.join config.source, path.basename(file, path.extname file) + lang.source
+
+  <span class="keyword">if</span> config.source
+    code = _.pluck(sections, <span class="string">'codeText'</span>).join <span class="string">'\n'</span>
+    code = code.trim().replace <span class="regexp">/(\n{2,})/g</span>, <span class="string">'\n\n'</span>
+
+    console.log <span class="string">"docco: <span class="subst">#{source}</span> -&gt; <span class="subst">#{destination source}</span>"</span>
+    fs.writeFileSync destination(source), code</pre></div>
         
       
         
@@ -373,6 +454,7 @@ defaults =
   template:   <span class="literal">null</span>
   css:        <span class="literal">null</span>
   extension:  <span class="literal">null</span>
+  source:     <span class="literal">null</span>
   blocks:     <span class="literal">false</span>
   markdown:   <span class="literal">false</span></pre></div>
         
@@ -420,7 +502,7 @@ fs          = require <span class="string">'fs-extra'</span>
 path        = require <span class="string">'path'</span>
 marked      = require <span class="string">'marked'</span>
 commander   = require <span class="string">'commander'</span>
-{highlight} = require <span class="string">'highlight.js'</span>
+highlightjs = require <span class="string">'highlight.js'</span>
 
 marked.setOptions({
   gfm: <span class="literal">true</span>,
@@ -499,10 +581,13 @@ file extension. Detect and tag &quot;literate&quot; <code>.ext.md</code> variant
 <span class="function"><span class="title">getLanguage</span></span> = (source, config) -&gt;
   ext  = config.extension <span class="keyword">or</span> path.extname(source) <span class="keyword">or</span> path.basename(source)
   lang = languages[ext] || <span class="string">'text'</span>
-  <span class="keyword">if</span> lang <span class="keyword">and</span> lang.name <span class="keyword">is</span> <span class="string">'markdown'</span>
-    codeExt = path.extname(path.basename(source, ext))
-    <span class="keyword">if</span> codeExt <span class="keyword">and</span> codeLang = languages[codeExt]
-      lang = _.extend {}, codeLang, {literate: <span class="literal">yes</span>}
+  <span class="keyword">if</span> lang
+    <span class="keyword">if</span> lang.name <span class="keyword">is</span> <span class="string">'markdown'</span>
+      codeExt = path.extname(path.basename(source, ext))
+      <span class="keyword">if</span> codeExt <span class="keyword">and</span> codeLang = languages[codeExt]
+        lang = _.extend {}, codeLang, {literate: <span class="literal">yes</span>, source: <span class="string">''</span>}
+    <span class="keyword">else</span> <span class="keyword">if</span> <span class="keyword">not</span> lang.source
+      lang.source = ext
   lang</pre></div>
         
       
@@ -529,13 +614,14 @@ Parse options using <a href="https://github.com/visionmedia/commander.js">Comman
   c = defaults
   commander.version(version)
     .usage(<span class="string">'[options] files'</span>)
-    .option(<span class="string">'-l, --layout [name]'</span>,    <span class="string">'choose a layout (parallel, linear or classic)'</span>, c.layout)
+    .option(<span class="string">'-l, --layout [name]'</span>,    <span class="string">'choose a layout (parallel, linear, pretty or classic)'</span>, c.layout)
     .option(<span class="string">'-o, --output [path]'</span>,    <span class="string">'output to a given folder'</span>, c.output)
     .option(<span class="string">'-c, --css [file]'</span>,       <span class="string">'use a custom css file'</span>, c.css)
     .option(<span class="string">'-t, --template [file]'</span>,  <span class="string">'use a custom .jst template'</span>, c.template)
     .option(<span class="string">'-b, --blocks'</span>,           <span class="string">'parse block comments where available'</span>, c.blocks)
     .option(<span class="string">'-m, --markdown'</span>,         <span class="string">'output markdown'</span>, c.markdown)
     .option(<span class="string">'-e, --extension [ext]'</span>,  <span class="string">'assume a file extension for all inputs'</span>, c.extension)
+    .option(<span class="string">'-s, --source [path]'</span>,    <span class="string">'output code in a given folder'</span>, c.source)
     .parse(args)
     .name = <span class="string">"docco"</span>
   <span class="keyword">if</span> commander.args.length
@@ -553,7 +639,7 @@ Parse options using <a href="https://github.com/visionmedia/commander.js">Comman
         
         
           <div class='highlight'><pre>
-Docco = module.exports = {run, document, parse, version}</pre></div>
+Docco = module.exports = {run, document, parse, format, configure, version}</pre></div>
         
       
       <div class="fleur">h</div>

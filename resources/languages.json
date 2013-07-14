@@ -52,7 +52,7 @@
   ".html":
     {"name": "html", "symbol": "", "enter": "^\\s*<!--(\\s+|$)", "exit": "\\s*-->\\s*$", "next": "" },
   ".htm":
-    {"name": "html", "symbol": "", "enter": "^\\s*<!--(\\s+|$)", "exit": "\\s*-->\\s*$", "next": "" }
+    {"name": "html", "symbol": "", "enter": "^\\s*<!--(\\s+|$)", "exit": "\\s*-->\\s*$", "next": "" },
   ".md":
     {"name" : "markdown", "symbol" : ""},
   ".markdown":
@@ -82,7 +82,7 @@
   ".jison":
     {"name" : "jison", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
   ".cfc":
-    {"name" : "coldfusion", "symbol" : "//"}
+    {"name" : "coldfusion", "symbol" : "//"},
   ".clj":
     {"name": "clojure", "symbol": ";"},
   ".cmake":

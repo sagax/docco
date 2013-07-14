@@ -98,7 +98,7 @@ out in an HTML template, and writing plain code files where instructed.
           else callback()
 
       files = config.sources.slice()
-      
+
       nextFile = ->
         source = files.shift()
         fs.readFile source, (error, buffer) ->
@@ -114,13 +114,13 @@ name of the source file.
           first = marked.lexer(sections[0].docsText)[0]
           hasTitle = first and first.type is 'heading' and first.depth is 1
           title = if hasTitle then first.text else path.basename source
-	  	  
-	  source_infos.push({
-	    source: source,
-	    hasTitle: hasTitle,
-	    title: title,
-	    sections: sections
-	  })
+
+          source_infos.push({
+            source: source,
+            hasTitle: hasTitle,
+            title: title,
+            sections: sections
+          })
 
           if files.length then nextFile() else outputFiles()
 
@@ -307,13 +307,13 @@ and rendering it to the specified output path.
       html = config.template {
         sources: config.sources
         titles: source_infos.map (info) ->
-	  info.title
+          info.title
         css: path.basename(config.css)
         title: source_infos[title_idx].title
-	hasTitle: source_infos[title_idx].hasTitle
-	sections: source_infos[title_idx].sections
-	path
-	destination
+        hasTitle: source_infos[title_idx].hasTitle
+        sections: source_infos[title_idx].sections
+        path
+        destination
       }
 
       console.log "docco: #{source} -> #{destination source}"
