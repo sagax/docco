@@ -83,6 +83,7 @@
 
 document = (options = {}, callback) ->
   config = configure options
+  source_infos = []
 
   fs.mkdirsSync config.output
   fs.mkdirsSync config.source if config.source
@@ -106,9 +107,37 @@ document = (options = {}, callback) ->
       code = buffer.toString()
       sections = parse source, code, config
       format source, sections, config
-      write source, sections, config
-      outputCode source, sections, config
-      if files.length then nextFile() else complete()
+
+# The **title** of the file is either the first heading in the prose, or the
+# name of the source file.
+
+      first = marked.lexer(sections[0].docsText)[0]
+      hasTitle = first and first.type is 'heading' and first.depth is 1
+      title = if hasTitle then first.text else path.basename source
+
+      source_infos.push({
+        source: source,
+        hasTitle: hasTitle,
+        title: title,
+        sections: sections
+      })
+
+      if files.length then nextFile() else outputFiles()
+
+# When we have finished all preparations (such as extracting a title for each file),
+# we produce all output files.
+#
+# We have collected all titles before outputting the individual files to give the
+# template access to all sources' titles for rendering, e.g. when the template
+# needs to produce a TOC with each file.
+
+  outputFiles = ->
+    for info, i in source_infos
+      write info.source, i, source_infos, config
+      outputCode info.source, info.sections, config
+    complete()
+
+# Start processing all sources and producing the corresponding files for each:
 
   nextFile()
 
@@ -250,20 +279,22 @@ format = (source, sections, config) ->
 # documentation file by passing the completed HTML sections into the template,
 # and rendering it to the specified output path.
 
-write = (source, sections, config) ->
+write = (source, title_idx, source_infos, config) ->
 
   destination = (file) ->
     path.join(config.output, path.basename(file, path.extname(file)) + '.html')
 
-# The **title** of the file is either the first heading in the prose, or the
-# name of the source file.
-
-  first = marked.lexer(sections[0].docsText)[0]
-  hasTitle = first and first.type is 'heading' and first.depth is 1
-  title = if hasTitle then first.text else path.basename source
-
-  html = config.template {sources: config.sources, css: path.basename(config.css),
-    title, hasTitle, sections, path, destination,}
+  html = config.template {
+    sources: config.sources
+    titles: source_infos.map (info) ->
+      info.title
+    css: path.basename(config.css)
+    title: source_infos[title_idx].title
+    hasTitle: source_infos[title_idx].hasTitle
+    sections: source_infos[title_idx].sections
+    path
+    destination
+  }
 
   console.log "docco: #{source} -> #{destination source}"
   fs.writeFileSync destination(source), html
@@ -411,7 +442,7 @@ run = (args = process.argv) ->
   c = defaults
   commander.version(version)
     .usage('[options] files')
-    .option('-l, --layout [name]',    'choose a layout (parallel, linear or classic)', c.layout)
+    .option('-l, --layout [name]',    'choose a layout (parallel, linear, pretty or classic)', c.layout)
     .option('-o, --output [path]',    'output to a given folder', c.output)
     .option('-c, --css [file]',       'use a custom css file', c.css)
     .option('-t, --template [file]',  'use a custom .jst template', c.template)
@@ -430,6 +461,6 @@ run = (args = process.argv) ->
 # Public API
 # ----------
 
-Docco = module.exports = {run, document, parse, version}
+Docco = module.exports = {run, document, parse, format, version}
 
 
