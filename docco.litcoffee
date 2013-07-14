@@ -237,7 +237,7 @@ If we happen upon a JavaDoc @param parameter, then process that item.
             if param
               line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
 
-    if not ignore_this_block and (in_block or single)
+        if not ignore_this_block and (in_block or single)
 
 If we have code text, and we're entering a comment, store off
 the current docs and code, then start a new section.
