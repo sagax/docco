@@ -5,6 +5,8 @@
     {"name" : "coffeescript", "symbol" : "#", "literate": true, "enter": "^\\s*#{3}(?!#)", "exit": "#{3}(?!#)\\s*$", "source": ".coffee" },
   "Cakefile":
     {"name": "coffeescript", "symbol": "#"},
+  "Makefile":
+    {"name": "make", "symbol": "#"},
   ".ls":
     {"name" : "livescript", "symbol": "#"},
   ".rb":
@@ -47,6 +49,10 @@
     {"name" : "erlang", "symbol" : "%"},
   ".hrl":
     {"name" : "erlang", "symbol" : "%"},
+  ".html":
+    {"name": "html", "symbol": "", "enter": "^\\s*<!--(\\s+|$)", "exit": "\\s*-->\\s*$", "next": "" },
+  ".htm":
+    {"name": "html", "symbol": "", "enter": "^\\s*<!--(\\s+|$)", "exit": "\\s*-->\\s*$", "next": "" }
   ".md":
     {"name" : "markdown", "symbol" : ""},
   ".markdown":
