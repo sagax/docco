@@ -461,6 +461,6 @@ run = (args = process.argv) ->
 # Public API
 # ----------
 
-Docco = module.exports = {run, document, parse, format, version}
+Docco = module.exports = {run, document, parse, format, configure, version}
 
 
