@@ -8,3 +8,8 @@ npm-debug.log
 # editor backup files
 *~
 *.bak
+
+# Sublime project and workspace files
+docco.sublime-project
+docco.sublime-workspace
+

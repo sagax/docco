@@ -435,7 +435,7 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
       c = defaults
       commander.version(version)
         .usage('[options] files')
-        .option('-l, --layout [name]',    'choose a layout (parallel, linear or classic)', c.layout)
+        .option('-l, --layout [name]',    'choose a layout (parallel, linear, pretty or classic)', c.layout)
         .option('-o, --output [path]',    'output to a given folder', c.output)
         .option('-c, --css [file]',       'use a custom css file', c.css)
         .option('-t, --template [file]',  'use a custom .jst template', c.template)
