@@ -63,6 +63,8 @@
     {"name" : "objectivec", "symbol": "//"},
   ".mm":
     {"name" : "objectivec", "symbol": "//"},
+  ".n":
+    {"name": "nemerle", "symbol": "//"},
   ".scala":
     {"name" : "scala", "symbol": "//"},
   ".cs":
