@@ -101,6 +101,8 @@
     {"name": "go", "symbol": "//"},
   ".ini":
     {"name": "ini", "symbol": ";"},
+  ".jade":
+    {"name": "jade", "symbol": "//"},
   ".lisp":
     {"name": "lisp", "symbol": ";"},
   ".lua":
