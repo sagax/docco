@@ -119,6 +119,8 @@
     {"name": "perl", "symbol": "#"},
   ".t":
     {"name": "perl", "symbol": "#"},
+  ".properties":
+    {"name" : ".properties", "symbol": "#"},
   ".r":
     {"name": "r", "symbol": "#"},
   ".rc":
