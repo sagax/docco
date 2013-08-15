@@ -107,12 +107,15 @@ invert the prose and code relationship on a per-line basis, and then continue as
 normal below.
 
       if lang.literate
+        isText = maybeCode = yes
         for line, i in lines
-          lines[i] = if /^\s*$/.test line
-            ''
-          else if match = (/^([ ]{4}|\t)/).exec line
+          lines[i] = if maybeCode and match = /^([ ]{4}|[ ]{0,3}\t)/.exec line
+            isText = no
             line[match[0].length..]
+          else if maybeCode = /^\s*$/.test line
+            if isText then lang.symbol else ''
           else
+            isText = yes
             lang.symbol + ' ' + line
 
       for line in lines
