@@ -12,18 +12,18 @@
     <div class="page">
 
       <div class="header">
-
-
+        
+          
           <h1>Docco</h1>
 
+          
+        
 
-
-
-
+        
       </div>
 
-
-
+      
+        
         <p><strong>Docco</strong> is a quick-and-dirty documentation generator, written in
 <a href="http://coffeescript.org/#literate">Literate CoffeeScript</a>.
 It produces an HTML document that displays your comments intermingled with your
@@ -54,9 +54,9 @@ language is also supported — just tack an <code>.md</code> extension on the en
 by passing the <code>-b</code> flag to Docco.</p>
 <h2>Partners in Crime:</h2>
 
-
-
-
+        
+      
+        
         <ul>
 <li><p>If <strong>Node.js</strong> doesn&#39;t run on your platform, or you&#39;d prefer a more
 convenient package, get <a href="http://github.com/rtomayko">Ryan Tomayko</a>&#39;s
@@ -96,15 +96,15 @@ and aims to gracefully handle large projects with complex hierarchies of code.</
 <p>Note that not all ports will support all Docco features ... yet.</p>
 <h2>Main Documentation Generation Functions</h2>
 
-
-
-
+        
+      
+        
         <p>Generate the documentation for our configured source file by copying over static
 assets, reading all the source files in, splitting them up into prose+code
 sections, highlighting each file in the appropriate language, printing them
 out in an HTML template, and writing plain code files where instructed.</p>
 
-
+        
           <div class='highlight'><pre><span class="function"><span class="title">document</span></span> = (options = {}, callback) -&gt;
   config = configure options
   source_infos = []
@@ -131,13 +131,13 @@ out in an HTML template, and writing plain code files where instructed.</p>
       code = buffer.toString()
       sections = parse source, code, config
       format source, sections, config</pre></div>
-
-
-
+        
+      
+        
         <p>The <strong>title</strong> of the file is either the first heading in the prose, or the
 name of the source file.</p>
 
-
+        
           <div class='highlight'><pre>      first = marked.lexer(sections[<span class="number">0</span>].docsText)[<span class="number">0</span>]
       hasTitle = first <span class="keyword">and</span> first.type <span class="keyword">is</span> <span class="string">'heading'</span> <span class="keyword">and</span> first.depth <span class="keyword">is</span> <span class="number">1</span>
       title = <span class="keyword">if</span> hasTitle <span class="keyword">then</span> first.text <span class="keyword">else</span> path.basename source
@@ -150,37 +150,37 @@ name of the source file.</p>
       })
 
       <span class="keyword">if</span> files.length <span class="keyword">then</span> nextFile() <span class="keyword">else</span> outputFiles()</pre></div>
-
-
-
+        
+      
+        
         <p>When we have finished all preparations (such as extracting a title for each file),
 we produce all output files.</p>
 <p>We have collected all titles before outputting the individual files to give the
 template access to all sources&#39; titles for rendering, e.g. when the template
 needs to produce a TOC with each file.</p>
 
-
+        
           <div class='highlight'><pre>  <span class="function"><span class="title">outputFiles</span></span> = -&gt;
     <span class="keyword">for</span> info, i <span class="keyword">in</span> source_infos
       write info.source, i, source_infos, config
       outputCode info.source, info.sections, config
     complete()</pre></div>
-
-
-
+        
+      
+        
         <p>Start processing all sources and producing the corresponding files for each:</p>
 
-
+        
           <div class='highlight'><pre>  nextFile()</pre></div>
-
-
-
+        
+      
+        
         <p>Given a string of source code, <strong>parse</strong> out each block of prose and the code that
 follows it — by detecting which is which, line by line — and then create an
 individual <strong>section</strong> for it. Each section is an object with <code>docsText</code> and
 <code>codeText</code> properties, and eventually <code>docsHtml</code> and <code>codeHtml</code> as well.</p>
 
-
+        
           <div class='highlight'><pre><span class="function"><span class="title">parse</span></span> = (source, code, config = {}) -&gt;
   lines    = code.split <span class="string">'\n'</span>
   sections = []
@@ -193,14 +193,14 @@ individual <strong>section</strong> for it. Each section is an object with <code
   <span class="function"><span class="title">save</span></span> = -&gt;
     sections.push {docsText, codeText}
     hasCode = docsText = codeText = <span class="string">''</span></pre></div>
-
-
-
+        
+      
+        
         <p>Our quick-and-dirty implementation of the literate programming style. Simply
 invert the prose and code relationship on a per-line basis, and then continue as
 normal below.</p>
 
-
+        
           <div class='highlight'><pre>  <span class="keyword">if</span> lang.literate
     isText = maybeCode = <span class="literal">yes</span>
     <span class="keyword">for</span> line, i <span class="keyword">in</span> lines
@@ -212,107 +212,107 @@ normal below.</p>
       <span class="keyword">else</span>
         isText = <span class="literal">yes</span>
         lang.symbol + <span class="string">' '</span> + line</pre></div>
-
-
-
+        
+      
+        
         <p>Iterate over the source lines, and separate out single/block
 comments from code chunks.</p>
 
-
+        
           <div class='highlight'><pre>  <span class="keyword">for</span> line <span class="keyword">in</span> lines
     <span class="keyword">if</span> in_block
       ++in_block
 
     raw_line = line</pre></div>
-
-
-
+        
+      
+        
         <p>If we&#39;re not in a block comment, and find a match for the start
 of one, eat the tokens, and note that we&#39;re now in a block.</p>
 
-
+        
           <div class='highlight'><pre>    <span class="keyword">if</span> <span class="keyword">not</span> in_block <span class="keyword">and</span> config.blocks <span class="keyword">and</span> lang.blocks <span class="keyword">and</span> line.match(lang.commentEnter)
       line = line.replace(lang.commentEnter, <span class="string">''</span>)</pre></div>
-
-
-
+        
+      
+        
         <p>Make sure this is a comment that we actually want to process; if not, treat it as code</p>
 
-
+        
           <div class='highlight'><pre>      in_block = <span class="number">1</span>
       <span class="keyword">if</span> lang.commentIgnore <span class="keyword">and</span> line.match(lang.commentIgnore)
         ignore_this_block = <span class="number">1</span></pre></div>
-
-
-
+        
+      
+        
         <p>Process the line, marking it as docs if we&#39;re in a block comment,
 or we find a single-line comment marker.</p>
 
-
+        
           <div class='highlight'><pre>    single = (<span class="keyword">not</span> in_block <span class="keyword">and</span> lang.commentMatcher <span class="keyword">and</span> line.match(lang.commentMatcher) <span class="keyword">and</span> <span class="keyword">not</span> line.match(lang.commentFilter))</pre></div>
-
-
-
+        
+      
+        
         <p>If there&#39;s a single comment, and we&#39;re not in a block, eat the
 comment token.</p>
 
-
+        
           <div class='highlight'><pre>    <span class="keyword">if</span> single
       line = line.replace(lang.commentMatcher, <span class="string">''</span>)</pre></div>
-
-
-
+        
+      
+        
         <p>Make sure this is a comment that we actually want to process; if not, treat it as code</p>
 
-
+        
           <div class='highlight'><pre>      <span class="keyword">if</span> lang.commentIgnore <span class="keyword">and</span> line.match(lang.commentIgnore)
         ignore_this_block = <span class="number">1</span></pre></div>
-
-
-
+        
+      
+        
         <p>Prepare the line further when it is (part of) a comment line.</p>
 
-
+        
           <div class='highlight'><pre>    <span class="keyword">if</span> in_block <span class="keyword">or</span> single</pre></div>
-
-
-
+        
+      
+        
         <p>If we&#39;re in a block comment and we find the end of it in the line, eat
 the end token, and note that we&#39;re no longer in the block.</p>
 
-
+        
           <div class='highlight'><pre>      <span class="keyword">if</span> in_block <span class="keyword">and</span> line.match(lang.commentExit)
         line = line.replace(lang.commentExit, <span class="string">''</span>)
         in_block = -<span class="number">1</span></pre></div>
-
-
-
+        
+      
+        
         <p>If we&#39;re in a block comment and are processing comment line 2 or further, eat the
 optional comment prefix (for C style comments, that would generally be
 a single &#39;*&#39;, for example).</p>
 
-
+        
           <div class='highlight'><pre>      <span class="keyword">if</span> in_block &gt; <span class="number">1</span> <span class="keyword">and</span> lang.commentNext
         line = line.replace(lang.commentNext, <span class="string">''</span>);</pre></div>
-
-
-
+        
+      
+        
         <p>If we happen upon a JavaDoc @param parameter, then process that item.</p>
 
-
+        
           <div class='highlight'><pre>      <span class="keyword">if</span> lang.commentParam
         param = line.match(lang.commentParam);
         <span class="keyword">if</span> param
           line = line.replace(param[<span class="number">0</span>], <span class="string">'\n'</span> + <span class="string">'&lt;b&gt;'</span> + param[<span class="number">1</span>] + <span class="string">'&lt;/b&gt;'</span>);
 
     <span class="keyword">if</span> <span class="keyword">not</span> ignore_this_block <span class="keyword">and</span> (in_block <span class="keyword">or</span> single)</pre></div>
-
-
-
+        
+      
+        
         <p>If we have code text, and we&#39;re entering a comment, store off
 the current docs and code, then start a new section.</p>
 
-
+        
           <div class='highlight'><pre>      save() <span class="keyword">if</span> hasCode
 
       docsText += line + <span class="string">'\n'</span>
@@ -321,49 +321,49 @@ the current docs and code, then start a new section.</p>
     <span class="keyword">else</span>
       hasCode = <span class="literal">yes</span>
       codeText += line + <span class="string">'\n'</span></pre></div>
-
-
-
+        
+      
+        
         <p>Reset <code>in_block</code> when we have reached the end of the comment block.</p>
 
-
+        
           <div class='highlight'><pre>    <span class="keyword">if</span> in_block == -<span class="number">1</span>
       in_block = <span class="number">0</span></pre></div>
-
-
-
+        
+      
+        
         <p>Reset <code>ignore_this_block</code> when we have reached the end of the comment block or single comment line.</p>
 
-
+        
           <div class='highlight'><pre>    <span class="keyword">if</span> <span class="keyword">not</span> in_block
       ignore_this_block = <span class="number">0</span></pre></div>
-
-
-
+        
+      
+        
         <p>Save the final section, if any, and return the sections array.</p>
 
-
+        
           <div class='highlight'><pre>  save()
 
   sections</pre></div>
-
-
-
+        
+      
+        
         <p>To <strong>format</strong> and highlight the now-parsed sections of code, we use <strong>Highlight.js</strong>
 over stdio, and run the text of their corresponding comments through
 <strong>Markdown</strong>, using <a href="https://github.com/chjj/marked">Marked</a>.</p>
 
-
+        
           <div class='highlight'><pre><span class="function"><span class="title">format</span></span> = (source, sections, config) -&gt;
   language = getLanguage source, config</pre></div>
-
-
-
+        
+      
+        
         <p>Tell Marked how to highlight code blocks within comments, treating that code
 as either the language specified in the code block or the language of the file
 if not specified.</p>
 
-
+        
           <div class='highlight'><pre>  marked.setOptions {
     highlight: (code, lang) -&gt;
       lang <span class="keyword">or</span>= language.name
@@ -380,14 +380,14 @@ if not specified.</p>
     code = code.replace(<span class="regexp">/\s+$/</span>, <span class="string">''</span>)
     section.codeHtml = <span class="string">"&lt;div class='highlight'&gt;&lt;pre&gt;<span class="subst">#{code}</span>&lt;/pre&gt;&lt;/div&gt;"</span>
     section.docsHtml = marked(section.docsText)</pre></div>
-
-
-
+        
+      
+        
         <p>Once all of the code has finished highlighting, we can <strong>write</strong> the resulting
 documentation file by passing the completed HTML sections into the template,
 and rendering it to the specified output path.</p>
 
-
+        
           <div class='highlight'><pre><span class="function"><span class="title">write</span></span> = (source, title_idx, source_infos, config) -&gt;
 
   <span class="function"><span class="title">destination</span></span> = (file) -&gt;
@@ -407,13 +407,13 @@ and rendering it to the specified output path.</p>
 
   console.log <span class="string">"docco: <span class="subst">#{source}</span> -&gt; <span class="subst">#{destination source}</span>"</span>
   fs.writeFileSync destination(source), html</pre></div>
-
-
-
+        
+      
+        
         <p>Print out the consolidated code sections parsed from the source file in to another
 file. No documentation will be included in the new file.</p>
 
-
+        
           <div class='highlight'><pre><span class="function"><span class="title">outputCode</span></span> = (source, sections, config) -&gt;
   lang = getLanguage source, config
 
@@ -426,18 +426,18 @@ file. No documentation will be included in the new file.</p>
 
     console.log <span class="string">"docco: <span class="subst">#{source}</span> -&gt; <span class="subst">#{destination source}</span>"</span>
     fs.writeFileSync destination(source), code</pre></div>
-
-
-
+        
+      
+        
         <h2>Configuration</h2>
 
-
-
-
+        
+      
+        
         <p>Default configuration <strong>options</strong>. All of these may be extended by
 user-specified options.</p>
 
-
+        
           <div class='highlight'><pre>defaults =
   layout:     <span class="string">'parallel'</span>
   output:     <span class="string">'docs'</span>
@@ -447,14 +447,14 @@ user-specified options.</p>
   source:     <span class="literal">null</span>
   blocks:     <span class="literal">false</span>
   markdown:   <span class="literal">false</span></pre></div>
-
-
-
+        
+      
+        
         <p><strong>Configure</strong> this particular run of Docco. We might use a passed-in external
 template, or one of the built-in <strong>layouts</strong>. We only attempt to process
 source files for languages for which we have definitions.</p>
 
-
+        
           <div class='highlight'><pre><span class="function"><span class="title">configure</span></span> = (options) -&gt;
   config = _.extend {}, defaults, _.pick(options, _.keys(defaults)...)
 
@@ -474,17 +474,17 @@ source files for languages for which we have definitions.</p>
   ).sort()
 
   config</pre></div>
-
-
-
+        
+      
+        
         <h2>Helpers &amp; Initial Setup</h2>
 
-
-
-
+        
+      
+        
         <p>Require our external dependencies.</p>
 
-
+        
           <div class='highlight'><pre>_           = require <span class="string">'underscore'</span>
 fs          = require <span class="string">'fs-extra'</span>
 path        = require <span class="string">'path'</span>
@@ -503,37 +503,37 @@ marked.setOptions({
   highlight: (code, lang) -&gt;
     code
 })</pre></div>
-
-
-
+        
+      
+        
         <p>Languages are stored in JSON in the file <code>resources/languages.json</code>.
 Each item maps the file extension to the name of the language and the
 <code>symbol</code> that indicates a line comment. To add support for a new programming
 language to Docco, just add it to the file.</p>
 
-
+        
           <div class='highlight'><pre>languages = JSON.parse fs.readFileSync(path.join(__dirname, <span class="string">'resources'</span>, <span class="string">'languages.json'</span>))</pre></div>
-
-
-
+        
+      
+        
         <p>Build out the appropriate matchers and delimiters for each language.</p>
 
-
+        
           <div class='highlight'><pre><span class="keyword">for</span> ext, l <span class="keyword">of</span> languages</pre></div>
-
-
-
+        
+      
+        
         <p>Does the line begin with a comment?</p>
 
-
+        
           <div class='highlight'><pre>  <span class="keyword">if</span> (l.symbol)
     l.commentMatcher = <span class="regexp">///^\s*<span class="comment">#{l.symbol}\s?///</span></pre></div>
-
-
-
+        
+      
+        
         <p>Support block comment parsing?</p>
 
-
+        
           <div class='highlight'><pre>  <span class="keyword">if</span> l.enter <span class="keyword">and</span> l.exit
     l.blocks = <span class="literal">true</span>
     l.commentEnter = <span class="keyword">new</span> RegExp(l.enter)
@@ -542,27 +542,27 @@ language to Docco, just add it to the file.</p>
       l.commentNext = <span class="keyword">new</span> RegExp(l.next)
   <span class="keyword">if</span> l.param
     l.commentParam = <span class="keyword">new</span> RegExp(l.param)</pre></div>
-
-
-
+        
+      
+        
         <p>Ignore <a href="http://en.wikipedia.org/wiki/Shebang_%28Unix%29">hashbangs</a> and interpolations...</p>
 
-
+        
           <div class='highlight'><pre>  l.commentFilter = <span class="regexp">/(^#![/]|^\s*#\{)/</span></pre></div>
-
-
-
+        
+      
+        
         <p>We ignore any comments which start with a colon &#39;:&#39; - these will be included in the code as is.</p>
 
-
+        
           <div class='highlight'><pre>  l.commentIgnore = <span class="keyword">new</span> RegExp(<span class="regexp">/^:/</span>)</pre></div>
-
-
-
+        
+      
+        
         <p>A function to get the current language we&#39;re documenting, based on the
 file extension. Detect and tag &quot;literate&quot; <code>.ext.md</code> variants.</p>
 
-
+        
           <div class='highlight'><pre><span class="function"><span class="title">getLanguage</span></span> = (source, config) -&gt;
   ext  = config.extension <span class="keyword">or</span> path.extname(source) <span class="keyword">or</span> path.basename(source)
   lang = languages[ext] || <span class="string">'text'</span>
@@ -574,25 +574,25 @@ file extension. Detect and tag &quot;literate&quot; <code>.ext.md</code> variant
     <span class="keyword">else</span> <span class="keyword">if</span> <span class="keyword">not</span> lang.source
       lang.source = ext
   lang</pre></div>
-
-
-
+        
+      
+        
         <p>Keep it DRY. Extract the docco <strong>version</strong> from <code>package.json</code></p>
 
-
+        
           <div class='highlight'><pre>version = JSON.parse(fs.readFileSync(path.join(__dirname, <span class="string">'package.json'</span>))).version</pre></div>
-
-
-
+        
+      
+        
         <h2>Command Line Interface</h2>
 
-
-
-
+        
+      
+        
         <p>Finally, let&#39;s define the interface to run Docco from the command line.
 Parse options using <a href="https://github.com/visionmedia/commander.js">Commander</a>.</p>
 
-
+        
           <div class='highlight'><pre><span class="function"><span class="title">run</span></span> = (args = process.argv) -&gt;
   c = defaults
   commander.version(version)
@@ -611,19 +611,19 @@ Parse options using <a href="https://github.com/visionmedia/commander.js">Comman
     document commander
   <span class="keyword">else</span>
     console.log commander.helpInformation()</pre></div>
-
-
-
+        
+      
+        
         <h2>Public API</h2>
 
-
-
-
-
-
+        
+      
+        
+        
+        
           <div class='highlight'><pre>Docco = module.exports = {run, document, parse, format, configure, version}</pre></div>
-
-
+        
+      
       <div class="fleur">h</div>
     </div>
   </div>
