@@ -1,4 +1,4 @@
-{ 
+{
   ".coffee" :
     {"name" : "coffeescript", "symbol" : "#", "enter": "^\\s*#{3}(?!#)", "exit": "#{3}(?!#)\\s*$" },
   ".litcoffee" :

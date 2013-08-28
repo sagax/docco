@@ -11,14 +11,14 @@ COFFEE=node_modules/.bin/coffee
 
 # ** COMMON DEPENDENCIES **
 
-SRC_DEPS=										\
-		Makefile								\
-		Cakefile								\
-		package.json							\
-		docco.litcoffee							
+SRC_DEPS=                                       \
+		Makefile                                \
+		Cakefile                                \
+		package.json                            \
+		docco.litcoffee
 
-TOOL_DEPS=										\
-		$(CAKE)									\
+TOOL_DEPS=                                      \
+		$(CAKE)                                 \
 		$(COFFEE)
 
 
@@ -26,7 +26,7 @@ TOOL_DEPS=										\
 # ** MAIN BUILD TARGETS **
 
 .PHONY: all install build doc loc clean
-	
+
 all: build doc loc
 
 install: build doc loc
@@ -39,7 +39,7 @@ doc: index.html
 loc: $(SRC_DEPS) $(TOOL_DEPS)
 	$(CAKE) loc
 
-clean: 
+clean:
 	-rm index.html
 	-rm docco.js
 
