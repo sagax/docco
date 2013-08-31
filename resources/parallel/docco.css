@@ -68,7 +68,6 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1em;
   font-weight: normal;
   font-family: "novecento-bold";
-  text-transform: uppercase;
   margin: 30px 0 15px 0;
 }
 
@@ -260,7 +259,6 @@ ul.sections > li > div {
   }
   #jump_to, #jump_page {
     font: 10px Arial;
-    text-transform: uppercase;
   }
   #jump_page .source {
     padding: 5px 10px;

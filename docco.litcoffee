@@ -185,6 +185,7 @@ and rendering it to the specified output path.
 
       qualifiedName = (file) ->
         nameParts = path.dirname(file).replace(config.cwd, '').split(path.sep)
+        nameParts.shift() if nameParts[0] is ''
         nameParts.push(path.basename(file, path.extname(file)))
 
         nameParts.join(config.seperator) + '.html'
