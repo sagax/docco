@@ -184,7 +184,7 @@ and rendering it to the specified output path.
     write = (source, sections, config) ->
 
       qualifiedName = (file) ->
-        nameParts = path.dirname(file).split(path.sep)
+        nameParts = path.dirname(file).replace(config.cwd, '').split(path.sep)
         nameParts.push(path.basename(file, path.extname(file)))
 
         nameParts.join(config.seperator) + '.html'
@@ -220,6 +220,7 @@ user-specified options.
       extension:  null
       languages:  {}
       seperator:  '-'
+      cwd: '.'
 
 **Configure** this particular run of Docco. We might use a passed-in external
 template, or one of the built-in **layouts**. We only attempt to process
