@@ -163,7 +163,8 @@
     css: null,
     extension: null,
     languages: {},
-    seperator: '-'
+    seperator: '-',
+    cwd: '.'
   };
 
   configure = function(options) {
