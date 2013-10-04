@@ -8,7 +8,7 @@
   ".dtx":         {"name": "tex", "symbol": "%"},
   ".sty":         {"name": "tex", "symbol": "%"},
   ".cls":         {"name": "tex", "symbol": "%"},
-  ".js":          {"name": "javascript", "symbol": "(?:/\\*+|\\*+|\\*+/|//)"},
+  ".js":          {"name": "javascript", "symbol": "(?:/\\*+|\\*+/|\\*+|//)"},
   ".java":        {"name": "java", "symbol": "//"},
   ".groovy":      {"name": "groovy", "symbol": "//"},
   ".scss":        {"name": "scss", "symbol": "//"},
