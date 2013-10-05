@@ -1,8 +1,9 @@
 {
-  "name":         "docco",
+  "name":         "morocco",
   "description":  "The Quick and Dirty Literate Programming Documentation Generator",
   "keywords":     ["documentation", "docs", "generator", "literate", "coffeescript"],
   "author":       "Jeremy Ashkenas",
+  "contributors": ["Dan Tao <daniel.tao@gmail.com> (http://danieltao.com)"],
   "version":      "0.6.2",
   "licenses": [{
     "type":       "MIT",
@@ -10,10 +11,7 @@
   }],
   "repository": {
     "type": "git",
-    "url": "https://github.com/jashkenas/docco.git"
-  },
-  "engines": {
-    "node":       ">=0.2.0"
+    "url": "https://github.com/dtao/morocco.git"
   },
   "dependencies": {
     "commander":  ">= 0.5.2",
@@ -22,8 +20,8 @@
     "underscore": ">= 1.0.0",
     "highlight.js": ">= 7.3.0"
   },
-  "main" :        "./docco",
+  "main" :        "./morocco",
   "bin": {
-    "docco":      "./bin/docco"
+    "morocco":    "./bin/morocco"
   }
 }
