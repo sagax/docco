@@ -80,6 +80,23 @@ out in an HTML template.
     document = (options = {}, callback) ->
       config = configure options
 
+      config.onNewSection = (section) ->
+        examples = null
+        docLines = section.docsText.split('\n')
+
+        for line, i in docLines
+          if line.match(/^\s*@examples/)
+            examples = docLines.splice(i)
+            examples.shift()
+            break
+
+        if examples?
+          section.docsText = docLines.join('\n')
+          section.examples = for example in examples when example.indexOf('// =>') != -1
+            [input, output] = example.split('// =>', 2)
+            [input, output] = [trim(input), trim(output)]
+            {input, output}
+
       fs.mkdirs config.output, ->
 
         callback or= (error) -> throw error if error
@@ -106,6 +123,11 @@ out in an HTML template.
 
         nextFile()
 
+Just a little helper to trim leading and trailing whitespace from a string.
+
+    trim = (str) ->
+      str.replace(/^\s+/, '').replace(/\s+$/, '')
+
 Given a string of source code, **parse** out each block of prose and the code that
 follows it — by detecting which is which, line by line — and then create an
 individual **section** for it. Each section is an object with `docsText` and
@@ -117,8 +139,19 @@ individual **section** for it. Each section is an object with `docsText` and
       lang     = getLanguage source, config
       hasCode  = docsText = codeText = ''
 
+Provide a way for calling code to access (and, if desired, modify) sections as they
+are encountered.
+
+      handleNewSection = config.onNewSection || (section) ->
+
       save = ->
-        sections.push {docsText, codeText}
+        section = {docsText, codeText}
+
+Call any custom hooks that want to fiddle with the section before saving it.
+
+        handleNewSection(section)
+
+        sections.push section
         hasCode = docsText = codeText = ''
 
 Our quick-and-dirty implementation of the literate programming style. Simply
