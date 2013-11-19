@@ -26,7 +26,8 @@ doesn't handle your favorite yet, feel free to
 [add it to the list](https://github.com/jashkenas/docco/blob/master/resources/languages.json).
 Finally, the ["literate" style](http://coffeescript.org/#literate) of *any*
 language is also supported — just tack an `.md` extension on the end:
-`.coffee.md`, `.py.md`, and so on.
+`.coffee.md`, `.py.md`, and so on. Also get usable source code by adding the
+`--source` option while specifying a directory for the files.
 
 By default only single-line comments are processed, block comments may be included
 by passing the `-b` flag to Docco.
@@ -35,7 +36,7 @@ by passing the `-b` flag to Docco.
 Partners in Crime:
 ------------------
 
-* If Node.js doesn't run on your platform, or you'd prefer a more
+* If **Node.js** doesn't run on your platform, or you'd prefer a more
 convenient package, get [Ryan Tomayko](http://github.com/rtomayko)'s
 [Rocco](http://rtomayko.github.io/rocco/rocco.html), the **Ruby** port that's
 available as a gem.
@@ -54,7 +55,7 @@ also by Mr. Tomayko.
 * There's a **Go** port called [Gocco](http://nikhilm.github.io/gocco/),
 written by [Nikhil Marathe](https://github.com/nikhilm).
 
-* Your all you **PHP** buffs out there, Fredi Bach's
+* For all you **PHP** buffs out there, Fredi Bach's
 [sourceMakeup](http://jquery-jkit.com/sourcemakeup/) (we'll let the faux pas
 with respect to our naming scheme slide), should do the trick nicely.
 
@@ -77,37 +78,68 @@ Main Documentation Generation Functions
 
 Generate the documentation for our configured source file by copying over static
 assets, reading all the source files in, splitting them up into prose+code
-sections, highlighting each file in the appropriate language, and printing them
-out in an HTML template.
+sections, highlighting each file in the appropriate language, printing them
+out in an HTML template, and writing plain code files where instructed.
 
     document = (options = {}, callback) ->
       config = configure options
+      source_infos = []
 
-      fs.mkdirs config.output, ->
+      fs.mkdirsSync config.output
+      fs.mkdirsSync config.source if config.source
 
-        callback or= (error) -> throw error if error
-        copyAsset  = (file, callback) ->
-          fs.copy file, path.join(config.output, path.basename(file)), callback
-        complete   = ->
-          copyAsset config.css, (error) ->
-            if error then callback error
-            else if fs.existsSync config.public then copyAsset config.public, callback
-            else callback()
+      callback or= (error) -> throw error if error
+      copyAsset  = (file, callback) ->
+        fs.copy file, path.join(config.output, path.basename(file)), callback
+      complete   = ->
+        copyAsset config.css, (error) ->
+          if error then callback error
+          else if fs.existsSync config.public then copyAsset config.public, callback
+          else callback()
 
-        files = config.sources.slice()
+      files = config.sources.slice()
 
-        nextFile = ->
-          source = files.shift()
-          fs.readFile source, (error, buffer) ->
-            return callback error if error
+      nextFile = ->
+        source = files.shift()
+        fs.readFile source, (error, buffer) ->
+          return callback error if error
 
-            code = buffer.toString()
-            sections = parse source, code, config
-            format source, sections, config
-            write source, sections, config
-            if files.length then nextFile() else complete()
+          code = buffer.toString()
+          sections = parse source, code, config
+          format source, sections, config
 
-        nextFile()
+The **title** of the file is either the first heading in the prose, or the
+name of the source file.
+
+          first = marked.lexer(sections[0].docsText)[0]
+          hasTitle = first and first.type is 'heading' and first.depth is 1
+          title = if hasTitle then first.text else path.basename source
+
+          source_infos.push({
+            source: source,
+            hasTitle: hasTitle,
+            title: title,
+            sections: sections
+          })
+
+          if files.length then nextFile() else outputFiles()
+
+When we have finished all preparations (such as extracting a title for each file),
+we produce all output files.
+
+We have collected all titles before outputting the individual files to give the
+template access to all sources' titles for rendering, e.g. when the template
+needs to produce a TOC with each file.
+
+      outputFiles = ->
+        for info, i in source_infos
+          write info.source, i, source_infos, config
+          outputCode info.source, info.sections, config
+        complete()
+
+Start processing all sources and producing the corresponding files for each:
+
+      nextFile()
 
 Given a string of source code, **parse** out each block of prose and the code that
 follows it — by detecting which is which, line by line — and then create an
@@ -205,7 +237,7 @@ If we happen upon a JavaDoc @param parameter, then process that item.
             if param
               line = line.replace(param[0], '\n' + '<b>' + param[1] + '</b>');
 
-    if not ignore_this_block and (in_block or single)
+        if not ignore_this_block and (in_block or single)
 
 If we have code text, and we're entering a comment, store off
 the current docs and code, then start a new section.
@@ -241,8 +273,24 @@ over stdio, and run the text of their corresponding comments through
 
     format = (source, sections, config) ->
       language = getLanguage source, config
+
+Tell Marked how to highlight code blocks within comments, treating that code
+as either the language specified in the code block or the language of the file
+if not specified.
+
+      marked.setOptions {
+        highlight: (code, lang) ->
+          lang or= language.name
+
+          if highlightjs.LANGUAGES[lang]
+            highlightjs.highlight(lang, code).value
+          else
+            console.warn "docco: couldn't highlight code block with unknown language '#{lang}' in #{source}"
+            code
+      }
+
       for section, i in sections
-        code = highlight(language.name, section.codeText).value
+        code = highlightjs.highlight(language.name, section.codeText).value
         code = code.replace(/\s+$/, '')
         section.codeHtml = "<div class='highlight'><pre>#{code}</pre></div>"
         section.docsHtml = marked(section.docsText)
@@ -251,23 +299,49 @@ Once all of the code has finished highlighting, we can **write** the resulting
 documentation file by passing the completed HTML sections into the template,
 and rendering it to the specified output path.
 
-    write = (source, sections, config) ->
+    write = (source, title_idx, source_infos, config) ->
 
       destination = (file) ->
-        path.join(config.output, path.basename(file, path.extname(file)) + '.html')
+        path.join(config.output, path.dirname(file), path.basename(file, path.extname(file)) + '.html')
 
-The **title** of the file is either the first heading in the prose, or the
-name of the source file.
+      relative = (file) ->
+        to = path.dirname(path.resolve(file))
+        from = path.dirname(path.resolve(destination(source)))
+        path.join(path.relative(from, to), path.basename(file))
 
-      first = marked.lexer(sections[0].docsText)[0]
-      hasTitle = first and first.type is 'heading' and first.depth is 1
-      title = if hasTitle then first.text else path.basename source
+      css = relative path.join(config.output, path.basename(config.css))
 
-      html = config.template {sources: config.sources, css: path.basename(config.css),
-        title, hasTitle, sections, path, destination,}
+      html = config.template {
+        sources: config.sources
+        titles: source_infos.map (info) ->
+          info.title
+        css: css
+        title: source_infos[title_idx].title
+        hasTitle: source_infos[title_idx].hasTitle
+        sections: source_infos[title_idx].sections
+        path
+        destination
+	relative
+      }
 
       console.log "docco: #{source} -> #{destination source}"
       fs.writeFileSync destination(source), html
+
+Print out the consolidated code sections parsed from the source file in to another
+file. No documentation will be included in the new file.
+
+    outputCode = (source, sections, config) ->
+      lang = getLanguage source, config
+
+      destination = (file) ->
+        path.join config.source, path.basename(file, path.extname file) + lang.source
+
+      if config.source
+        code = _.pluck(sections, 'codeText').join '\n'
+        code = code.trim().replace /(\n{2,})/g, '\n\n'
+
+        console.log "docco: #{source} -> #{destination source}"
+        fs.writeFileSync destination(source), code
 
 
 Configuration
@@ -282,6 +356,8 @@ user-specified options.
       template:   null
       css:        null
       extension:  null
+      languages:  {}
+      source:     null
       blocks:     false
       markdown:   false
 
@@ -292,6 +368,7 @@ source files for languages for which we have definitions.
     configure = (options) ->
       config = _.extend {}, defaults, _.pick(options, _.keys(defaults)...)
 
+      config.languages = buildMatchers config.languages
       if options.template
         config.layout = null
       else
@@ -320,7 +397,9 @@ Require our external dependencies.
     path        = require 'path'
     marked      = require 'marked'
     commander   = require 'commander'
-    {highlight} = require 'highlight.js'
+    highlightjs = require 'highlight.js'
+
+Enable nicer typography with marked.
 
     marked.setOptions({
       gfm: true,
@@ -329,6 +408,7 @@ Require our external dependencies.
       pedantic: false,
       sanitize: false,
       smartLists: true,
+      smartypants: yes,
       langPrefix: 'language-',
       highlight: (code, lang) ->
         code
@@ -343,42 +423,49 @@ language to Docco, just add it to the file.
 
 Build out the appropriate matchers and delimiters for each language.
 
-    for ext, l of languages
+    buildMatchers = (languages) ->
+      for ext, l of languages
 
 Does the line begin with a comment?
 
-      if (l.symbol)
-        l.commentMatcher = ///^\s*#{l.symbol}\s?///
+        if (l.symbol)
+          l.commentMatcher = ///^\s*#{l.symbol}\s?///
 
 Support block comment parsing?
 
-      if l.enter and l.exit
-        l.blocks = true
-        l.commentEnter = new RegExp(l.enter)
-        l.commentExit = new RegExp(l.exit)
-        if (l.next)
-          l.commentNext = new RegExp(l.next)
-      if l.param
-        l.commentParam = new RegExp(l.param)
+        if l.enter and l.exit
+          l.blocks = true
+          l.commentEnter = new RegExp(l.enter)
+          l.commentExit = new RegExp(l.exit)
+          if (l.next)
+            l.commentNext = new RegExp(l.next)
+        if l.param
+          l.commentParam = new RegExp(l.param)
 
 Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_%28Unix%29) and interpolations...
 
-      l.commentFilter = /(^#![/]|^\s*#\{)/
+        l.commentFilter = /(^#![/]|^\s*#\{)/
 
 We ignore any comments which start with a colon ':' - these will be included in the code as is.
 
-      l.commentIgnore = new RegExp(/^:/)
+        l.commentIgnore = new RegExp(/^:/)
+
+      languages
+    languages = buildMatchers languages
 
 A function to get the current language we're documenting, based on the
 file extension. Detect and tag "literate" `.ext.md` variants.
 
     getLanguage = (source, config) ->
       ext  = config.extension or path.extname(source) or path.basename(source)
-      lang = languages[ext] || 'text'
-      if lang and lang.name is 'markdown'
-        codeExt = path.extname(path.basename(source, ext))
-        if codeExt and codeLang = languages[codeExt]
-          lang = _.extend {}, codeLang, {literate: yes}
+      lang = config.languages[ext] or languages[ext] or languages['text']
+      if lang
+        if lang.name is 'markdown'
+          codeExt = path.extname(path.basename(source, ext))
+          if codeExt and codeLang = languages[codeExt]
+            lang = _.extend {}, codeLang, {literate: yes, source: ''}
+        else if not lang.source
+          lang.source = ext
       lang
 
 Keep it DRY. Extract the docco **version** from `package.json`
@@ -396,13 +483,15 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
       c = defaults
       commander.version(version)
         .usage('[options] files')
-        .option('-l, --layout [name]',    'choose a layout (parallel, linear or classic)', c.layout)
+        .option('-L, --languages [file]', 'use a custom languages.json', _.compose JSON.parse, fs.readFileSync)
+        .option('-l, --layout [name]',    'choose a layout (parallel, linear, pretty or classic)', c.layout)
         .option('-o, --output [path]',    'output to a given folder', c.output)
         .option('-c, --css [file]',       'use a custom css file', c.css)
         .option('-t, --template [file]',  'use a custom .jst template', c.template)
         .option('-b, --blocks',           'parse block comments where available', c.blocks)
         .option('-m, --markdown',         'output markdown', c.markdown)
         .option('-e, --extension [ext]',  'assume a file extension for all inputs', c.extension)
+        .option('-s, --source [path]',    'output code in a given folder', c.source)
         .parse(args)
         .name = "docco"
       if commander.args.length
@@ -414,6 +503,6 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
 Public API
 ----------
 
-    Docco = module.exports = {run, document, parse, version}
+    Docco = module.exports = {run, document, parse, format, configure, version}
 
 

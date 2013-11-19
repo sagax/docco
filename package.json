@@ -8,6 +8,10 @@
     "type":       "MIT",
     "url":        "http://opensource.org/licenses/mit-license.php"
   }],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jashkenas/docco.git"
+  },
   "engines": {
     "node":       ">=0.2.0"
   },
@@ -17,6 +21,10 @@
     "fs-extra":   ">= 0.6.1",
     "underscore": ">= 1.4.4",
     "highlight.js": ">=7.3.0"
+  },
+  "devDependencies": {
+    "coffee":         ">= 0.0.1",
+    "coffee-script":  ">= 1.6.3"
   },
   "main" :        "./docco",
   "bin": {

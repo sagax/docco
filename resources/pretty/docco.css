@@ -30,9 +30,20 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'fleurons';
+    src: url('public/fonts/fleurons.eot');
+    src: url('public/fonts/fleurons.eot?#iefix') format('embedded-opentype'),
+         url('public/fonts/fleurons.woff') format('woff'),
+         url('public/fonts/fleurons.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 /*--------------------- Layout ----------------------------*/
 html { height: 100%; }
 body {
+  background: url('public/images/lightblue.jpg') #fff;
   font-family: "aller-light";
   font-size: 14px;
   line-height: 18px;
@@ -78,18 +89,15 @@ h1 {
 
 hr {
   border: 0;
-  background: 1px solid #ddd;
+  background: 1px #ddd;
   height: 1px;
   margin: 20px 0;
 }
 
 pre, tt, code {
-  /* font-size: 12px; line-height: 16px; */
+  font-size: 12px; line-height: 16px;
   font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
   margin: 0; padding: 0;
-}
-pre {
-  font-size: 12px; line-height: 16px;
 }
   .annotation pre {
     display: block;
@@ -111,15 +119,14 @@ pre {
 blockquote {
   border-left: 5px solid #ccc;
   margin: 0;
-  padding: 4px 0.25em 8px 1em;
-  background-color: #fafaff;
+  padding: 1px 0 1px 1em;
 }
   .sections blockquote p {
-    /* font-family: Menlo, Consolas, Monaco, monospace; */
-    font-size: 14px; line-height: 16px;
-    color: #101830; /* #999 */
+    font-family: Menlo, Consolas, Monaco, monospace;
+    font-size: 12px; line-height: 16px;
+    color: #999;
     margin: 10px 0 0;
-    /* white-space: pre-wrap; */
+    white-space: pre-wrap;
   }
 
 ul.sections {
@@ -230,7 +237,7 @@ ul.sections > li > div {
     padding-left: 15px;
   }
 
-  ul.sections > li > div.annotation p tt, .annotation p code {
+  ul.sections > li > div.annotation p tt, .annotation code {
     background: #f8f8ff;
     border: 1px solid #dedede;
     font-size: 12px;
