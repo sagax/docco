@@ -316,13 +316,13 @@ and rendering it to the specified output path.
         titles: source_infos.map (info) ->
           info.title
         css
-	js: path.basename(config.js)
+        js: path.basename(config.js)
         title: source_infos[title_idx].title
         hasTitle: source_infos[title_idx].hasTitle
         sections: source_infos[title_idx].sections
         path
         destination
-	relative
+        relative
       }
 
       console.log "docco: #{source} -> #{destination source}"
@@ -378,7 +378,7 @@ source files for languages for which we have definitions.
         config.public       = path.join dir, 'public' if fs.existsSync path.join dir, 'public'
         config.template     = path.join dir, 'docco.jst'
         config.css          = options.css or path.join dir, 'docco.css'
-        config.js           = options.js or path.join dire, 'jump_menu.js'
+        config.js           = options.js or path.join dir, 'jump_menu.js'
       config.template = _.template fs.readFileSync(config.template).toString()
 
       config.sources = options.args.filter((source) ->
