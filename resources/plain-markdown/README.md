@@ -3,14 +3,14 @@ This is a simple plain-markdown template.
 It can be used to convert your docco output even further,
 for example to output to PDF via `LaTeX` with [`pandoc`][pandoc].
 
-The resulting markdown uses code fences (<code>```</code>), 
+The resulting markdown uses code fences (<code>```</code>),
 which is compatible with Github- and pandoc-flavoured markdown.
 
 Example PDF output:
 
     # fetch some annotated source code
     cd /tmp
-    wget https://raw.github.com/documentcloud/underscore/master/underscore.js 
+    wget https://raw.github.com/documentcloud/underscore/master/underscore.js
     # make plain with docco
     docco -l plain-markdown underscore.js
     cd ./docs
