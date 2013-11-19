@@ -21,12 +21,20 @@
     {"name" : "tex", "symbol" : "%", "enter": "\\\\begin{comment}", "exit": "\\\\end{comment}" },
   ".latex":
     {"name" : "tex", "symbol" : "%", "enter": "\\\\begin{comment}", "exit": "\\\\end{comment}" },
+  ".dtx":
+    {"name": "tex", "symbol": "%" },
+  ".sty":
+    {"name": "tex", "symbol": "%" },
+  ".cls":
+    {"name": "tex", "symbol": "%" },
   ".js":
     {"name" : "javascript", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
   ".jsx":
     {"name": "javascript", "symbol": "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
   ".java":
     {"name" : "java", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".groovy":
+    {"name": "groovy", "symbol": "//" },
   ".sass":
     {"name" : "sass", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
   ".scss":
@@ -58,7 +66,7 @@
   ".markdown":
     {"name" : "markdown", "symbol" : ""},
   ".less":
-    {"name" : "scss", "symbol": "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
+    {"name" : "less", "symbol": "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
   ".m":
     {"name" : "objectivec", "symbol": "//"},
   ".mm":

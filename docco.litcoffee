@@ -55,7 +55,7 @@ also by Mr. Tomayko.
 * There's a **Go** port called [Gocco](http://nikhilm.github.io/gocco/),
 written by [Nikhil Marathe](https://github.com/nikhilm).
 
-* Your all you **PHP** buffs out there, Fredi Bach's
+* For all you **PHP** buffs out there, Fredi Bach's
 [sourceMakeup](http://jquery-jkit.com/sourcemakeup/) (we'll let the faux pas
 with respect to our naming scheme slide), should do the trick nicely.
 
@@ -348,6 +348,7 @@ user-specified options.
       template:   null
       css:        null
       extension:  null
+      languages:  {}
       source:     null
       blocks:     false
       markdown:   false
@@ -359,6 +360,7 @@ source files for languages for which we have definitions.
     configure = (options) ->
       config = _.extend {}, defaults, _.pick(options, _.keys(defaults)...)
 
+      config.languages = buildMatchers config.languages
       if options.template
         config.layout = null
       else
@@ -389,6 +391,8 @@ Require our external dependencies.
     commander   = require 'commander'
     highlightjs = require 'highlight.js'
 
+Enable nicer typography with marked.
+
     marked.setOptions({
       gfm: true,
       tables: true,
@@ -396,6 +400,7 @@ Require our external dependencies.
       pedantic: false,
       sanitize: false,
       smartLists: true,
+      smartypants: yes,
       langPrefix: 'language-',
       highlight: (code, lang) ->
         code
@@ -410,38 +415,42 @@ language to Docco, just add it to the file.
 
 Build out the appropriate matchers and delimiters for each language.
 
-    for ext, l of languages
+    buildMatchers = (languages) ->
+      for ext, l of languages
 
 Does the line begin with a comment?
 
-      if (l.symbol)
-        l.commentMatcher = ///^\s*#{l.symbol}\s?///
+        if (l.symbol)
+          l.commentMatcher = ///^\s*#{l.symbol}\s?///
 
 Support block comment parsing?
 
-      if l.enter and l.exit
-        l.blocks = true
-        l.commentEnter = new RegExp(l.enter)
-        l.commentExit = new RegExp(l.exit)
-        if (l.next)
-          l.commentNext = new RegExp(l.next)
-      if l.param
-        l.commentParam = new RegExp(l.param)
+        if l.enter and l.exit
+          l.blocks = true
+          l.commentEnter = new RegExp(l.enter)
+          l.commentExit = new RegExp(l.exit)
+          if (l.next)
+            l.commentNext = new RegExp(l.next)
+        if l.param
+          l.commentParam = new RegExp(l.param)
 
 Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_%28Unix%29) and interpolations...
 
-      l.commentFilter = /(^#![/]|^\s*#\{)/
+        l.commentFilter = /(^#![/]|^\s*#\{)/
 
 We ignore any comments which start with a colon ':' - these will be included in the code as is.
 
-      l.commentIgnore = new RegExp(/^:/)
+        l.commentIgnore = new RegExp(/^:/)
+
+      languages
+    languages = buildMatchers languages
 
 A function to get the current language we're documenting, based on the
 file extension. Detect and tag "literate" `.ext.md` variants.
 
     getLanguage = (source, config) ->
       ext  = config.extension or path.extname(source) or path.basename(source)
-      lang = languages[ext] || 'text'
+      lang = config.languages[ext] or languages[ext] or languages['text']
       if lang
         if lang.name is 'markdown'
           codeExt = path.extname(path.basename(source, ext))
@@ -466,6 +475,7 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
       c = defaults
       commander.version(version)
         .usage('[options] files')
+        .option('-L, --languages [file]', 'use a custom languages.json', _.compose JSON.parse, fs.readFileSync)
         .option('-l, --layout [name]',    'choose a layout (parallel, linear, pretty or classic)', c.layout)
         .option('-o, --output [path]',    'output to a given folder', c.output)
         .option('-c, --css [file]',       'use a custom css file', c.css)
