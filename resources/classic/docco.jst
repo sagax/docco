@@ -20,7 +20,7 @@
             <% for (var i=0, l=sources.length; i<l; i++) { %>
               <% var source = sources[i]; %>
               <% var title = titles[i]; %>
-              <a class="source" href="<%= path.basename(destination(source, 'html')) %>">
+              <a class="source" href="<%= relative(destination(source, 'html')) %>">
                 <%= title %>
               </a>
             <% } %>

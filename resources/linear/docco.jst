@@ -30,7 +30,7 @@
                 <% var source = sources[i]; %>
                 <% var title = titles[i]; %>
                 <li>
-                  <a class="source" href="<%= path.basename(destination(source)) %>">
+                  <a class="source" href="<%= relative(destination(source)) %>">
                     <%= title %>
                   </a>
                 </li>

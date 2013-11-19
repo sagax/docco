@@ -302,18 +302,26 @@ and rendering it to the specified output path.
     write = (source, title_idx, source_infos, config) ->
 
       destination = (file) ->
-        path.join(config.output, path.basename(file, path.extname(file)) + '.html')
+        path.join(config.output, path.dirname(file), path.basename(file, path.extname(file)) + '.html')
+
+      relative = (file) ->
+        to = path.dirname(path.resolve(file))
+        from = path.dirname(path.resolve(destination(source)))
+        path.join(path.relative(from, to), path.basename(file))
+
+      css = relative path.join(config.output, path.basename(config.css))
 
       html = config.template {
         sources: config.sources
         titles: source_infos.map (info) ->
           info.title
-        css: path.basename(config.css)
+        css: css
         title: source_infos[title_idx].title
         hasTitle: source_infos[title_idx].hasTitle
         sections: source_infos[title_idx].sections
         path
         destination
+	relative
       }
 
       console.log "docco: #{source} -> #{destination source}"
