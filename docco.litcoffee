@@ -315,13 +315,13 @@ and rendering it to the specified output path.
         sources: config.sources
         titles: source_infos.map (info) ->
           info.title
-        css: css
+        css
         title: source_infos[title_idx].title
         hasTitle: source_infos[title_idx].hasTitle
         sections: source_infos[title_idx].sections
         path
         destination
-	relative
+        relative
       }
 
       console.log "docco: #{source} -> #{destination source}"
