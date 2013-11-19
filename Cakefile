@@ -7,7 +7,7 @@ option '-w', '--watch', 'continually build the docco library'
 option '-l', '--layout [LAYOUT]', 'specify the layout for Docco\'s docs'
 
 task 'build', 'build the docco library', (options) ->
-  coffee = spawn 'coffee', ['-c' + (if options.watch then 'w' else ''), '.']
+  coffee = spawn 'node_modules/.bin/coffee', ['-c' + (if options.watch then 'w' else ''), '.']
   coffee.stdout.on 'data', (data) -> console.log data.toString().trim()
   coffee.stderr.on 'data', (data) -> console.log data.toString().trim()
 
@@ -17,6 +17,8 @@ task 'install', 'install the `docco` command into /usr/local (or --prefix)', (op
   exec([
     'mkdir -p ' + lib
     'cp -rf bin README resources lib ' + lib
+    'cp docco.js ' + lib
+    'cp package.json ' + lib
     'ln -sf ' + lib + '/bin/docco ' + base + '/bin/docco'
   ].join(' && '), (err, stdout, stderr) ->
    if err then console.error stderr

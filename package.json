@@ -8,15 +8,23 @@
     "type":       "MIT",
     "url":        "http://opensource.org/licenses/mit-license.php"
   }],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jashkenas/docco.git"
+  },
   "engines": {
     "node":       ">=0.2.0"
   },
   "dependencies": {
-    "commander":  ">= 0.5.2",
-    "marked":     ">= 0.2.7",
-    "fs-extra":   ">= 0.6.0",
-    "underscore": ">= 1.0.0",
-    "highlight.js": ">= 7.3.0"
+    "commander":  ">= 1.1.1",
+    "marked":     ">= 0.2.9",
+    "fs-extra":   ">= 0.6.1",
+    "underscore": ">= 1.4.4",
+    "highlight.js": ">=7.3.0"
+  },
+  "devDependencies": {
+    "coffee":         ">= 0.0.1",
+    "coffee-script":  ">= 1.6.3"
   },
   "main" :        "./docco",
   "bin": {
