@@ -51,7 +51,7 @@ also by Mr. Tomayko.
 * There's a **Go** port called [Gocco](http://nikhilm.github.io/gocco/),
 written by [Nikhil Marathe](https://github.com/nikhilm).
 
-* Your all you **PHP** buffs out there, Fredi Bach's
+* For all you **PHP** buffs out there, Fredi Bach's
 [sourceMakeup](http://jquery-jkit.com/sourcemakeup/) (we'll let the faux pas
 with respect to our naming scheme slide), should do the trick nicely.
 
@@ -155,8 +155,24 @@ over stdio, and run the text of their corresponding comments through
 
     format = (source, sections, config) ->
       language = getLanguage source, config
+
+Tell Marked how to highlight code blocks within comments, treating that code
+as either the language specified in the code block or the language of the file
+if not specified.
+
+      marked.setOptions {
+        highlight: (code, lang) ->
+          lang or= language.name
+
+          if highlightjs.LANGUAGES[lang]
+            highlightjs.highlight(lang, code).value
+          else
+            console.warn "docco: couldn't highlight code block with unknown language '#{lang}' in #{source}"
+            code
+      }
+
       for section, i in sections
-        code = highlight(language.name, section.codeText).value
+        code = highlightjs.highlight(language.name, section.codeText).value
         code = code.replace(/\s+$/, '')
         section.codeHtml = "<div class='highlight'><pre>#{code}</pre></div>"
         section.docsHtml = marked(section.docsText)
@@ -196,6 +212,7 @@ user-specified options.
       template:   null
       css:        null
       extension:  null
+      languages:  {}
 
 **Configure** this particular run of Docco. We might use a passed-in external
 template, or one of the built-in **layouts**. We only attempt to process
@@ -204,6 +221,7 @@ source files for languages for which we have definitions.
     configure = (options) ->
       config = _.extend {}, defaults, _.pick(options, _.keys(defaults)...)
 
+      config.languages = buildMatchers config.languages
       if options.template
         config.layout = null
       else
@@ -232,7 +250,11 @@ Require our external dependencies.
     path        = require 'path'
     marked      = require 'marked'
     commander   = require 'commander'
-    {highlight} = require 'highlight.js'
+    highlightjs = require 'highlight.js'
+
+Enable nicer typography with marked.
+
+    marked.setOptions smartypants: yes
 
 Languages are stored in JSON in the file `resources/languages.json`.
 Each item maps the file extension to the name of the language and the
@@ -243,22 +265,25 @@ language to Docco, just add it to the file.
 
 Build out the appropriate matchers and delimiters for each language.
 
-    for ext, l of languages
+    buildMatchers = (languages) ->
+      for ext, l of languages
 
 Does the line begin with a comment?
 
-      l.commentMatcher = ///^\s*#{l.symbol}\s?///
+        l.commentMatcher = ///^\s*#{l.symbol}\s?///
 
 Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_%28Unix%29) and interpolations...
 
-      l.commentFilter = /(^#![/]|^\s*#\{)/
+        l.commentFilter = /(^#![/]|^\s*#\{)/
+      languages
+    languages = buildMatchers languages
 
 A function to get the current language we're documenting, based on the
 file extension. Detect and tag "literate" `.ext.md` variants.
 
     getLanguage = (source, config) ->
       ext  = config.extension or path.extname(source) or path.basename(source)
-      lang = languages[ext]
+      lang = config.languages[ext] or languages[ext]
       if lang and lang.name is 'markdown'
         codeExt = path.extname(path.basename(source, ext))
         if codeExt and codeLang = languages[codeExt]
@@ -280,6 +305,7 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
       c = defaults
       commander.version(version)
         .usage('[options] files')
+        .option('-L, --languages [file]', 'use a custom languages.json', _.compose JSON.parse, fs.readFileSync)
         .option('-l, --layout [name]',    'choose a layout (parallel, linear or classic)', c.layout)
         .option('-o, --output [path]',    'output to a given folder', c.output)
         .option('-c, --css [file]',       'use a custom css file', c.css)
@@ -296,4 +322,4 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
 Public API
 ----------
 
-    Docco = module.exports = {run, document, parse, version}
+    Docco = module.exports = {run, document, parse, format, version}
