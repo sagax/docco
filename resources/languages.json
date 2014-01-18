@@ -8,6 +8,7 @@
   ".dtx":         {"name": "tex", "symbol": "%"},
   ".sty":         {"name": "tex", "symbol": "%"},
   ".cls":         {"name": "tex", "symbol": "%"},
+  ".dust":        {"name": "dust", "symbol": "!"},
   ".js":          {"name": "javascript", "symbol": "//"},
   ".java":        {"name": "java", "symbol": "//"},
   ".groovy":      {"name": "groovy", "symbol": "//"},
