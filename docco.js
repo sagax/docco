@@ -205,6 +205,7 @@
         return info.title;
       }),
       css: css,
+      js: path.basename(config.js),
       title: source_infos[title_idx].title,
       hasTitle: source_infos[title_idx].hasTitle,
       sections: source_infos[title_idx].sections,
@@ -231,10 +232,11 @@
   };
 
   defaults = {
-    layout: 'parallel',
+    layout: 'pretty',
     output: 'docs',
     template: null,
     css: null,
+    js: null,
     extension: null,
     languages: {},
     source: null,
@@ -255,6 +257,7 @@
       }
       config.template = path.join(dir, 'docco.jst');
       config.css = options.css || path.join(dir, 'docco.css');
+      config.js = options.js || path.join(dir, 'jump_menu.js');
     }
     config.template = _.template(fs.readFileSync(config.template).toString());
     config.sources = options.args.filter(function(source) {
@@ -350,7 +353,7 @@
       args = process.argv;
     }
     c = defaults;
-    commander.version(version).usage('[options] files').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear, pretty or classic)', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-c, --css [file]', 'use a custom css file', c.css).option('-t, --template [file]', 'use a custom .jst template', c.template).option('-b, --blocks', 'parse block comments where available', c.blocks).option('-m, --markdown', 'output markdown', c.markdown).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-s, --source [path]', 'output code in a given folder', c.source).parse(args).name = "docco";
+    commander.version(version).usage('[options] files').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear, pretty or classic)', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-c, --css [file]', 'use a custom css file', c.css).option('-j, --js [file]', 'use a custom js file', c.js).option('-t, --template [file]', 'use a custom .jst template', c.template).option('-b, --blocks', 'parse block comments where available', c.blocks).option('-m, --markdown', 'output markdown', c.markdown).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-s, --source [path]', 'output code in a given folder', c.source).parse(args).name = "docco";
     if (commander.args.length) {
       return document(commander);
     } else {

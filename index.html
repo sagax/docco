@@ -407,6 +407,7 @@ and rendering it to the specified output path.</p>
     <span class="hljs-attribute">titles</span>: source_infos.map <span class="hljs-function"><span class="hljs-params">(info)</span> -&gt;</span>
       info.title
     css
+    <span class="hljs-attribute">js</span>: path.basename(config.js)
     <span class="hljs-attribute">title</span>: source_infos[title_idx].title
     <span class="hljs-attribute">hasTitle</span>: source_infos[title_idx].hasTitle
     <span class="hljs-attribute">sections</span>: source_infos[title_idx].sections
@@ -449,10 +450,11 @@ user-specified options.</p>
 
         
           <div class='highlight'><pre>defaults =
-  <span class="hljs-attribute">layout</span>:     <span class="hljs-string">'parallel'</span>
+  <span class="hljs-attribute">layout</span>:     <span class="hljs-string">'pretty'</span>
   <span class="hljs-attribute">output</span>:     <span class="hljs-string">'docs'</span>
   <span class="hljs-attribute">template</span>:   <span class="hljs-literal">null</span>
   <span class="hljs-attribute">css</span>:        <span class="hljs-literal">null</span>
+  <span class="hljs-attribute">js</span>:         <span class="hljs-literal">null</span>
   <span class="hljs-attribute">extension</span>:  <span class="hljs-literal">null</span>
   <span class="hljs-attribute">languages</span>:  {}
   <span class="hljs-attribute">source</span>:     <span class="hljs-literal">null</span>
@@ -477,6 +479,7 @@ source files for languages for which we have definitions.</p>
     config.public       = path.join dir, <span class="hljs-string">'public'</span> <span class="hljs-keyword">if</span> fs.existsSync path.join dir, <span class="hljs-string">'public'</span>
     config.template     = path.join dir, <span class="hljs-string">'docco.jst'</span>
     config.css          = options.css <span class="hljs-keyword">or</span> path.join dir, <span class="hljs-string">'resources/linear/docco.css'</span>
+    config.js           = options.js <span class="hljs-keyword">or</span> path.join dir, <span class="hljs-string">'jump_menu.js'</span>
   config.template = _.template fs.readFileSync(config.template).toString()
 
   config.sources = options.args.filter<span class="hljs-function"><span class="hljs-params">((source) -&gt;
@@ -626,6 +629,7 @@ Parse options using <a href="https://github.com/visionmedia/commander.js">Comman
     .option(<span class="hljs-string">'-l, --layout [name]'</span>,    <span class="hljs-string">'choose a layout (parallel, linear, pretty or classic)'</span>, c.layout)
     .option(<span class="hljs-string">'-o, --output [path]'</span>,    <span class="hljs-string">'output to a given folder'</span>, c.output)
     .option(<span class="hljs-string">'-c, --css [file]'</span>,       <span class="hljs-string">'use a custom css file'</span>, c.css)
+    .option(<span class="hljs-string">'-j, --js [file]'</span>,        <span class="hljs-string">'use a custom js file'</span>, c.js)
     .option(<span class="hljs-string">'-t, --template [file]'</span>,  <span class="hljs-string">'use a custom .jst template'</span>, c.template)
     .option(<span class="hljs-string">'-b, --blocks'</span>,           <span class="hljs-string">'parse block comments where available'</span>, c.blocks)
     .option(<span class="hljs-string">'-m, --markdown'</span>,         <span class="hljs-string">'output markdown'</span>, c.markdown)
