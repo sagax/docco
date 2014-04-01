@@ -111,7 +111,9 @@ out in an HTML template, and writing plain code files where instructed.
 The **title** of the file is either the first heading in the prose, or the
 name of the source file.
 
-          first = marked.lexer(sections[0].docsText)[0]
+          firstSection = _.find sections, (section) ->
+            section.docsText.length > 0
+          if firstSection then first = marked.lexer(firstSection.docsText)[0]
           hasTitle = first and first.type is 'heading' and first.depth is 1
           title = if hasTitle then first.text else path.basename source
 
@@ -282,7 +284,7 @@ if not specified.
         highlight: (code, lang) ->
           lang or= language.name
 
-          if highlightjs.LANGUAGES[lang]
+          if highlightjs.getLanguage(lang)
             highlightjs.highlight(lang, code).value
           else
             console.warn "docco: couldn't highlight code block with unknown language '#{lang}' in #{source}"
