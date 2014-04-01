@@ -55,7 +55,10 @@ docco.js: $(SRC_DEPS) $(TOOL_DEPS)
 	#$(CAKE) build
 
 index.html: $(SRC_DEPS) $(TOOL_DEPS)
-	$(CAKE) doc
+	bin/docco --layout linear docco.litcoffee
+	sed -e 's/docco.css/resources\/linear\/docco.css/g' < docs/docco.html > index.html
+	rm -rf docs
+	#$(CAKE) doc
 
 # did 'npm install' run before?
 $(TOOL_DEPS):
