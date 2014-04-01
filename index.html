@@ -375,10 +375,10 @@ if not specified.</p>
         code
   }
 
-  <span class="keyword">for</span> section, i <span class="keyword">in</span> sections
+  <span class="hljs-keyword">for</span> section, i <span class="hljs-keyword">in</span> sections
     code = highlightjs.highlight(language.name, section.codeText).value
-    code = code.replace(<span class="regexp">/\s+$/</span>, <span class="string">''</span>)
-    section.codeHtml = <span class="string">"&lt;div class='highlight'&gt;&lt;pre&gt;<span class="subst">#{code}</span>&lt;/pre&gt;&lt;/div&gt;"</span>
+    code = code.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>)
+    section.codeHtml = <span class="hljs-string">"&lt;div class='highlight'&gt;&lt;pre&gt;<span class="hljs-subst">#{code}</span>&lt;/pre&gt;&lt;/div&gt;"</span>
     section.docsHtml = marked(section.docsText)</pre></div>
         
       
@@ -468,13 +468,13 @@ source files for languages for which we have definitions.</p>
   config = _.extend {}, defaults, _.pick(options, _.keys(defaults)...)
 
   config.languages = buildMatchers config.languages
-  <span class="keyword">if</span> options.template
-    config.layout = <span class="literal">null</span>
-  <span class="keyword">else</span>
-    dir = config.layout = path.join __dirname, <span class="string">'resources'</span>, config.layout
-    config.public       = path.join dir, <span class="string">'public'</span> <span class="keyword">if</span> fs.existsSync path.join dir, <span class="string">'public'</span>
-    config.template     = path.join dir, <span class="string">'docco.jst'</span>
-    config.css          = options.css <span class="keyword">or</span> path.join dir, <span class="string">'resources/linear/docco.css'</span>
+  <span class="hljs-keyword">if</span> options.template
+    config.layout = <span class="hljs-literal">null</span>
+  <span class="hljs-keyword">else</span>
+    dir = config.layout = path.join __dirname, <span class="hljs-string">'resources'</span>, config.layout
+    config.public       = path.join dir, <span class="hljs-string">'public'</span> <span class="hljs-keyword">if</span> fs.existsSync path.join dir, <span class="hljs-string">'public'</span>
+    config.template     = path.join dir, <span class="hljs-string">'docco.jst'</span>
+    config.css          = options.css <span class="hljs-keyword">or</span> path.join dir, <span class="hljs-string">'resources/linear/docco.css'</span>
   config.template = _.template fs.readFileSync(config.template).toString()
 
   config.sources = options.args.filter<span class="function"><span class="params">((source) -&gt;
@@ -525,13 +525,20 @@ highlightjs = <span class="built_in">require</span> <span class="string">'highli
         
       
         
+        <p>Enable nicer typography with marked.</p>
+
+        
+          <div class='highlight'><pre>marked.setOptions <span class="hljs-attribute">smartypants</span>: <span class="hljs-literal">yes</span></pre></div>
+        
+      
+        
         <p>Languages are stored in JSON in the file <code>resources/languages.json</code>.
 Each item maps the file extension to the name of the language and the
 <code>symbol</code> that indicates a line comment. To add support for a new programming
 language to Docco, just add it to the file.</p>
 
         
-          <div class='highlight'><pre>languages = JSON.parse fs.readFileSync(path.join(__dirname, <span class="string">'resources'</span>, <span class="string">'languages.json'</span>))</pre></div>
+          <div class='highlight'><pre>languages = JSON.parse fs.readFileSync(path.join(__dirname, <span class="hljs-string">'resources'</span>, <span class="hljs-string">'languages.json'</span>))</pre></div>
         
       
         
@@ -605,7 +612,7 @@ file extension. Detect and tag “literate” <code>.ext.md</code> variants.</p>
         <p>Keep it DRY. Extract the docco <strong>version</strong> from <code>package.json</code></p>
 
         
-          <div class='highlight'><pre>version = JSON.parse(fs.readFileSync(path.join(__dirname, <span class="string">'package.json'</span>))).version</pre></div>
+          <div class='highlight'><pre>version = JSON.parse(fs.readFileSync(path.join(__dirname, <span class="hljs-string">'package.json'</span>))).version</pre></div>
         
       
         

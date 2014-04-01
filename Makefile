@@ -51,7 +51,8 @@ superclean: clean
 # ** ASSISTANT/SUBSERVIENT BUILD TARGETS **
 
 docco.js: $(SRC_DEPS) $(TOOL_DEPS)
-	$(CAKE) build
+	$(COFFEE) -c docco.litcoffee
+	#$(CAKE) build
 
 index.html: $(SRC_DEPS) $(TOOL_DEPS)
 	$(CAKE) doc
