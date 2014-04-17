@@ -1,6 +1,7 @@
 { ".coffee":      {"name": "coffeescript", "symbol": "#"},
   ".litcoffee":   {"name": "coffeescript", "symbol": "#", "literate": true},
   "Cakefile":     {"name": "coffeescript", "symbol": "#"},
+  ".cson":        {"name": "coffeescript", "symbol": "#"},
   ".rb":          {"name": "ruby", "symbol": "#"},
   ".py":          {"name": "python", "symbol": "#"},
   ".tex":         {"name": "tex", "symbol": "%"},
@@ -20,6 +21,7 @@
   ".md":          {"name": "markdown", "symbol": ""},
   ".markdown":    {"name": "markdown", "symbol": ""},
   ".less":        {"name": "less", "symbol": "//"},
+  ".ls":          {"name": "coffeescript", "symbol": "#"},
   ".h":           {"name": "objectivec", "symbol": "//"},
   ".m":           {"name": "objectivec", "symbol": "//"},
   ".n":           {"name": "nemerle", "symbol": "//"},
@@ -58,5 +60,8 @@
   ".vbs":         {"name": "vbscript", "symbol": "'"},
   ".wsc":         {"name": "vbscript", "symbol": "'"},
   ".wsf":         {"name": "vbscript", "symbol": "'"},
-  ".vhdl":        {"name": "vhdl", "symbol": "--"}
+  ".vhdl":        {"name": "vhdl", "symbol": "--"},
+  ".glsl":        {"name": "glsl", "symbol": "//"},
+  ".vert":        {"name": "glsl", "symbol": "//"},
+  ".frag":        {"name": "glsl", "symbol": "//"}
 }
