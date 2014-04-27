@@ -1,160 +1,81 @@
 {
-  ".coffee" :
-    {"name" : "coffeescript", "symbol" : "#", "enter": "^\\s*#{3}(?!#)", "exit": "#{3}(?!#)\\s*$" },
-  ".litcoffee" :
-    {"name" : "coffeescript", "symbol" : "#", "literate": true, "enter": "^\\s*#{3}(?!#)", "exit": "#{3}(?!#)\\s*$", "source": ".coffee" },
-  "Cakefile":
-    {"name": "coffeescript", "symbol": "#"},
-  "Makefile":
-    {"name": "make", "symbol": "#"},
-  ".ls":
-    {"name" : "livescript", "symbol": "#"},
-  ".rb":
-    {"name" : "ruby", "symbol" : "#", "enter": "^=begin$", "exit": "^=end$" },
-  ".py":
-    {"name" : "python", "symbol" : "#", "enter": "^\\s*\"\"\"", "exit": "\"\"\"\\s*$" },
-  ".feature":
-    {"name" : "gherkin", "symbol" : "#"},
-  ".yaml":
-    {"name" : "yaml", "symbol" : "#"},
-  ".tex":
-    {"name" : "tex", "symbol" : "%", "enter": "\\\\begin{comment}", "exit": "\\\\end{comment}" },
-  ".latex":
-    {"name" : "tex", "symbol" : "%", "enter": "\\\\begin{comment}", "exit": "\\\\end{comment}" },
-  ".dtx":
-    {"name": "tex", "symbol": "%" },
-  ".sty":
-    {"name": "tex", "symbol": "%" },
-  ".cls":
-    {"name": "tex", "symbol": "%" },
-  ".js":
-    {"name" : "javascript", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
-  ".json":
-    {"name" : "javascript", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
-  ".jsx":
-    {"name": "javascript", "symbol": "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
-  ".java":
-    {"name" : "java", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
-  ".groovy":
-    {"name": "groovy", "symbol": "//" },
-  ".sass":
-    {"name" : "sass", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
-  ".scss":
-    {"name" : "scss", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
-  ".css":
-    {"name" : "css", "symbol" : "", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
-  ".c":
-    {"name" : "c", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
-  ".h":
-    {"name" : "c", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
-  ".cc":
-    {"name" : "cpp", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
-  ".cpp":
-    {"name" : "cpp", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
-  ".php":
-    {"name" : "php", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
-  ".hs":
-    {"name" : "haskell", "symbol" : "--"},
-  ".erl":
-    {"name" : "erlang", "symbol" : "%"},
-  ".hrl":
-    {"name" : "erlang", "symbol" : "%"},
-  ".html":
-    {"name": "html", "symbol": "", "enter": "^\\s*<!--(\\s+|$)", "exit": "\\s*-->\\s*$", "next": "" },
-  ".htm":
-    {"name": "html", "symbol": "", "enter": "^\\s*<!--(\\s+|$)", "exit": "\\s*-->\\s*$", "next": "" },
-  ".md":
-    {"name" : "markdown", "symbol" : ""},
-  ".markdown":
-    {"name" : "markdown", "symbol" : ""},
-  ".less":
-    {"name" : "less", "symbol": "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
-  ".m":
-    {"name" : "objectivec", "symbol": "//"},
-  ".mm":
-    {"name" : "objectivec", "symbol": "//"},
-  ".n":
-    {"name": "nemerle", "symbol": "//"},
-  ".scala":
-    {"name" : "scala", "symbol": "//"},
-  ".cs":
-    {"name" : "csharp", "symbol": "//"},
-  ".as":
-    {"name" : "actionscript", "symbol": "//"},
-  ".scpt":
-    {"name": "applescript", "symbol": "--"},
-  ".applescript":
-    {"name": "applescript", "symbol": "--"},
-  ".ino":
-    {"name": "arduino", "symbol": "//"},
-  ".sh":
-    { "name": "bash", "symbol": "#" },
-  ".mak":
-    { "name": "makefile", "symbol": "#" },
-  ".jison":
-    {"name" : "jison", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
-  ".cfc":
-    {"name" : "coldfusion", "symbol" : "//"},
-  ".clj":
-    {"name": "clojure", "symbol": ";"},
-  ".cmake":
-    {"name": "cmake", "symbol": "#"},
-  ".d":
-    {"name": "d", "symbol": "//"},
-  ".p":
-    {"name": "delphi", "symbol": "//"},
-  ".pp":
-    {"name": "delphi", "symbol": "//"},
-  ".pas":
-    {"name": "delphi", "symbol": "//"},
-  ".bat":
-    {"name": "dos", "symbol": "@?rem"},
-  ".btm":
-    {"name": "dos", "symbol": "@?rem"},
-  ".cmd":
-    {"name": "dos", "symbol": "@?rem"},
-  ".go":
-    {"name": "go", "symbol": "//"},
-  ".ini":
-    {"name": "ini", "symbol": ";"},
-  ".jade":
-    {"name": "jade", "symbol": "//"},
-  ".lisp":
-    {"name": "lisp", "symbol": ";"},
-  ".lua":
-    {"name": "lua", "symbol": "--"},
-  ".mel":
-    {"name": "mel", "symbol": "//"},
-  ".pl":
-    {"name": "perl", "symbol": "#"},
-  ".pm":
-    {"name": "perl", "symbol": "#"},
-  ".pod":
-    {"name": "perl", "symbol": "#"},
-  ".t":
-    {"name": "perl", "symbol": "#"},
-  ".properties":
-    {"name" : ".properties", "symbol": "#"},
-  ".r":
-    {"name": "r", "symbol": "#"},
-  ".rc":
-    {"name": "rust", "symbol": "//"},
-  ".rs":
-    {"name": "rust", "symbol": "//"},
-  ".sql":
-    {"name": "sql", "symbol": "--"},
-  ".vala":
-    {"name": "vala", "symbol": "//"},
-  ".vapi":
-    {"name": "vala", "symbol": "//"},
-  ".vbe":
-    {"name": "vbscript", "symbol": "'"},
-  ".vbs":
-    {"name": "vbscript", "symbol": "'"},
-  ".wsc":
-    {"name": "vbscript", "symbol": "'"},
-  ".wsf":
-    {"name": "vbscript", "symbol": "'"},
-  ".vhdl":
-    {"name": "vhdl", "symbol": "--"}
+  ".applescript": {"name": "applescript", "symbol": "--"},
+  ".as": {"name" : "actionscript", "symbol": "//"},
+  ".bat": {"name": "dos", "symbol": "@?rem"},
+  ".btm": {"name": "dos", "symbol": "@?rem"},
+  ".c": {"name" : "c", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".cc": {"name" : "cpp", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".cfc": {"name" : "coldfusion", "symbol" : "//"},
+  ".clj": {"name": "clojure", "symbol": ";"},
+  ".cls": {"name": "tex", "symbol": "%" },
+  ".cmake": {"name": "cmake", "symbol": "#"},
+  ".cmd": {"name": "dos", "symbol": "@?rem"},
+  ".coffee" : {"name" : "coffeescript", "symbol" : "#", "enter": "^\\s*#{3}(?!#)", "exit": "#{3}(?!#)\\s*$" },
+  ".cpp": {"name" : "cpp", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".cs": {"name" : "csharp", "symbol": "//"},
+  ".css": {"name" : "css", "symbol" : "", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
+  ".d": {"name": "d", "symbol": "//"},
+  ".dtx": {"name": "tex", "symbol": "%" },
+  ".erl": {"name" : "erlang", "symbol" : "%"},
+  ".feature": {"name" : "gherkin", "symbol" : "#"},
+  ".go": {"name": "go", "symbol": "//"},
+  ".groovy": {"name": "groovy", "symbol": "//" },
+  ".h": {"name" : "c", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".hrl": {"name" : "erlang", "symbol" : "%"},
+  ".hs": {"name" : "haskell", "symbol" : "--"},
+  ".htm": {"name": "html", "symbol": "", "enter": "^\\s*<!--(\\s+|$)", "exit": "\\s*-->\\s*$", "next": "" },
+  ".html": {"name": "html", "symbol": "", "enter": "^\\s*<!--(\\s+|$)", "exit": "\\s*-->\\s*$", "next": "" },
+  ".ini": {"name": "ini", "symbol": ";"},
+  ".ino": {"name": "arduino", "symbol": "//"},
+  ".jade": {"name": "jade", "symbol": "//"},
+  ".java": {"name" : "java", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".jison": {"name" : "jison", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".js": {"name" : "javascript", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".json": {"name" : "javascript", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".jsx": {"name": "javascript", "symbol": "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".latex": {"name" : "tex", "symbol" : "%", "enter": "\\\\begin{comment}", "exit": "\\\\end{comment}" },
+  ".less": {"name" : "less", "symbol": "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
+  ".lisp": {"name": "lisp", "symbol": ";"},
+  ".litcoffee" : {"name" : "coffeescript", "symbol" : "#", "literate": true, "enter": "^\\s*#{3}(?!#)", "exit": "#{3}(?!#)\\s*$", "source": ".coffee" },
+  ".ls": {"name" : "livescript", "symbol": "#"},
+  ".lua": {"name": "lua", "symbol": "--"},
+  ".m": {"name" : "objectivec", "symbol": "//"},
+  ".mak": { "name": "makefile", "symbol": "#" },
+  ".markdown": {"name" : "markdown", "symbol" : ""},
+  ".md": {"name" : "markdown", "symbol" : ""},
+  ".mel": {"name": "mel", "symbol": "//"},
+  ".mm": {"name" : "objectivec", "symbol": "//"},
+  ".n": {"name": "nemerle", "symbol": "//"},
+  ".p": {"name": "delphi", "symbol": "//"},
+  ".pas": {"name": "delphi", "symbol": "//"},
+  ".php": {"name" : "php", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".pl": {"name": "perl", "symbol": "#"},
+  ".pm": {"name": "perl", "symbol": "#"},
+  ".pod": {"name": "perl", "symbol": "#"},
+  ".pp": {"name": "delphi", "symbol": "//"},
+  ".properties": {"name" : ".properties", "symbol": "#"},
+  ".py": {"name" : "python", "symbol" : "#", "enter": "^\\s*\"\"\"", "exit": "\"\"\"\\s*$" },
+  ".r": {"name": "r", "symbol": "#"},
+  ".rb": {"name" : "ruby", "symbol" : "#", "enter": "^=begin$", "exit": "^=end$" },
+  ".rc": {"name": "rust", "symbol": "//"},
+  ".rs": {"name": "rust", "symbol": "//"},
+  ".sass": {"name" : "sass", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
+  ".scala": {"name" : "scala", "symbol": "//"},
+  ".scpt": {"name": "applescript", "symbol": "--"},
+  ".scss": {"name" : "scss", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
+  ".sh": { "name": "bash", "symbol": "#" },
+  ".sql": {"name": "sql", "symbol": "--"},
+  ".sty": {"name": "tex", "symbol": "%" },
+  ".t": {"name": "perl", "symbol": "#"},
+  ".tex": {"name" : "tex", "symbol" : "%", "enter": "\\\\begin{comment}", "exit": "\\\\end{comment}" },
+  ".vala": {"name": "vala", "symbol": "//"},
+  ".vapi": {"name": "vala", "symbol": "//"},
+  ".vbe": {"name": "vbscript", "symbol": "'"},
+  ".vbs": {"name": "vbscript", "symbol": "'"},
+  ".vhdl": {"name": "vhdl", "symbol": "--"},
+  ".wsc": {"name": "vbscript", "symbol": "'"},
+  ".wsf": {"name": "vbscript", "symbol": "'"},
+  ".yaml": {"name" : "yaml", "symbol" : "#"},
+  "Cakefile": {"name": "coffeescript", "symbol": "#"},
+  "Makefile": {"name": "make", "symbol": "#"}
 }
