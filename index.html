@@ -140,7 +140,7 @@ name of the source file.</p>
         
           <div class='highlight'><pre>      firstSection = _.find sections, <span class="hljs-function"><span class="hljs-params">(section)</span> -&gt;</span>
         section.docsText.length &gt; <span class="hljs-number">0</span>
-      <span class="hljs-keyword">if</span> firstSection <span class="hljs-keyword">then</span> first = marked.lexer(firstSection.docsText)[<span class="hljs-number">0</span>]
+      first = marked.lexer(firstSection.docsText)[<span class="hljs-number">0</span>] <span class="hljs-keyword">if</span> firstSection
       hasTitle = first <span class="hljs-keyword">and</span> first.type <span class="hljs-keyword">is</span> <span class="hljs-string">'heading'</span> <span class="hljs-keyword">and</span> first.depth <span class="hljs-keyword">is</span> <span class="hljs-number">1</span>
       title = <span class="hljs-keyword">if</span> hasTitle <span class="hljs-keyword">then</span> first.text <span class="hljs-keyword">else</span> path.basename source
 
@@ -393,7 +393,7 @@ and rendering it to the specified output path.</p>
           <div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">write</span> = <span class="hljs-params">(source, title_idx, source_infos, config)</span> -&gt;</span>
 
   <span class="hljs-function"><span class="hljs-title">destination</span> = <span class="hljs-params">(file)</span> -&gt;</span>
-    path.join(config.output, path.dirname(file), path.basename(file, path.extname(file)) + <span class="hljs-string">'.html'</span>)
+    path.join(config.output, file + <span class="hljs-string">'.html'</span>)
 
   <span class="hljs-function"><span class="hljs-title">relative</span> = <span class="hljs-params">(file)</span> -&gt;</span>
     to = path.dirname(path.resolve(file))

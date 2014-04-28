@@ -190,7 +190,7 @@
   write = function(source, title_idx, source_infos, config) {
     var css, destination, html, relative;
     destination = function(file) {
-      return path.join(config.output, path.dirname(file), path.basename(file, path.extname(file)) + '.html');
+      return path.join(config.output, file + '.html');
     };
     relative = function(file) {
       var from, to;

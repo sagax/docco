@@ -113,7 +113,7 @@ name of the source file.
 
           firstSection = _.find sections, (section) ->
             section.docsText.length > 0
-          if firstSection then first = marked.lexer(firstSection.docsText)[0]
+          first = marked.lexer(firstSection.docsText)[0] if firstSection
           hasTitle = first and first.type is 'heading' and first.depth is 1
           title = if hasTitle then first.text else path.basename source
 
@@ -304,7 +304,7 @@ and rendering it to the specified output path.
     write = (source, title_idx, source_infos, config) ->
 
       destination = (file) ->
-        path.join(config.output, path.dirname(file), path.basename(file, path.extname(file)) + '.html')
+        path.join(config.output, file + '.html')
 
       relative = (file) ->
         to = path.dirname(path.resolve(file))
