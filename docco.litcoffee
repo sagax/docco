@@ -276,6 +276,13 @@ over stdio, and run the text of their corresponding comments through
     format = (source, sections, config) ->
       language = getLanguage source, config
 
+Pass any user defined options to Marked if specified via command line option,
+otherwise revert use the default configuration.
+
+      markedOptions = config.marked
+
+      marked.setOptions markedOptions
+
 Tell Marked how to highlight code blocks within comments, treating that code
 as either the language specified in the code block or the language of the file
 if not specified.
@@ -362,6 +369,18 @@ user-specified options.
       source:     null
       blocks:     false
       markdown:   false
+      marked_options: {
+        gfm: true,
+        tables: true,
+        breaks: false,
+        pedantic: false,
+        sanitize: false,
+        smartLists: true,
+        smartypants: yes,
+        langPrefix: 'language-',
+        highlight: (code, lang) ->
+          code
+      }
 
 **Configure** this particular run of Docco. We might use a passed-in external
 template, or one of the built-in **layouts**. We only attempt to process
@@ -379,6 +398,9 @@ source files for languages for which we have definitions.
         config.template     = path.join dir, 'docco.jst'
         config.css          = options.css or path.join dir, 'docco.css'
       config.template = _.template fs.readFileSync(config.template).toString()
+
+      if options.marked_options
+        config.marked_options = _.extend {}, config.marked_options, JSON.parse fs.readFileSync(options.marked_options)
 
       config.sources = options.args.filter((source) ->
         lang = getLanguage source, config
@@ -400,21 +422,6 @@ Require our external dependencies.
     marked      = require 'marked'
     commander   = require 'commander'
     highlightjs = require 'highlight.js'
-
-Enable nicer typography with marked.
-
-    marked.setOptions({
-      gfm: true,
-      tables: true,
-      breaks: false,
-      pedantic: false,
-      sanitize: false,
-      smartLists: true,
-      smartypants: yes,
-      langPrefix: 'language-',
-      highlight: (code, lang) ->
-        code
-    })
 
 Languages are stored in JSON in the file `resources/languages.json`.
 Each item maps the file extension to the name of the language and the
@@ -491,9 +498,10 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
         .option('-c, --css [file]',       'use a custom css file', c.css)
         .option('-t, --template [file]',  'use a custom .jst template', c.template)
         .option('-b, --blocks',           'parse block comments where available', c.blocks)
-        .option('-m, --markdown',         'output markdown', c.markdown)
+        .option('-M, --markdown',         'output markdown', c.markdown)
         .option('-e, --extension [ext]',  'assume a file extension for all inputs', c.extension)
         .option('-s, --source [path]',    'output code in a given folder', c.source)
+        .option('-m, --marked-options [file]',  'use custom Marked options', c.marked_options)
         .parse(args)
         .name = "docco"
       if commander.args.length
