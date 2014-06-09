@@ -399,8 +399,12 @@ source files for languages for which we have definitions.
         config.css          = options.css or path.join dir, 'docco.css'
       config.template = _.template fs.readFileSync(config.template).toString()
 
+When the user specifies custom Marked options in a (JSON-formatted) configuration file,
+mix those options which our defaults such that each default option remains active when it has
+not been explicitly overridden by the user.
+
       if options.marked_options
-        config.marked_options = _.extend {}, config.marked_options, JSON.parse fs.readFileSync(options.marked_options)
+        config.marked_options = _.extend config.marked_options, JSON.parse fs.readFileSync(options.marked_options)
 
       config.sources = options.args.filter((source) ->
         lang = getLanguage source, config
