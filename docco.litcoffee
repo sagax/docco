@@ -298,11 +298,19 @@ if not specified.
             code
       }
 
+Process each chunk:
+- both the code and text blocks are stripped of trailing empty lines
+- the code block is marked up by highlighted to show a nice HTML rendition of the code
+- the text block is fed to Marked to turn it into HTML
+
       for section, i in sections
-        code = highlightjs.highlight(language.name, section.codeText).value
-        code = code.replace(/\s+$/, '')
+        code = section.codeText
+        section.codeText = code = code.replace(/\s+$/, '')
+        code = highlightjs.highlight(language.name, code).value
         section.codeHtml = "<div class='highlight'><pre>#{code}</pre></div>"
-        section.docsHtml = marked(section.docsText)
+        doc = section.docsText
+        section.docsText = doc = doc.replace(/\s+$/, '')
+        section.docsHtml = marked(doc)
 
 Once all of the code has finished highlighting, we can **write** the resulting
 documentation file by passing the completed HTML sections into the template,
