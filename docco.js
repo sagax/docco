@@ -163,7 +163,7 @@
   };
 
   format = function(source, sections, config) {
-    var code, i, language, markedOptions, section, _i, _len, _results;
+    var code, doc, i, language, markedOptions, section, _i, _len, _results;
     language = getLanguage(source, config);
     markedOptions = config.marked;
     marked.setOptions(markedOptions);
@@ -181,10 +181,13 @@
     _results = [];
     for (i = _i = 0, _len = sections.length; _i < _len; i = ++_i) {
       section = sections[i];
-      code = highlightjs.highlight(language.name, section.codeText).value;
-      code = code.replace(/\s+$/, '');
+      code = section.codeText;
+      section.codeText = code = code.replace(/\s+$/, '');
+      code = highlightjs.highlight(language.name, code).value;
       section.codeHtml = "<div class='highlight'><pre>" + code + "</pre></div>";
-      _results.push(section.docsHtml = marked(section.docsText));
+      doc = section.docsText;
+      section.docsText = doc = doc.replace(/\s+$/, '');
+      _results.push(section.docsHtml = marked(doc));
     }
     return _results;
   };

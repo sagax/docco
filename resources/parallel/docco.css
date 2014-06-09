@@ -212,8 +212,8 @@ ul.sections > li > div {
 #jump_page .source:first-child {
 }
 
-/*---------------------- Low resolutions (> 320px) ---------------------*/
-@media only screen and (min-width: 320px) {
+/*---------------------- Low resolutions (>= 320px) ---------------------*/
+@media only screen {
   .pilwrap { display: none; }
 
   ul.sections > li > div {
@@ -226,12 +226,13 @@ ul.sections > li > div {
   }
 
   ul.sections > li > div.content {
-    overflow-x:auto;
+    overflow-x: auto;
     -webkit-box-shadow: inset 0 0 5px #e5e5ee;
     box-shadow: inset 0 0 5px #e5e5ee;
     border: 1px solid #dedede;
-    margin:5px 10px 5px 10px;
+    margin: 5px 10px 5px 10px;
     padding-bottom: 5px;
+    background-color: #fdfdff;
   }
 
   ul.sections > li > div.annotation pre {
@@ -247,8 +248,8 @@ ul.sections > li > div {
   }
 }
 
-/*----------------------  (> 481px) ---------------------*/
-@media only screen and (min-width: 481px) {
+/*----------------------  (> 800px) ---------------------*/
+@media only screen and (min-width: 801px) {
   #container {
     position: relative;
   }
@@ -329,6 +330,7 @@ ul.sections > li > div {
     border: none;
     -webkit-box-shadow: none;
     box-shadow: none;
+    background-color: inherit;
   }
 
   .pilwrap {
@@ -358,9 +360,8 @@ ul.sections > li > div {
   }
 }
 
-/*---------------------- (> 1025px) ---------------------*/
+/*---------------------- (> 1024px) ---------------------*/
 @media only screen and (min-width: 1025px) {
-
   body {
     font-size: 16px;
     line-height: 24px;
