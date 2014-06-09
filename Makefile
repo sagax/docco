@@ -6,6 +6,8 @@
 #CAKE=cake.coffeescript
 CAKE=node_modules/.bin/cake
 COFFEE=node_modules/.bin/coffee
+# linear | parallel | pretty | plain-markdown | classic
+TEMPLATE=pretty
 
 
 
@@ -55,8 +57,8 @@ docco.js: $(SRC_DEPS) $(TOOL_DEPS)
 	#$(CAKE) build
 
 index.html: $(SRC_DEPS) $(TOOL_DEPS)
-	bin/docco --layout linear docco.litcoffee
-	sed -e 's/docco.css/resources\/linear\/docco.css/g' < docs/docco.litcoffee.html > index.html
+	bin/docco --layout $(TEMPLATE) docco.litcoffee
+	sed -e 's/docco.css/resources\/$(TEMPLATE)\/docco.css/g' < docs/docco.litcoffee.html > index.html
 	rm -rf docs
 	#$(CAKE) doc
 

@@ -16,14 +16,16 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page">
-            <% for (var i=0, l=sources.length; i<l; i++) { %>
-              <% var source = sources[i]; %>
-              <% var title = titles[i]; %>
-              <a class="source" href="<%= relative(destination(source, 'html')) %>">
-                <%= title %>
-              </a>
-            <% } %>
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              <% for (var i = 0, l = sources.length; i < l; i++) { %>
+                <% var source = sources[i]; %>
+                <% var title = titles[i]; %>
+                <a class="source" href="<%= relative(destination(source)) %>">
+                  <%= title %>
+                </a>
+              <% } %>
+            </div>
           </div>
         </li>
       </ul>
@@ -36,7 +38,7 @@
               </div>
           </li>
         <% } %>
-        <% for (var i=0, l=sections.length; i<l; i++) { %>
+        <% for (var i = 0, l = sections.length; i < l; i++) { %>
         <% var section = sections[i]; %>
         <li id="section-<%= i + 1 %>">
             <div class="annotation">

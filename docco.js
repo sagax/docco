@@ -163,8 +163,10 @@
   };
 
   format = function(source, sections, config) {
-    var code, i, language, section, _i, _len, _results;
+    var code, doc, i, language, markedOptions, section, _i, _len, _results;
     language = getLanguage(source, config);
+    markedOptions = config.marked;
+    marked.setOptions(markedOptions);
     marked.setOptions({
       highlight: function(code, lang) {
         lang || (lang = language.name);
@@ -179,10 +181,13 @@
     _results = [];
     for (i = _i = 0, _len = sections.length; _i < _len; i = ++_i) {
       section = sections[i];
-      code = highlightjs.highlight(language.name, section.codeText).value;
-      code = code.replace(/\s+$/, '');
+      code = section.codeText;
+      section.codeText = code = code.replace(/\s+$/, '');
+      code = highlightjs.highlight(language.name, code).value;
       section.codeHtml = "<div class='highlight'><pre>" + code + "</pre></div>";
-      _results.push(section.docsHtml = marked(section.docsText));
+      doc = section.docsText;
+      section.docsText = doc = doc.replace(/\s+$/, '');
+      _results.push(section.docsHtml = marked(doc));
     }
     return _results;
   };
@@ -241,7 +246,20 @@
     languages: {},
     source: null,
     blocks: false,
-    markdown: false
+    markdown: false,
+    marked_options: {
+      gfm: true,
+      tables: true,
+      breaks: false,
+      pedantic: false,
+      sanitize: false,
+      smartLists: true,
+      smartypants: true,
+      langPrefix: 'language-',
+      highlight: function(code, lang) {
+        return code;
+      }
+    }
   };
 
   configure = function(options) {
@@ -260,6 +278,9 @@
       config.js = options.js || path.join(dir, 'jump_menu.js');
     }
     config.template = _.template(fs.readFileSync(config.template).toString());
+    if (options.marked_options) {
+      config.marked_options = _.extend(config.marked_options, JSON.parse(fs.readFileSync(options.marked_options)));
+    }
     config.sources = options.args.filter(function(source) {
       var lang;
       lang = getLanguage(source, config);
@@ -282,20 +303,6 @@
   commander = require('commander');
 
   highlightjs = require('highlight.js');
-
-  marked.setOptions({
-    gfm: true,
-    tables: true,
-    breaks: false,
-    pedantic: false,
-    sanitize: false,
-    smartLists: true,
-    smartypants: true,
-    langPrefix: 'language-',
-    highlight: function(code, lang) {
-      return code;
-    }
-  });
 
   languages = JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'languages.json')));
 
@@ -353,7 +360,7 @@
       args = process.argv;
     }
     c = defaults;
-    commander.version(version).usage('[options] files').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear, pretty or classic)', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-c, --css [file]', 'use a custom css file', c.css).option('-j, --js [file]', 'use a custom js file', c.js).option('-t, --template [file]', 'use a custom .jst template', c.template).option('-b, --blocks', 'parse block comments where available', c.blocks).option('-m, --markdown', 'output markdown', c.markdown).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-s, --source [path]', 'output code in a given folder', c.source).parse(args).name = "docco";
+    commander.version(version).usage('[options] files').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear, pretty or classic)', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-c, --css [file]', 'use a custom css file', c.css).option('-j, --js [file]', 'use a custom js file', c.js).option('-t, --template [file]', 'use a custom .jst template', c.template).option('-b, --blocks', 'parse block comments where available', c.blocks).option('-M, --markdown', 'output markdown', c.markdown).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-s, --source [path]', 'output code in a given folder', c.source).option('-m, --marked-options [file]', 'use custom Marked options', c.marked_options).parse(args).name = "docco";
     if (commander.args.length) {
       return document(commander);
     } else {

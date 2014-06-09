@@ -105,9 +105,18 @@ ul.sections > li > div {
   display: block;
 }
 
+#jump_page_wrapper{
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
 #jump_page {
   padding: 5px 0 3px;
   margin: 0 0 25px 25px;
+  max-height: 100%;
+  overflow: auto;
 }
 
 #jump_page .source {
@@ -124,8 +133,8 @@ ul.sections > li > div {
 #jump_page .source:first-child {
 }
 
-/*---------------------- Low resolutions (> 320px) ---------------------*/
-@media only screen and (min-width: 320px) {
+/*---------------------- Low resolutions (>= 320px) ---------------------*/
+@media only screen {
   .pilwrap { display: none; }
 
   ul.sections > li > div {
@@ -142,13 +151,13 @@ ul.sections > li > div {
   }
 
   ul.sections > li > div.content {
-    background: #f5f5ff;
-    overflow-x:auto;
+    overflow-x: auto;
     -webkit-box-shadow: inset 0 0 5px #e5e5ee;
     box-shadow: inset 0 0 5px #e5e5ee;
     border: 1px solid #dedede;
-    margin:5px 10px 5px 10px;
+    margin: 5px 10px 5px 10px;
     padding-bottom: 5px;
+    background-color: #f5f5ff;
   }
 
   ul.sections > li > div.annotation pre {
@@ -156,7 +165,7 @@ ul.sections > li > div {
     padding-left: 15px;
   }
 
-  ul.sections > li > div.annotation p tt, .annotation code {
+  ul.sections > li > div.annotation p tt, .annotation p code {
     background: #f8f8ff;
     border: 1px solid #dedede;
     font-size: 12px;
@@ -164,8 +173,8 @@ ul.sections > li > div {
   }
 }
 
-/*----------------------  (> 481px) ---------------------*/
-@media only screen and (min-width: 481px) {
+/*----------------------  (> 800px) ---------------------*/
+@media only screen and (min-width: 801px) {
   #container {
     position: relative;
   }
@@ -204,7 +213,7 @@ ul.sections > li > div {
     position: absolute;
     top: 0; bottom: 0;
     width: 350px;
-    background: #ffffff;
+    background: #fff;
     border-right: 1px solid #e5e5ee;
     z-index: -1;
   }
@@ -239,10 +248,10 @@ ul.sections > li > div {
   ul.sections > li > div.content {
     padding: 13px;
     vertical-align: top;
-    background: #f5f5ff;
     border: none;
     -webkit-box-shadow: none;
     box-shadow: none;
+    background-color: inherit;
   }
 
   .pilwrap {
@@ -272,7 +281,7 @@ ul.sections > li > div {
   }
 }
 
-/*---------------------- (> 1025px) ---------------------*/
+/*---------------------- (> 1024px) ---------------------*/
 @media only screen and (min-width: 1025px) {
 
   #background {

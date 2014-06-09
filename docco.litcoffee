@@ -276,6 +276,13 @@ over stdio, and run the text of their corresponding comments through
     format = (source, sections, config) ->
       language = getLanguage source, config
 
+Pass any user defined options to Marked if specified via command line option,
+otherwise revert use the default configuration.
+
+      markedOptions = config.marked
+
+      marked.setOptions markedOptions
+
 Tell Marked how to highlight code blocks within comments, treating that code
 as either the language specified in the code block or the language of the file
 if not specified.
@@ -291,11 +298,19 @@ if not specified.
             code
       }
 
+Process each chunk:
+- both the code and text blocks are stripped of trailing empty lines
+- the code block is marked up by highlighted to show a nice HTML rendition of the code
+- the text block is fed to Marked to turn it into HTML
+
       for section, i in sections
-        code = highlightjs.highlight(language.name, section.codeText).value
-        code = code.replace(/\s+$/, '')
+        code = section.codeText
+        section.codeText = code = code.replace(/\s+$/, '')
+        code = highlightjs.highlight(language.name, code).value
         section.codeHtml = "<div class='highlight'><pre>#{code}</pre></div>"
-        section.docsHtml = marked(section.docsText)
+        doc = section.docsText
+        section.docsText = doc = doc.replace(/\s+$/, '')
+        section.docsHtml = marked(doc)
 
 Once all of the code has finished highlighting, we can **write** the resulting
 documentation file by passing the completed HTML sections into the template,
@@ -364,6 +379,18 @@ user-specified options.
       source:     null
       blocks:     false
       markdown:   false
+      marked_options: {
+        gfm: true,
+        tables: true,
+        breaks: false,
+        pedantic: false,
+        sanitize: false,
+        smartLists: true,
+        smartypants: yes,
+        langPrefix: 'language-',
+        highlight: (code, lang) ->
+          code
+      }
 
 **Configure** this particular run of Docco. We might use a passed-in external
 template, or one of the built-in **layouts**. We only attempt to process
@@ -382,6 +409,13 @@ source files for languages for which we have definitions.
         config.css          = options.css or path.join dir, 'docco.css'
         config.js           = options.js or path.join dir, 'jump_menu.js'
       config.template = _.template fs.readFileSync(config.template).toString()
+
+When the user specifies custom Marked options in a (JSON-formatted) configuration file,
+mix those options which our defaults such that each default option remains active when it has
+not been explicitly overridden by the user.
+
+      if options.marked_options
+        config.marked_options = _.extend config.marked_options, JSON.parse fs.readFileSync(options.marked_options)
 
       config.sources = options.args.filter((source) ->
         lang = getLanguage source, config
@@ -403,21 +437,6 @@ Require our external dependencies.
     marked      = require 'marked'
     commander   = require 'commander'
     highlightjs = require 'highlight.js'
-
-Enable nicer typography with marked.
-
-    marked.setOptions({
-      gfm: true,
-      tables: true,
-      breaks: false,
-      pedantic: false,
-      sanitize: false,
-      smartLists: true,
-      smartypants: yes,
-      langPrefix: 'language-',
-      highlight: (code, lang) ->
-        code
-    })
 
 Languages are stored in JSON in the file `resources/languages.json`.
 Each item maps the file extension to the name of the language and the
@@ -495,9 +514,10 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
         .option('-j, --js [file]',        'use a custom js file', c.js)
         .option('-t, --template [file]',  'use a custom .jst template', c.template)
         .option('-b, --blocks',           'parse block comments where available', c.blocks)
-        .option('-m, --markdown',         'output markdown', c.markdown)
+        .option('-M, --markdown',         'output markdown', c.markdown)
         .option('-e, --extension [ext]',  'assume a file extension for all inputs', c.extension)
         .option('-s, --source [path]',    'output code in a given folder', c.source)
+        .option('-m, --marked-options [file]',  'use custom Marked options', c.marked_options)
         .parse(args)
         .name = "docco"
       if commander.args.length
