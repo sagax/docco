@@ -16,7 +16,9 @@ document = function(options, callback) {
       }
     });
     copyAsset = function(file, callback) {
-      return fs.copy(file, path.join(config.output, path.basename(file)), callback);
+      if (file) {
+        return fs.copy(file, path.join(config.output, path.basename(file)), callback);
+      }
     };
     complete = function() {
       return copyAsset(config.css, function(error) {
