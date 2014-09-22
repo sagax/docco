@@ -20,7 +20,8 @@
     "marked":     ">= 0.2.7",
     "fs-extra":   ">= 0.6.0",
     "underscore": ">= 1.0.0",
-    "highlight.js": ">= 8.0.x"
+    "highlight.js": ">= 8.0.x",
+    "hljs-classy-site": "davej/hljs-classy-site"
   },
   "main" :        "./docco",
   "bin": {
