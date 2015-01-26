@@ -27,6 +27,7 @@ Usage: docco [options] FILES
     -t, --template [file]  use a custom .jst template
     -b, --blocks           parse block comments where available
     -m, --markdown         output markdown
+    --marked [file]        use custom marked options
     -e, --extension [ext]  use the given file extension for all inputs
     -L, --languages [file] use a custom languages.json
 

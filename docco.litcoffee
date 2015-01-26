@@ -90,12 +90,13 @@ out in an HTML template, and writing plain code files where instructed.
 
       callback or= (error) -> throw error if error
       copyAsset  = (file, callback) ->
+        return callback() unless fs.existsSync file
         fs.copy file, path.join(config.output, path.basename(file)), callback
       complete   = ->
         copyAsset config.css, (error) ->
-          if error then callback error
-          else if fs.existsSync config.public then copyAsset config.public, callback
-          else callback()
+          return callback error if error
+          return copyAsset config.public, callback if fs.existsSync config.public
+          callback()
 
       files = config.sources.slice()
 
@@ -279,7 +280,7 @@ over stdio, and run the text of their corresponding comments through
 Pass any user defined options to Marked if specified via command line option,
 otherwise revert use the default configuration.
 
-      markedOptions = config.marked
+      markedOptions = config.marked_options
 
       marked.setOptions markedOptions
 
@@ -398,7 +399,15 @@ source files for languages for which we have definitions.
       config = _.extend {}, defaults, _.pick(options, _.keys(defaults)...)
 
       config.languages = buildMatchers config.languages
+
+The user is able to override the layout file used with the `--template` parameter.
+In this case, it is also neccessary to explicitly specify a stylesheet file.
+These custom templates are compiled exactly like the predefined ones, but the `public` folder
+is only copied for the latter.
+
       if options.template
+        unless options.css
+          console.warn "docco: no stylesheet file specified"
         config.layout = null
       else
         dir = config.layout = path.join __dirname, 'resources', config.layout
@@ -479,7 +488,7 @@ file extension. Detect and tag "literate" `.ext.md` variants.
 
     getLanguage = (source, config) ->
       ext  = config.extension or path.extname(source) or path.basename(source)
-      lang = config.languages[ext] or languages[ext] or languages['text']
+      lang = config.languages?[ext] or languages[ext] or languages['text']
       if lang
         if lang.name is 'markdown'
           codeExt = path.extname(path.basename(source, ext))
