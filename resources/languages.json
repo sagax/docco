@@ -18,6 +18,7 @@
   ".css": {"name" : "css", "symbol" : "", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?" },
   ".d": {"name": "d", "symbol": "//"},
   ".dtx": {"name": "TeX", "symbol": "%" },
+  ".dust": {"name": "dust", "symbol": "!"},
   ".erl": {"name" : "erlang", "symbol" : "%"},
   ".feature": {"name" : "gherkin", "symbol" : "#"},
   ".frag": {"name": "glsl", "symbol": "//"},
