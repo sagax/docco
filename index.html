@@ -724,7 +724,6 @@ user-specified options.</p>
   <span class="hljs-attribute">languages</span>:  {}
   <span class="hljs-attribute">source</span>:     <span class="hljs-literal">null</span>
   <span class="hljs-attribute">blocks</span>:     <span class="hljs-literal">false</span>
-  <span class="hljs-attribute">markdown</span>:   <span class="hljs-literal">false</span>
   <span class="hljs-attribute">marked_options</span>: {
     <span class="hljs-attribute">gfm</span>: <span class="hljs-literal">true</span>,
     <span class="hljs-attribute">tables</span>: <span class="hljs-literal">true</span>,
@@ -768,7 +767,7 @@ source files for languages for which we have definitions.</p>
                 <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>The user is able to override the layout file used with the <code>--template</code> parameter.
-In this case, it is also neccessary to explicitly specify a stylesheet file.
+In this case, it is also necessary to explicitly specify a stylesheet file.
 These custom templates are compiled exactly like the predefined ones, but the <code>public</code> folder
 is only copied for the latter.</p>
 
@@ -1027,7 +1026,6 @@ Parse options using <a href="https://github.com/visionmedia/commander.js">Comman
     .option(<span class="hljs-string">'-c, --css [file]'</span>,       <span class="hljs-string">'use a custom css file'</span>, c.css)
     .option(<span class="hljs-string">'-t, --template [file]'</span>,  <span class="hljs-string">'use a custom .jst template'</span>, c.template)
     .option(<span class="hljs-string">'-b, --blocks'</span>,           <span class="hljs-string">'parse block comments where available'</span>, c.blocks)
-    .option(<span class="hljs-string">'-M, --markdown'</span>,         <span class="hljs-string">'output markdown'</span>, c.markdown)
     .option(<span class="hljs-string">'-e, --extension [ext]'</span>,  <span class="hljs-string">'assume a file extension for all inputs'</span>, c.extension)
     .option(<span class="hljs-string">'-s, --source [path]'</span>,    <span class="hljs-string">'output code in a given folder'</span>, c.source)
     .option(<span class="hljs-string">'-m, --marked-options [file]'</span>,  <span class="hljs-string">'use custom Marked options'</span>, c.marked_options)

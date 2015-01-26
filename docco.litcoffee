@@ -377,7 +377,6 @@ user-specified options.
       languages:  {}
       source:     null
       blocks:     false
-      markdown:   false
       marked_options: {
         gfm: true,
         tables: true,
@@ -401,7 +400,7 @@ source files for languages for which we have definitions.
       config.languages = buildMatchers config.languages
 
 The user is able to override the layout file used with the `--template` parameter.
-In this case, it is also neccessary to explicitly specify a stylesheet file.
+In this case, it is also necessary to explicitly specify a stylesheet file.
 These custom templates are compiled exactly like the predefined ones, but the `public` folder
 is only copied for the latter.
 
@@ -519,7 +518,6 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
         .option('-c, --css [file]',       'use a custom css file', c.css)
         .option('-t, --template [file]',  'use a custom .jst template', c.template)
         .option('-b, --blocks',           'parse block comments where available', c.blocks)
-        .option('-M, --markdown',         'output markdown', c.markdown)
         .option('-e, --extension [ext]',  'assume a file extension for all inputs', c.extension)
         .option('-s, --source [path]',    'output code in a given folder', c.source)
         .option('-m, --marked-options [file]',  'use custom Marked options', c.marked_options)
