@@ -195,6 +195,7 @@ ul.sections > li > div {
   padding: 5px 0 3px;
   margin: 0 0 25px 25px;
   max-height: 100%;
+  max-height: 100vh;        /* 100% is fallback for browsers which do not support the 'vh' unit */
   overflow: auto;
 }
 
