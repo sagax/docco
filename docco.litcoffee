@@ -189,7 +189,9 @@ if not specified.
         section.codeHtml = "<div class='highlight'><pre>#{code}</pre></div>"
         section.docsHtml = marked(section.docsText)
         firstComment = marked.lexer(section.docsText)[0]
-        section.heading = firstComment.text if firstComment?.type is 'heading'
+        if firstComment?.type is 'heading'
+          section.heading = firstComment.text
+          section.headingDepth = firstComment.depth
 
 Once all of the code has finished highlighting, we can **write** the resulting
 documentation file by passing the completed HTML sections into the template,

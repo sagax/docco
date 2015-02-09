@@ -132,7 +132,8 @@
       section.docsHtml = marked(section.docsText);
       firstComment = marked.lexer(section.docsText)[0];
       if ((firstComment != null ? firstComment.type : void 0) === 'heading') {
-        _results.push(section.heading = firstComment.text);
+        section.heading = firstComment.text;
+        _results.push(section.headingDepth = firstComment.depth);
       } else {
         _results.push(void 0);
       }

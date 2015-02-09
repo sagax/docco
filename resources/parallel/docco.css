@@ -220,6 +220,22 @@ ul.sections > li > div {
   border-top: 1px solid #eee;
 }
 
+#jump_page .heading {
+  text-align: left;
+  margin-left: 27px;
+}
+#jump_page .heading-1 {
+  font-weight: bold;
+  margin-left: 0px;
+}
+#jump_page .heading-2 {
+  font-weight: bold;
+  margin-left: 7px;
+}
+#jump_page .heading-2 {
+  margin-left: 17px;
+}
+
 #jump_page .source:hover {
   background: #f5f5ff;
 }

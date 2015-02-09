@@ -19,11 +19,11 @@
             <div id="jump_page_wrapper">
               <div id="jump_page">
                 <div class="jump_dir">Headings</div>
-                  <a class="source" href="#">Top</a>
+                  <a class="source heading heading-1" href="#">Top</a>
                   <% for (var i=0, l=sections.length; i<l; i++) { %>
                     <% var section = sections[i]; %>
                     <% if (section.heading) { %>
-                      <a class="source" href="#section-<%= i + 1 %>">
+                      <a class="source heading heading-<%= section.headingDepth %>" href="#section-<%= i + 1 %>">
                         <%= section.heading %>
                       </a>
                     <% } %>
