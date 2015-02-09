@@ -26,13 +26,19 @@
           <div class="toc">
             <h3>Table of Contents</h3>
             <ol>
+              <% var prevDir = '' %>
               <% for (var i=0, l = sources.length; i < l; i++) { %>
                 <% var source = sources[i]; %>
+                <% var dir = path.dirname(source) %>
+                <% if (dir !== prevDir) { %>
+                  <div class="jump_dir"><%= dir %></div>
+                <% } %>
                 <li>
-                  <a class="source" href="<%= path.basename(destination(source)) %>">
+                  <a class="source" href="<%= destination(source) %>">
                     <%= path.basename(source) %>
                   </a>
                 </li>
+                <% prevDir = dir %>
               <% } %>
             </ol>
           </div>

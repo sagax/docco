@@ -178,10 +178,16 @@ ul.sections {
   transition: max-height 1s;
 }
   .header:hover .toc {
-    max-height: 500px;
+    max-height: 8000px;
   }
   .toc h3 {
     margin-top: 20px;
+  }
+  .toc .jump_dir {
+    text-transform: uppercase;
+    margin: 18px 0 5px 0;
+    font-weight: bold;
+    color: gray;
   }
   .toc ol {
     margin: 0 0 20px 0;

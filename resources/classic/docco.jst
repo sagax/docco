@@ -16,13 +16,21 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
           <div id="jump_page">
+            <% var prevDir = '' %>
             <% for (var i=0, l=sources.length; i<l; i++) { %>
               <% var source = sources[i]; %>
-              <a class="source" href="<%= path.basename(destination(source)) %>">
+              <% var dir = path.dirname(source) %>
+              <% if (dir !== prevDir) { %>
+                <div class="jump_dir"><%= dir %></div>
+              <% } %>
+              <a class="source" href="<%= destination(source) %>">
                 <%= path.basename(source) %>
               </a>
+              <% prevDir = dir %>
             <% } %>
+          </div>
           </div>
         </li>
       </ul>

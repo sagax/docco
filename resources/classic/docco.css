@@ -89,6 +89,13 @@ ul.sections > li > div {
   color: #676767;
 }
 
+.jump_dir {
+  text-align: left;
+  margin: 15px 0px 4px 3px;
+  font-weight: bold;
+  color: gray;
+}
+
 #jump_to, #jump_wrapper {
   position: fixed;
   right: 0; top: 0;
@@ -108,6 +115,7 @@ ul.sections > li > div {
 #jump_page {
   padding: 5px 0 3px;
   margin: 0 0 25px 25px;
+  min-width: 200px;
 }
 
 #jump_page .source {

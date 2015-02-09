@@ -195,7 +195,13 @@ and rendering it to the specified output path.
     write = (source, sections, config) ->
 
       destination = (file) ->
-        path.join(config.output, path.basename(file, path.extname(file)) + '.html')
+        path.join(config.output, path.dirname(file), path.basename(file, path.extname(file)) + '.html')
+        # path.join(config.output, path.basename(file, path.extname(file)) + '.html')
+
+      jumpToFile = (file) ->
+        goOut = path.relative path.dirname(destination(source)), config.output
+        goIn  = path.relative config.output, destination(file)
+        path.join goOut, goIn
 
 The **title** of the file is either the first heading in the prose, or the
 name of the source file.
@@ -206,11 +212,21 @@ name of the source file.
       hasTitle = first and first.type is 'heading' and first.depth is 1
       title = if hasTitle then first.text else path.basename source
 
-      html = config.template {sources: config.sources, css: path.basename(config.css),
-        title, hasTitle, sections, path, destination,}
+      destinationFile = destination(source)
+      destinationDir  = path.dirname destinationFile
+
+      html = config.template 
+        sources:      config.sources
+        css:          path.join(path.relative(destinationDir, config.output), path.basename(config.css))
+        destination:  jumpToFile
+        path:         path
+        title:        title
+        hasTitle:     hasTitle
+        sections:     sections
 
       console.log "docco: #{source} -> #{destination source}"
-      fs.writeFileSync destination(source), html
+      fs.mkdirsSync destinationDir
+      fs.writeFileSync destinationFile, html
 
 
 Configuration
@@ -256,7 +272,11 @@ is only copied for the latter.
       if options.marked
         config.marked = JSON.parse fs.readFileSync(options.marked)
 
-      config.sources = options.args.filter((source) ->
+      allSources = []
+      for dir in options.args
+        diveSync dir, (err, file) -> allSources.push file unless err
+
+      config.sources = allSources.filter((source) ->
         lang = getLanguage source, config
         console.warn "docco: skipped unknown type (#{path.basename source})" unless lang
         lang
@@ -276,6 +296,7 @@ Require our external dependencies.
     marked      = require 'marked'
     commander   = require 'commander'
     highlightjs = require 'highlight.js'
+    diveSync    = require 'diveSync'
 
 Languages are stored in JSON in the file `resources/languages.json`.
 Each item maps the file extension to the name of the language and the
@@ -325,7 +346,7 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
     run = (args = process.argv) ->
       c = defaults
       commander.version(version)
-        .usage('[options] files')
+        .usage('[options] directories')
         .option('-L, --languages [file]', 'use a custom languages.json', _.compose JSON.parse, fs.readFileSync)
         .option('-l, --layout [name]',    'choose a layout (parallel, linear or classic)', c.layout)
         .option('-o, --output [path]',    'output to a given folder', c.output)

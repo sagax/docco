@@ -68,7 +68,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1em;
   font-weight: normal;
   font-family: "roboto-black";
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
   margin: 30px 0 15px 0;
 }
 
@@ -167,6 +167,13 @@ ul.sections > li > div {
   color: #676767;
 }
 
+.jump_dir {
+  text-align: left;
+  margin: 15px 0px 4px 3px;
+  font-weight: bold;
+  color: gray;
+}
+
 #jump_to, #jump_wrapper {
   position: fixed;
   right: 0; top: 0;
@@ -195,6 +202,7 @@ ul.sections > li > div {
   margin: 0 0 25px 25px;
   max-height: 100%;
   overflow: auto;
+  min-width: 200px;
 }
 
 #jump_page .source {
