@@ -222,7 +222,7 @@ ul.sections > li > div {
 
 #jump_page .heading {
   text-align: left;
-  margin-left: 27px;
+  margin-left: 37px;
 }
 #jump_page .heading-1 {
   font-weight: bold;
@@ -232,8 +232,11 @@ ul.sections > li > div {
   font-weight: bold;
   margin-left: 7px;
 }
-#jump_page .heading-2 {
+#jump_page .heading-3 {
   margin-left: 17px;
+}
+#jump_page .heading-4 {
+  margin-left: 27px;
 }
 
 #jump_page .source:hover {
