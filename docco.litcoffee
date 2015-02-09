@@ -139,6 +139,7 @@ normal below.
             lang.symbol + ' ' + line
 
       for line in lines
+        continue if line.match lang.discardLineFilter
         if line.match(lang.commentMatcher) and not line.match(lang.commentFilter)
           save() if hasCode
           docsText += (line = line.replace(lang.commentMatcher, '')) + '\n'
@@ -187,6 +188,8 @@ if not specified.
         code = code.replace(/\s+$/, '')
         section.codeHtml = "<div class='highlight'><pre>#{code}</pre></div>"
         section.docsHtml = marked(section.docsText)
+        firstComment = marked.lexer(section.docsText)[0]
+        section.heading = firstComment.text if firstComment?.type is 'heading'
 
 Once all of the code has finished highlighting, we can **write** the resulting
 documentation file by passing the completed HTML sections into the template,
@@ -316,7 +319,11 @@ Does the line begin with a comment?
 
 Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_%28Unix%29) and interpolations...
 
-        l.commentFilter = /(^#![/]|^\s*#\{)/
+        l.commentFilter = /(^#![/]|^\s*#\{|^\s*## )/
+
+Ignore these lines altogether
+
+        l.discardLineFilter = /^\s*#-/
       languages
     languages = buildMatchers languages
 

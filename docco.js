@@ -82,6 +82,9 @@
     }
     for (_j = 0, _len1 = lines.length; _j < _len1; _j++) {
       line = lines[_j];
+      if (line.match(lang.discardLineFilter)) {
+        continue;
+      }
       if (line.match(lang.commentMatcher) && !line.match(lang.commentFilter)) {
         if (hasCode) {
           save();
@@ -100,7 +103,7 @@
   };
 
   format = function(source, sections, config) {
-    var code, i, language, markedOptions, section, _i, _len, _results;
+    var code, firstComment, i, language, markedOptions, section, _i, _len, _results;
     language = getLanguage(source, config);
     markedOptions = {
       smartypants: true
@@ -126,7 +129,13 @@
       code = highlightjs.highlight(language.name, section.codeText).value;
       code = code.replace(/\s+$/, '');
       section.codeHtml = "<div class='highlight'><pre>" + code + "</pre></div>";
-      _results.push(section.docsHtml = marked(section.docsText));
+      section.docsHtml = marked(section.docsText);
+      firstComment = marked.lexer(section.docsText)[0];
+      if ((firstComment != null ? firstComment.type : void 0) === 'heading') {
+        _results.push(section.heading = firstComment.text);
+      } else {
+        _results.push(void 0);
+      }
     }
     return _results;
   };
@@ -239,7 +248,8 @@
     for (ext in languages) {
       l = languages[ext];
       l.commentMatcher = RegExp("^\\s*" + l.symbol + "\\s?");
-      l.commentFilter = /(^#![/]|^\s*#\{)/;
+      l.commentFilter = /(^#![/]|^\s*#\{|^\s*## )/;
+      l.discardLineFilter = /^\s*#-/;
     }
     return languages;
   };

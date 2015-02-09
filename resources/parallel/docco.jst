@@ -16,20 +16,32 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page_wrapper">
-            <div id="jump_page">
-              <% var prevDir = '' %>
-              <% for (var i=0, l=sources.length; i<l; i++) { %>
-                <% var source = sources[i]; %>
-                <% var dir = path.dirname(source) %>
-                <% if (dir !== prevDir) { %>
-                  <div class="jump_dir"><%= dir %></div>
+            <div id="jump_page_wrapper">
+              <div id="jump_page">
+                <div class="jump_dir">Headings</div>
+                  <a class="source" href="#">Top</a>
+                  <% for (var i=0, l=sections.length; i<l; i++) { %>
+                    <% var section = sections[i]; %>
+                    <% if (section.heading) { %>
+                      <a class="source" href="#section-<%= i + 1 %>">
+                        <%= section.heading %>
+                      </a>
+                    <% } %>
+                  <% } %>
+
+                <% var prevDir = '' %>
+                <% for (var i=0, l=sources.length; i<l; i++) { %>
+                  <% var source = sources[i]; %>
+                  <% var dir = path.dirname(source) %>
+                  <% if (dir !== prevDir) { %>
+                    <div class="jump_dir"><%= dir %></div>
+                  <% } %>
+                  <a class="source" href="<%= destination(source) %>">
+                    <%= path.basename(source) %>
+                  </a>
+                  <% prevDir = dir %>
                 <% } %>
-                <a class="source" href="<%= destination(source) %>">
-                  <%= path.basename(source) %>
-                </a>
-                <% prevDir = dir %>
-              <% } %>
+              </div>
             </div>
           </div>
         </li>
