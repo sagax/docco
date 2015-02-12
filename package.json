@@ -29,10 +29,14 @@
     "fs-extra": ">= 0.6.0",
     "highlight.js": ">= 8.0.x",
     "marked": ">= 0.2.7",
-    "underscore": ">= 1.0.0"
+    "slash": "^1.0.0",
+    "underscore": ">= 1.0.0",
+    "emojify.js": "^1.0.1"
   },
   "main": "./docco",
   "bin": {
     "docco": "./bin/docco"
+  },
+  "devDependencies": {
   }
 }

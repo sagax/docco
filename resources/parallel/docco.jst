@@ -36,7 +36,7 @@
                   <% if (dir !== prevDir) { %>
                     <div class="jump_dir"><%= dir %></div>
                   <% } %>
-                  <a class="source" href="<%= destination(source) %>">
+                  <a class="source" href="<%= htmlPath(source) %>">
                     <%= path.basename(source) %>
                   </a>
                   <% prevDir = dir %>
@@ -72,5 +72,15 @@
         <% } %>
     </ul>
   </div>
+
+  <!-- Emoji-->
+  <script src="<%= assetPath('public/scripts/emojify.js') %>"></script>
+  <script language="javascript">
+    emojify.setConfig({
+      img_dir: "<%= assetPath('public/images/basic') %>"
+    });
+    emojify.run();
+  </script>
+
 </body>
 </html>

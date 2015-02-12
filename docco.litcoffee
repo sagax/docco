@@ -199,14 +199,19 @@ and rendering it to the specified output path.
 
     write = (source, sections, config) ->
 
-      destination = (file) ->
-        path.join(config.output, path.dirname(file), path.basename(file, path.extname(file)) + '.html')
-        # path.join(config.output, path.basename(file, path.extname(file)) + '.html')
+      destination = (file, options = {}) ->
+        if (options.fKeepExtension ? false)
+          filename = path.basename file
+        else
+          filename = path.basename(file, path.extname(file)) + '.html'
+        path.join(config.output, path.dirname(file), filename)
 
-      jumpToFile = (file) ->
+      htmlPath = (file, options = {}) ->
         goOut = path.relative path.dirname(destination(source)), config.output
-        goIn  = path.relative config.output, destination(file)
-        path.join goOut, goIn
+        goIn  = path.relative config.output, destination(file, options)
+        return slash(path.join goOut, goIn)
+
+      assetPath = (file) -> htmlPath file, fKeepExtension: true
 
 The **title** of the file is either the first heading in the prose, or the
 name of the source file.
@@ -223,7 +228,9 @@ name of the source file.
       html = config.template 
         sources:      config.sources
         css:          path.join(path.relative(destinationDir, config.output), path.basename(config.css))
-        destination:  jumpToFile
+        destination:  htmlPath
+        htmlPath:     htmlPath
+        assetPath:    assetPath
         path:         path
         title:        title
         hasTitle:     hasTitle
@@ -302,6 +309,7 @@ Require our external dependencies.
     commander   = require 'commander'
     highlightjs = require 'highlight.js'
     diveSync    = require 'diveSync'
+    slash       = require 'slash'
 
 Languages are stored in JSON in the file `resources/languages.json`.
 Each item maps the file extension to the name of the language and the
