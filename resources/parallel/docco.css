@@ -50,7 +50,13 @@ body {
 #container { min-height: 100%; }
 
 a {
-  color: #000;
+  color: #CD853F;
+  text-decoration: none;
+  font-weight: bold;
+}
+a:hover {
+  color: #523519;
+  text-decoration: underline;
 }
 
 b, strong {
@@ -98,6 +104,16 @@ h3 {
   margin-top: 2px;
   border-top: 1px solid lightgray;
   padding-top: 4px;
+}
+h4, h5, h6 {
+  margin-top: 2px;
+}
+body.raw-markdown h2,
+body.raw-markdown h3,
+body.raw-markdown h4,
+body.raw-markdown h5,
+body.raw-markdown h6 {
+  margin-top: 30px;
 }
 
 hr {

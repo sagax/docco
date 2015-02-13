@@ -7,9 +7,9 @@
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="<%= css %>" />
 </head>
-<body>
+<% var cl = lang == "markdown" ? "raw-markdown" : "" %>
+<body class="<%= cl %>">
   <div id="container">
-    <% console.log(lang) %>
     <% var cl = lang == "markdown" ? "background-md" : "" %>
     <div id="background" class="<%= cl %>"></div>
     <% if (sources.length > 1) { %>
