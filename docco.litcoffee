@@ -225,7 +225,10 @@ name of the source file.
       destinationFile = destination(source)
       destinationDir  = path.dirname destinationFile
 
-      html = config.template 
+      lang = getLanguage source, config
+      template = if lang.name is 'markdown' then config.mdTemplate else config.template
+
+      html = template 
         sources:      config.sources
         css:          path.join(path.relative(destinationDir, config.output), path.basename(config.css))
         destination:  htmlPath
@@ -251,6 +254,7 @@ user-specified options.
       layout:     'parallel'
       output:     'docs'
       template:   null
+      mdTemplate: null
       css:        null
       extension:  null
       languages:  {}
@@ -270,27 +274,29 @@ In this case, it is also neccessary to explicitly specify a stylesheet file.
 These custom templates are compiled exactly like the predefined ones, but the `public` folder
 is only copied for the latter.
 
-      if options.template
-        unless options.css
-          console.warn "docco: no stylesheet file specified"
-        config.layout = null
-      else
-        dir = config.layout = path.join __dirname, 'resources', config.layout
-        config.public       = path.join dir, 'public' if fs.existsSync path.join dir, 'public'
-        config.template     = path.join dir, 'docco.jst'
-        config.css          = options.css or path.join dir, 'docco.css'
-      config.template = _.template fs.readFileSync(config.template).toString()
+      dir = config.layout = path.join __dirname, 'resources', config.layout
+      config.public       = path.join dir, 'public' if fs.existsSync path.join dir, 'public'
+      config.css          = path.join dir, 'docco.css'
+      config.template     = _.template fs.readFileSync(path.join dir, 'docco.jst').toString()
+      config.mdTemplate   = _.template fs.readFileSync(path.join dir, 'markdown.jst').toString()
 
       if options.marked
         config.marked = JSON.parse fs.readFileSync(options.marked)
 
       allSources = []
-      for dir in options.args
-        diveSync dir, (err, file) -> allSources.push file unless err
+      for fileOrDir in options.args
+        console.log fileOrDir
+        stats = fs.lstatSync fileOrDir
+        if stats.isDirectory()
+          console.log '...is a dir'
+          diveSync fileOrDir, (err, file) -> allSources.push file unless err
+        else if stats.isFile()
+          console.log '...is a file'
+          allSources.push fileOrDir
 
       config.sources = allSources.filter((source) ->
         lang = getLanguage source, config
-        console.warn "docco: skipped unknown type (#{path.basename source})" unless lang
+        console.warn "docco: skipped unknown type (#{source})" unless lang
         lang
       ).sort()
 
@@ -329,7 +335,10 @@ Does the line begin with a comment?
 
 Ignore [hashbangs](http://en.wikipedia.org/wiki/Shebang_%28Unix%29) and interpolations...
 
-        l.commentFilter = /(^#![/]|^\s*#\{|^\s*## )/
+        if l.name is 'coffeescript'
+          l.commentFilter = /(^#![/]|^\s*#\{|^\s*## )/
+        else
+          l.commentFilter = /(^#![/]|^\s*#\{)/
 
 Ignore these lines altogether
 
@@ -367,8 +376,6 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
         .option('-L, --languages [file]', 'use a custom languages.json', _.compose JSON.parse, fs.readFileSync)
         .option('-l, --layout [name]',    'choose a layout (parallel, linear or classic)', c.layout)
         .option('-o, --output [path]',    'output to a given folder', c.output)
-        .option('-c, --css [file]',       'use a custom css file', c.css)
-        .option('-t, --template [file]',  'use a custom .jst template', c.template)
         .option('-e, --extension [ext]',  'assume a file extension for all inputs', c.extension)
         .option('-m, --marked [file]',    'use custom marked options', c.marked)
         .parse(args)
