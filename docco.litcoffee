@@ -140,9 +140,11 @@ normal below.
 
       for line in lines
         continue if line.match lang.discardLineFilter
-        if line.match(lang.commentMatcher) and not line.match(lang.commentFilter)
+        if lang.name is 'markdown' or (line.match(lang.commentMatcher) and not line.match(lang.commentFilter))
           save() if hasCode
-          docsText += (line = line.replace(lang.commentMatcher, '')) + '\n'
+          if lang.name isnt 'markdown'
+            line = line.replace(lang.commentMatcher, '')
+          docsText += line + '\n'
           save() if /^(---+|===+)$/.test line
         else
           hasCode = yes

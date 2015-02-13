@@ -85,11 +85,14 @@
       if (line.match(lang.discardLineFilter)) {
         continue;
       }
-      if (line.match(lang.commentMatcher) && !line.match(lang.commentFilter)) {
+      if (lang.name === 'markdown' || (line.match(lang.commentMatcher) && !line.match(lang.commentFilter))) {
         if (hasCode) {
           save();
         }
-        docsText += (line = line.replace(lang.commentMatcher, '')) + '\n';
+        if (lang.name !== 'markdown') {
+          line = line.replace(lang.commentMatcher, '');
+        }
+        docsText += line + '\n';
         if (/^(---+|===+)$/.test(line)) {
           save();
         }
