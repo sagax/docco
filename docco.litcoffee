@@ -228,9 +228,8 @@ name of the source file.
       destinationDir  = path.dirname destinationFile
 
       lang = getLanguage source, config
-      template = if lang.name is 'markdown' then config.mdTemplate else config.template
 
-      html = template 
+      html = config.template 
         sources:      config.sources
         css:          path.join(path.relative(destinationDir, config.output), path.basename(config.css))
         destination:  htmlPath
@@ -240,6 +239,7 @@ name of the source file.
         title:        title
         hasTitle:     hasTitle
         sections:     sections
+        lang:         lang.name
 
       console.log "docco: #{source} -> #{destination source}"
       fs.mkdirsSync destinationDir
@@ -256,7 +256,6 @@ user-specified options.
       layout:     'parallel'
       output:     'docs'
       template:   null
-      mdTemplate: null
       css:        null
       extension:  null
       languages:  {}
@@ -276,11 +275,16 @@ In this case, it is also neccessary to explicitly specify a stylesheet file.
 These custom templates are compiled exactly like the predefined ones, but the `public` folder
 is only copied for the latter.
 
-      dir = config.layout = path.join __dirname, 'resources', config.layout
-      config.public       = path.join dir, 'public' if fs.existsSync path.join dir, 'public'
-      config.css          = path.join dir, 'docco.css'
-      config.template     = _.template fs.readFileSync(path.join dir, 'docco.jst').toString()
-      config.mdTemplate   = _.template fs.readFileSync(path.join dir, 'markdown.jst').toString()
+      if options.template
+        unless options.css
+          console.warn "docco: no stylesheet file specified"
+        config.layout = null
+      else
+        dir = config.layout = path.join __dirname, 'resources', config.layout
+        config.public       = path.join dir, 'public' if fs.existsSync path.join dir, 'public'
+        config.template     = path.join dir, 'docco.jst'
+        config.css          = options.css or path.join dir, 'docco.css'
+      config.template = _.template fs.readFileSync(config.template).toString()
 
       if options.marked
         config.marked = JSON.parse fs.readFileSync(options.marked)
@@ -378,6 +382,8 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
         .option('-L, --languages [file]', 'use a custom languages.json', _.compose JSON.parse, fs.readFileSync)
         .option('-l, --layout [name]',    'choose a layout (parallel, linear or classic)', c.layout)
         .option('-o, --output [path]',    'output to a given folder', c.output)
+        .option('-c, --css [file]',       'use a custom css file', c.css)
+        .option('-t, --template [file]',  'use a custom .jst template', c.template)
         .option('-e, --extension [ext]',  'assume a file extension for all inputs', c.extension)
         .option('-m, --marked [file]',    'use custom marked options', c.marked)
         .parse(args)

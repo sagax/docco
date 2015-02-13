@@ -145,7 +145,7 @@
   };
 
   write = function(source, sections, config) {
-    var assetPath, destination, destinationDir, destinationFile, first, firstSection, hasTitle, html, htmlPath, lang, template, title;
+    var assetPath, destination, destinationDir, destinationFile, first, firstSection, hasTitle, html, htmlPath, lang, title;
     destination = function(file, options) {
       var filename, _ref;
       if (options == null) {
@@ -183,8 +183,7 @@
     destinationFile = destination(source);
     destinationDir = path.dirname(destinationFile);
     lang = getLanguage(source, config);
-    template = lang.name === 'markdown' ? config.mdTemplate : config.template;
-    html = template({
+    html = config.template({
       sources: config.sources,
       css: path.join(path.relative(destinationDir, config.output), path.basename(config.css)),
       destination: htmlPath,
@@ -193,7 +192,8 @@
       path: path,
       title: title,
       hasTitle: hasTitle,
-      sections: sections
+      sections: sections,
+      lang: lang.name
     });
     console.log("docco: " + source + " -> " + (destination(source)));
     fs.mkdirsSync(destinationDir);
@@ -204,7 +204,6 @@
     layout: 'parallel',
     output: 'docs',
     template: null,
-    mdTemplate: null,
     css: null,
     extension: null,
     languages: {},
@@ -215,13 +214,20 @@
     var allSources, config, dir, fileOrDir, stats, _i, _len, _ref;
     config = _.extend({}, defaults, _.pick.apply(_, [options].concat(__slice.call(_.keys(defaults)))));
     config.languages = buildMatchers(config.languages);
-    dir = config.layout = path.join(__dirname, 'resources', config.layout);
-    if (fs.existsSync(path.join(dir, 'public'))) {
-      config["public"] = path.join(dir, 'public');
+    if (options.template) {
+      if (!options.css) {
+        console.warn("docco: no stylesheet file specified");
+      }
+      config.layout = null;
+    } else {
+      dir = config.layout = path.join(__dirname, 'resources', config.layout);
+      if (fs.existsSync(path.join(dir, 'public'))) {
+        config["public"] = path.join(dir, 'public');
+      }
+      config.template = path.join(dir, 'docco.jst');
+      config.css = options.css || path.join(dir, 'docco.css');
     }
-    config.css = path.join(dir, 'docco.css');
-    config.template = _.template(fs.readFileSync(path.join(dir, 'docco.jst')).toString());
-    config.mdTemplate = _.template(fs.readFileSync(path.join(dir, 'markdown.jst')).toString());
+    config.template = _.template(fs.readFileSync(config.template).toString());
     if (options.marked) {
       config.marked = JSON.parse(fs.readFileSync(options.marked));
     }
@@ -312,7 +318,7 @@
       args = process.argv;
     }
     c = defaults;
-    commander.version(version).usage('[options] directories').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear or classic)', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-m, --marked [file]', 'use custom marked options', c.marked).parse(args).name = "docco";
+    commander.version(version).usage('[options] directories').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear or classic)', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-c, --css [file]', 'use a custom css file', c.css).option('-t, --template [file]', 'use a custom .jst template', c.template).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-m, --marked [file]', 'use custom marked options', c.marked).parse(args).name = "docco";
     if (commander.args.length) {
       return document(commander);
     } else {

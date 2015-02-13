@@ -9,7 +9,9 @@
 </head>
 <body>
   <div id="container">
-    <div id="background"></div>
+    <% console.log(lang) %>
+    <% var cl = lang == "markdown" ? "background-md" : "" %>
+    <div id="background" class="<%= cl %>"></div>
     <% if (sources.length > 1) { %>
       <ul id="jump_to">
         <li>
@@ -48,9 +50,11 @@
       </ul>
     <% } %>
     <ul class="sections">
+        <% var annotationClass = "annotation" + (lang == "markdown" ? " annotation-md" : "") %>
+
         <% if (!hasTitle) { %>
           <li id="title">
-              <div class="annotation">
+              <div class="<%= annotationClass %>">
                   <h1><%= title %></h1>
               </div>
           </li>
@@ -58,7 +62,7 @@
         <% for (var i=0, l=sections.length; i<l; i++) { %>
         <% var section = sections[i]; %>
         <li id="section-<%= i + 1 %>">
-            <div class="annotation">
+            <div class="<%= annotationClass %>">
               <% heading = section.docsHtml.match(/^\s*<(h\d)>/) %>
               <div class="pilwrap <%= heading ? 'for-' + heading[1] : '' %>">
                 <a class="pilcrow" href="#section-<%= i + 1 %>">&#182;</a>
