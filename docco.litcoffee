@@ -138,12 +138,12 @@ normal below.
             isText = yes
             lang.symbol + ' ' + line
 
+      fMarkdown = lang.name is 'markdown'
       for line in lines
         continue if line.match lang.discardLineFilter
-        if lang.name is 'markdown' or (line.match(lang.commentMatcher) and not line.match(lang.commentFilter))
-          save() if hasCode
-          if lang.name isnt 'markdown'
-            line = line.replace(lang.commentMatcher, '')
+        if fMarkdown or (line.match(lang.commentMatcher) and not line.match(lang.commentFilter))
+          save() if hasCode or (fMarkdown and line.match /^s*(#+) /)
+          line = line.replace(lang.commentMatcher, '') unless fMarkdown
           docsText += line + '\n'
           save() if /^(---+|===+)$/.test line
         else

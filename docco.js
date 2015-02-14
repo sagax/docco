@@ -58,7 +58,7 @@
   };
 
   parse = function(source, code, config) {
-    var codeText, docsText, hasCode, i, isText, lang, line, lines, match, maybeCode, save, sections, _i, _j, _len, _len1;
+    var codeText, docsText, fMarkdown, hasCode, i, isText, lang, line, lines, match, maybeCode, save, sections, _i, _j, _len, _len1;
     if (config == null) {
       config = {};
     }
@@ -80,16 +80,17 @@
         lines[i] = maybeCode && (match = /^([ ]{4}|[ ]{0,3}\t)/.exec(line)) ? (isText = false, line.slice(match[0].length)) : (maybeCode = /^\s*$/.test(line)) ? isText ? lang.symbol : '' : (isText = true, lang.symbol + ' ' + line);
       }
     }
+    fMarkdown = lang.name === 'markdown';
     for (_j = 0, _len1 = lines.length; _j < _len1; _j++) {
       line = lines[_j];
       if (line.match(lang.discardLineFilter)) {
         continue;
       }
-      if (lang.name === 'markdown' || (line.match(lang.commentMatcher) && !line.match(lang.commentFilter))) {
-        if (hasCode) {
+      if (fMarkdown || (line.match(lang.commentMatcher) && !line.match(lang.commentFilter))) {
+        if (hasCode || (fMarkdown && line.match(/^s*(#+) /))) {
           save();
         }
-        if (lang.name !== 'markdown') {
+        if (!fMarkdown) {
           line = line.replace(lang.commentMatcher, '');
         }
         docsText += line + '\n';
