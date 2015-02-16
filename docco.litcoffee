@@ -294,10 +294,8 @@ is only copied for the latter.
         console.log fileOrDir
         stats = fs.lstatSync fileOrDir
         if stats.isDirectory()
-          console.log '...is a dir'
           diveSync fileOrDir, (err, file) -> allSources.push file unless err
         else if stats.isFile()
-          console.log '...is a file'
           allSources.push fileOrDir
 
       config.sources = allSources.filter((source) ->
