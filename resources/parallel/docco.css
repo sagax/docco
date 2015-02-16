@@ -144,6 +144,12 @@ pre, tt, code {
       background: transparent;
     }
 
+ul.sections > li > div.annotation.annotation-md {
+  max-width: 1000px;
+}
+#background.background-md {
+  width: 100%;
+}
 
 blockquote {
   border-left: 5px solid #ccc;
@@ -382,9 +388,6 @@ ul.sections > li > div {
     vertical-align: top;
     text-align: left;
   }
-  ul.sections > li > div.annotation.annotation-md {
-    max-width: 1000px;
-  }
   ul.sections > li > div.annotation pre {
     margin: 15px 0 15px;
     padding-left: 15px;
@@ -435,9 +438,6 @@ ul.sections > li > div {
 
   #background {
     width: 525px;
-  }
-  #background.background-md {
-    width: 1000px;
   }
   ul.sections > li {
     margin-bottom: 18px;
