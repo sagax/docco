@@ -82,6 +82,24 @@ p {
       margin: 0;
     }
 
+  .annotation table {
+    font-size: 14px;
+    line-height: 18px;
+    border-top: 3px solid lightgray;
+    border-bottom: 3px solid lightgray;
+    border-collapse: collapse;
+    margin-left: 25px;
+  }
+    .annotation table thead th {
+      border: 0px;
+      border-bottom: 3px solid lightgray;
+    }
+    .annotation table td {
+      vertical-align: top;
+      border: 0px;
+      border-bottom: 1px solid lightgray;
+    }
+
 h1, h2, h3, h4, h5, h6 {
   color: #112233;
   line-height: 1em;
