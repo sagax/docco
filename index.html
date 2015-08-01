@@ -105,21 +105,21 @@ out in an HTML template.</p>
           <div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">document</span> = <span class="hljs-params">(options = {}, callback)</span> -&gt;</span>
   config = configure options
 
-  fs.mkdirs config.output,<span class="hljs-function"> -&gt;</span>
+  fs.mkdirs config.output, <span class="hljs-function">-&gt;</span>
 
-    callback <span class="hljs-function"><span class="hljs-title">or</span>= <span class="hljs-params">(error)</span> -&gt;</span> <span class="hljs-keyword">throw</span> error <span class="hljs-keyword">if</span> error
-    <span class="hljs-function"><span class="hljs-title">copyAsset</span>  = <span class="hljs-params">(file, callback)</span> -&gt;</span>
+    callback <span class="hljs-keyword">or</span>= <span class="hljs-function"><span class="hljs-params">(error)</span> -&gt;</span> <span class="hljs-keyword">throw</span> error <span class="hljs-keyword">if</span> error
+<span class="hljs-function">    <span class="hljs-title">copyAsset</span>  = <span class="hljs-params">(file, callback)</span> -&gt;</span>
       <span class="hljs-keyword">return</span> callback() <span class="hljs-keyword">unless</span> fs.existsSync file
       fs.copy file, path.join(config.output, path.basename(file)), callback
-    <span class="hljs-function"><span class="hljs-title">complete</span>   = -&gt;</span>
+<span class="hljs-function">    <span class="hljs-title">complete</span>   = -&gt;</span>
       copyAsset config.css, <span class="hljs-function"><span class="hljs-params">(error)</span> -&gt;</span>
         <span class="hljs-keyword">return</span> callback error <span class="hljs-keyword">if</span> error
         <span class="hljs-keyword">return</span> copyAsset config.public, callback <span class="hljs-keyword">if</span> fs.existsSync config.public
         callback()
 
     files = config.sources.slice()
-
-    <span class="hljs-function"><span class="hljs-title">nextFile</span> = -&gt;</span>
+<span class="hljs-function">
+    <span class="hljs-title">nextFile</span> = -&gt;</span>
       source = files.shift()
       fs.readFile source, <span class="hljs-function"><span class="hljs-params">(error, buffer)</span> -&gt;</span>
         <span class="hljs-keyword">return</span> callback error <span class="hljs-keyword">if</span> error
@@ -145,8 +145,8 @@ individual <strong>section</strong> for it. Each section is an object with <code
   sections = []
   lang     = getLanguage source, config
   hasCode  = docsText = codeText = <span class="hljs-string">''</span>
-
-  <span class="hljs-function"><span class="hljs-title">save</span> = -&gt;</span>
+<span class="hljs-function">
+  <span class="hljs-title">save</span> = -&gt;</span>
     sections.push {docsText, codeText}
     hasCode = docsText = codeText = <span class="hljs-string">''</span></pre></div>
         
@@ -236,8 +236,8 @@ and rendering it to the specified output path.</p>
 
         
           <div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">write</span> = <span class="hljs-params">(source, sections, config)</span> -&gt;</span>
-
-  <span class="hljs-function"><span class="hljs-title">destination</span> = <span class="hljs-params">(file)</span> -&gt;</span>
+<span class="hljs-function">
+  <span class="hljs-title">destination</span> = <span class="hljs-params">(file)</span> -&gt;</span>
     path.join(config.output, path.basename(file, path.extname(file)) + <span class="hljs-string">'.html'</span>)</pre></div>
         
       
@@ -281,7 +281,7 @@ user-specified options.</p>
       
         
         <p><strong>Configure</strong> this particular run of Docco. We might use a passed-in external
-template, or one of the built-in <strong>layouts</strong>. We only attempt to process
+template, one of the built-in <strong>layouts</strong>, or an external <strong>layout</strong>. We only attempt to process
 source files for languages for which we have definitions.</p>
 
         
@@ -303,7 +303,7 @@ is only copied for the latter.</p>
       <span class="hljs-built_in">console</span>.warn <span class="hljs-string">"docco: no stylesheet file specified"</span>
     config.layout = <span class="hljs-literal">null</span>
   <span class="hljs-keyword">else</span>
-    dir = config.layout = path.join __dirname, <span class="hljs-string">'resources'</span>, config.layout
+    dir = config.layout = <span class="hljs-keyword">if</span> fs.existsSync path.join __dirname, <span class="hljs-string">'resources'</span>, config.layout <span class="hljs-keyword">then</span> path.join __dirname, <span class="hljs-string">'resources'</span>, config.layout <span class="hljs-keyword">else</span> path.join process.cwd(), config.layout;
     config.public       = path.join dir, <span class="hljs-string">'public'</span> <span class="hljs-keyword">if</span> fs.existsSync path.join dir, <span class="hljs-string">'public'</span>
     config.template     = path.join dir, <span class="hljs-string">'docco.jst'</span>
     config.css          = options.css <span class="hljs-keyword">or</span> path.join dir, <span class="hljs-string">'resources/linear/docco.css'</span>
@@ -312,16 +312,13 @@ is only copied for the latter.</p>
   <span class="hljs-keyword">if</span> options.marked
     config.marked = JSON.parse fs.readFileSync(options.marked)
 
-  config.sources = options.args.filter<span class="hljs-function"><span class="hljs-params">((source) -&gt;
+  config.sources = options.args.filter(<span class="hljs-function"><span class="hljs-params">(source)</span> -&gt;</span>
     lang = getLanguage source, config
     <span class="hljs-built_in">console</span>.warn <span class="hljs-string">"docco: skipped unknown type (<span class="hljs-subst">#{path.basename source}</span>)"</span> <span class="hljs-keyword">unless</span> lang
     lang
-  )</span>.<span class="hljs-title">sort</span><span class="hljs-params">()</span>
+  ).sort()
 
-  <span class="hljs-title">config</span>
-
-
-</span></pre></div>
+  config</pre></div>
         
       
         
@@ -412,7 +409,7 @@ Parse options using <a href="https://github.com/visionmedia/commander.js">Comman
   commander.version(version)
     .usage(<span class="hljs-string">'[options] files'</span>)
     .option(<span class="hljs-string">'-L, --languages [file]'</span>, <span class="hljs-string">'use a custom languages.json'</span>, _.compose JSON.parse, fs.readFileSync)
-    .option(<span class="hljs-string">'-l, --layout [name]'</span>,    <span class="hljs-string">'choose a layout (parallel, linear or classic)'</span>, c.layout)
+    .option(<span class="hljs-string">'-l, --layout [name]'</span>,    <span class="hljs-string">'choose a layout (parallel, linear, classic or external layout)'</span>, c.layout)
     .option(<span class="hljs-string">'-o, --output [path]'</span>,    <span class="hljs-string">'output to a given folder'</span>, c.output)
     .option(<span class="hljs-string">'-c, --css [file]'</span>,       <span class="hljs-string">'use a custom css file'</span>, c.css)
     .option(<span class="hljs-string">'-t, --template [file]'</span>,  <span class="hljs-string">'use a custom .jst template'</span>, c.template)
@@ -434,7 +431,7 @@ Parse options using <a href="https://github.com/visionmedia/commander.js">Comman
         
         
         
-          <div class='highlight'><pre>Docco = <span class="hljs-built_in">module</span>.<span class="hljs-built_in">exports</span> = {run, <span class="hljs-built_in">document</span>, parse, format, version}</pre></div>
+          <div class='highlight'><pre>Docco = <span class="hljs-built_in">module</span>.exports = {run, <span class="hljs-built_in">document</span>, parse, format, version}</pre></div>
         
       
       <div class="fleur">h</div>

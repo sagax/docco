@@ -177,7 +177,7 @@
       }
       config.layout = null;
     } else {
-      dir = config.layout = path.join(__dirname, 'resources', config.layout);
+      dir = config.layout = fs.existsSync(path.join(__dirname, 'resources', config.layout)) ? path.join(__dirname, 'resources', config.layout) : path.join(process.cwd(), config.layout);
       if (fs.existsSync(path.join(dir, 'public'))) {
         config["public"] = path.join(dir, 'public');
       }
@@ -248,7 +248,7 @@
       args = process.argv;
     }
     c = defaults;
-    commander.version(version).usage('[options] files').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear or classic)', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-c, --css [file]', 'use a custom css file', c.css).option('-t, --template [file]', 'use a custom .jst template', c.template).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-m, --marked [file]', 'use custom marked options', c.marked).parse(args).name = "docco";
+    commander.version(version).usage('[options] files').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear, classic or external layout)', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-c, --css [file]', 'use a custom css file', c.css).option('-t, --template [file]', 'use a custom .jst template', c.template).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-m, --marked [file]', 'use custom marked options', c.marked).parse(args).name = "docco";
     if (commander.args.length) {
       return document(commander);
     } else {
