@@ -10,7 +10,15 @@
 Docco is a quick-and-dirty, hundred-line-long, literate-programming-style
 documentation generator. For more information, see:
 
-http://jashkenas.github.com/docco/
+- Current Repo: https://github.com/GerHobbelt/docco
+- Original Repo: https://github.com/jashkenas/docco
+
+
+Installation
+------------
+
+  sudo npm install -g @GerHobbelt/docco
+
 
 Usage
 -----
@@ -19,22 +27,23 @@ Usage: docco [options] FILES
 
   Options:
 
-    -h, --help             output usage information
-    -V, --version          output the version number
-    -l, --layout [layout]  choose a built-in layouts (parallel, linear)
-    -c, --css [file]       use a custom css file
-    -o, --output [path]    use a custom output path
-    -t, --template [file]  use a custom .jst template
+    -h, --help                output usage information
+    -V, --version             output the version number
+    -l, --layout [layout]     choose a built-in layouts (parallel, linear)
+    -c, --css [file]          use a custom css file
+    -o, --output [path]       use a custom output path
+    -t, --template [file]     use a custom .jst template
     -b, --blocks           parse block comments where available
     -m, --markdown         output markdown
     --marked [file]        use custom marked options
-    -e, --extension [ext]  use the given file extension for all inputs
-    -L, --languages [file] use a custom languages.json
+    -e, --extension [ext]     use the given file extension for all inputs
+    -L, --languages [file]    use a custom languages.json
 
 ---
 
-Building and Testing
---------------------
+
+For Docco Developers: Building and Testing
+------------------------------------------
 
 Install (on Ubuntu 12):
 
@@ -56,8 +65,8 @@ you must make sure to install the commander package as well:
 
 
 
-Building and Testing (original, outdated info):
------------------------------------------------
+For Docco Developers: Building and Testing (original, outdated info):
+---------------------------------------------------------------------
 
     npm install
     cake build
@@ -71,6 +80,7 @@ This fork supports JSDoc style comments and highlights declared parameters.
 
 Example:
 
+```
 /**
  * @description Lolify someone's name
  * @param {String} name A person's name
@@ -78,4 +88,5 @@ Example:
 function lolify(name) {
    return 'OH HAI ' + name + ' KTHXBAI';
 }
+```
 
