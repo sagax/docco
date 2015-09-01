@@ -1,8 +1,18 @@
 {
-  "name":         "docco",
+  "name": "@GerHobbelt/docco",
   "description":  "The Quick and Dirty Literate Programming Documentation Generator",
-  "keywords":     ["documentation", "docs", "generator", "literate", "coffeescript"],
+  "keywords": [
+    "documentation",
+    "docs",
+    "generator",
+    "literate",
+    "coffeescript"
+  ],
   "author":       "Jeremy Ashkenas",
+  "contributors": [{
+    "name": "Hellyna NG",
+    "email": "hellyna@hellyna.com"
+  }],
   "version":      "0.7.0",
   "license":      "MIT",
   "repository": {
