@@ -16,15 +16,15 @@
     "node":       ">=0.2.0"
   },
   "dependencies": {
-    "commander":  ">= 1.1.1",
-    "marked":     ">= 0.2.9",
-    "fs-extra":   ">= 0.6.1",
-    "underscore": ">= 1.4.4",
-    "highlight.js": ">= 8.0.0"
+    "commander": ">= 2.8.1",
+    "marked": ">= 0.3.5",
+    "fs-extra": ">= 0.23.1",
+    "underscore": ">= 1.8.3",
+    "highlight.js": ">= 8.7.0"
   },
   "devDependencies": {
-    "coffee":         ">= 0.0.1",
-    "coffee-script":  ">= 1.6.3"
+    "coffee": ">= 1.1.0",
+    "coffee-script": ">= 1.9.3"
   },
   "main" :        "./docco",
   "bin": {
