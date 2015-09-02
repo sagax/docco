@@ -79,6 +79,7 @@
   ".t": {"name": "perl", "symbol": "#"},
   ".tex": {"name" : "TeX", "symbol" : "%", "enter": "\\\\begin{comment}", "exit": "\\\\end{comment}" },
   ".ts":  {"name": "typescript", "symbol": "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".v": {"name": "verilog", "symbol": "//"},
   ".vala": {"name": "vala", "symbol": "//"},
   ".vapi": {"name": "vala", "symbol": "//"},
   ".vbe": {"name": "vbscript", "symbol": "'"},

@@ -320,7 +320,7 @@ and rendering it to the specified output path.
     write = (source, title_idx, source_infos, config) ->
 
       destination = (file) ->
-        path.join(config.output, file + '.html')
+        path.join(config.output, path.basename(file, path.extname(file)) + '.html')
 
       relative = (file) ->
         to = path.dirname(path.resolve(file))
