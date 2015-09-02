@@ -391,7 +391,7 @@ user-specified options.
       }
 
 **Configure** this particular run of Docco. We might use a passed-in external
-template, or one of the built-in **layouts**. We only attempt to process
+template, one of the built-in **layouts**, or an external **layout**. We only attempt to process
 source files for languages for which we have definitions.
 
     configure = (options) ->
@@ -409,7 +409,7 @@ is only copied for the latter.
           console.warn "docco: no stylesheet file specified"
         config.layout = null
       else
-        dir = config.layout = path.join __dirname, 'resources', config.layout
+        dir = config.layout = if fs.existsSync path.join __dirname, 'resources', config.layout then path.join __dirname, 'resources', config.layout else path.join process.cwd(), config.layout;
         config.public       = path.join dir, 'public' if fs.existsSync path.join dir, 'public'
         config.template     = path.join dir, 'docco.jst'
         config.css          = options.css or path.join dir, 'docco.css'
@@ -513,7 +513,7 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
       commander.version(version)
         .usage('[options] files')
         .option('-L, --languages [file]', 'use a custom languages.json', _.compose JSON.parse, fs.readFileSync)
-        .option('-l, --layout [name]',    'choose a layout (parallel, linear, pretty or classic)', c.layout)
+        .option('-l, --layout [name]',    'choose a layout (parallel, linear, pretty or classic) or external layout', c.layout)
         .option('-o, --output [path]',    'output to a given folder', c.output)
         .option('-c, --css [file]',       'use a custom css file', c.css)
         .option('-t, --template [file]',  'use a custom .jst template', c.template)

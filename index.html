@@ -747,7 +747,7 @@ user-specified options.</p>
                 <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p><strong>Configure</strong> this particular run of Docco. We might use a passed-in external
-template, or one of the built-in <strong>layouts</strong>. We only attempt to process
+template, one of the built-in <strong>layouts</strong>, or an external <strong>layout</strong>. We only attempt to process
 source files for languages for which we have definitions.</p>
 
             </div>
@@ -778,7 +778,7 @@ is only copied for the latter.</p>
       <span class="hljs-built_in">console</span>.warn <span class="hljs-string">"docco: no stylesheet file specified"</span>
     config.layout = <span class="hljs-literal">null</span>
   <span class="hljs-keyword">else</span>
-    dir = config.layout = path.join __dirname, <span class="hljs-string">'resources'</span>, config.layout
+    dir = config.layout = <span class="hljs-keyword">if</span> fs.existsSync path.join __dirname, <span class="hljs-string">'resources'</span>, config.layout <span class="hljs-keyword">then</span> path.join __dirname, <span class="hljs-string">'resources'</span>, config.layout <span class="hljs-keyword">else</span> path.join process.cwd(), config.layout;
     config.public       = path.join dir, <span class="hljs-string">'public'</span> <span class="hljs-keyword">if</span> fs.existsSync path.join dir, <span class="hljs-string">'public'</span>
     config.template     = path.join dir, <span class="hljs-string">'docco.jst'</span>
     config.css          = options.css <span class="hljs-keyword">or</span> path.join dir, <span class="hljs-string">'resources/parallel/docco.css'</span>
@@ -1021,7 +1021,7 @@ Parse options using <a href="https://github.com/visionmedia/commander.js">Comman
   commander.version(version)
     .usage(<span class="hljs-string">'[options] files'</span>)
     .option(<span class="hljs-string">'-L, --languages [file]'</span>, <span class="hljs-string">'use a custom languages.json'</span>, _.compose JSON.parse, fs.readFileSync)
-    .option(<span class="hljs-string">'-l, --layout [name]'</span>,    <span class="hljs-string">'choose a layout (parallel, linear, pretty or classic)'</span>, c.layout)
+    .option(<span class="hljs-string">'-l, --layout [name]'</span>,    <span class="hljs-string">'choose a layout (parallel, linear, pretty or classic) or external layout'</span>, c.layout)
     .option(<span class="hljs-string">'-o, --output [path]'</span>,    <span class="hljs-string">'output to a given folder'</span>, c.output)
     .option(<span class="hljs-string">'-c, --css [file]'</span>,       <span class="hljs-string">'use a custom css file'</span>, c.css)
     .option(<span class="hljs-string">'-t, --template [file]'</span>,  <span class="hljs-string">'use a custom .jst template'</span>, c.template)
