@@ -22,6 +22,8 @@
   ".erl": {"name" : "erlang", "symbol" : "%"},
   ".feature": {"name" : "gherkin", "symbol" : "#"},
   ".frag": {"name": "glsl", "symbol": "//"},
+  ".fs": {"name": "fsharp", "symbol": "//"},
+  ".fsx": {"name": "fsharp", "symbol": "//"},
   ".glsl": {"name": "glsl", "symbol": "//"},
   ".go": {"name": "go", "symbol": "//"},
   ".groovy": {"name": "groovy", "symbol": "//" },
