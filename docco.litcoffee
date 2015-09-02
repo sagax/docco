@@ -320,12 +320,14 @@ and rendering it to the specified output path.
     write = (source, title_idx, source_infos, config) ->
 
       destination = (file) ->
-        path.join(config.output, path.basename(file, path.extname(file)) + '.html')
+        make_destination(config.output, config.separator, file, '.html')
 
-      relative = (file) ->
-        to = path.dirname(path.resolve(file))
-        from = path.dirname(path.resolve(destination(source)))
-        path.join(path.relative(from, to), path.basename(file))
+      destfile = destination source
+
+      relative = (srcfile) ->
+        to = path.dirname(path.resolve(srcfile))
+        from = path.dirname(path.resolve(destfile))
+        path.join(path.relative(from, to), path.basename(srcfile))
 
       css = relative path.join(config.output, path.basename(config.css))
 
@@ -342,8 +344,8 @@ and rendering it to the specified output path.
         relative
       }
 
-      console.log "docco: #{source} -> #{destination source}"
-      fs.writeFileSync destination(source), html
+      console.log "docco: #{source} -> #{destfile}"
+      fs.writeFileSync destfile, html
 
 Print out the consolidated code sections parsed from the source file in to another
 file. No documentation will be included in the new file.
@@ -351,15 +353,42 @@ file. No documentation will be included in the new file.
     outputCode = (source, sections, config) ->
       lang = getLanguage source, config
 
-      destination = (file) ->
-        path.join config.source, path.basename(file, path.extname file) + lang.source
-
       if config.source
+        destfile = make_destination config.source, config.separator, source, lang.source
+      
         code = _.pluck(sections, 'codeText').join '\n'
         code = code.trim().replace /(\n{2,})/g, '\n\n'
 
-        console.log "docco: #{source} -> #{destination source}"
-        fs.writeFileSync destination(source), code
+        console.log "docco: #{source} -> #{destfile}"
+        fs.writeFileSync destfile, code
+
+
+Helper Functions
+----------------
+
+To help us produce decent file names and paths for all inputs, we define a few helper functions:
+
+It should not matter if we are running on Windows, Unix or some other platform: we unify all paths
+to a single UNIXy format which can be processed easily everywhere (Windows accepts both native and
+UNIX path separators).
+
+    normalize = (path) ->
+      path.replace(/[\\\/]/g, '/')
+
+We construct a suitable filename/path for each document by prepending it with the specified
+relative path while using the separator specified on the command line. (The default separator ('-'
+dash) is used to flatten the directory tree when we process a directory tree all at once.)
+
+    qualifiedName = (file, separator, extension) ->
+      file = normalize(file)
+      nameParts = path.dirname(file).replace(normalize(process.cwd()), '').split('/')
+      nameParts.shift() while nameParts[0] is '' or nameParts[0] is '.' or nameParts[0] is '..'
+      nameParts.push(path.basename(file, path.extname(file)))
+
+      nameParts.join(separator) + extension
+
+    make_destination = (basepath, separator, file, extension) ->
+      path.join basepath, qualifiedName(file, separator, extension)
 
 
 Configuration
@@ -376,6 +405,7 @@ user-specified options.
       extension:  null
       languages:  {}
       source:     null
+      separator:  '-'
       blocks:     false
       marked_options: {
         gfm: true,
@@ -520,6 +550,7 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
         .option('-b, --blocks',           'parse block comments where available', c.blocks)
         .option('-e, --extension [ext]',  'assume a file extension for all inputs', c.extension)
         .option('-s, --source [path]',    'output code in a given folder', c.source)
+        .option('-x, --separator [sep]',  'the source path is included the output filename, seaparated by this separator (default: "-")', c.separator)
         .option('-m, --marked-options [file]',  'use custom Marked options', c.marked_options)
         .parse(args)
         .name = "docco"
