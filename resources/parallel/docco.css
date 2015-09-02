@@ -340,7 +340,7 @@ ul.sections > li > div {
 
   ul.sections > li > div.content {
     padding: 13px;
-    vertical-align: top;
+    vertical-align: bottom;
     border: none;
     -webkit-box-shadow: none;
     box-shadow: none;
