@@ -58,7 +58,7 @@ docco.js: $(SRC_DEPS) $(TOOL_DEPS)
 
 index.html: $(SRC_DEPS) $(TOOL_DEPS)
 	bin/docco --layout $(TEMPLATE) docco.litcoffee
-	sed -e 's/docco.css/resources\/$(TEMPLATE)\/docco.css/g' < docs/docco.litcoffee.html > index.html
+	sed -e 's/docco.css/resources\/$(TEMPLATE)\/docco.css/g' < docs/docco.html > index.html
 	rm -rf docs
 	#$(CAKE) doc
 
