@@ -6,6 +6,7 @@
   ".bat":         {"name": "dos", "symbol": "@?rem"},
   ".btm":         {"name": "dos", "symbol": "@?rem"},
   ".c":           {"name": "c", "symbol": "//"},
+  ".cjsx":        {"name": "coffeescript", "symbol": "#"},
   ".clj":         {"name": "clojure", "symbol": ";"},
   ".cls":         {"name": "tex", "symbol": "%"},
   ".cmake":       {"name": "cmake", "symbol": "#"},
