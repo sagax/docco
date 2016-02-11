@@ -17,6 +17,7 @@ http://jashkenas.github.com/docco/
 
 Installation:
 
+```
   sudo npm install -g docco
 
 Usage: docco [options] FILES
@@ -32,3 +33,4 @@ Usage: docco [options] FILES
     -e, --extension [ext]  use the given file extension for all inputs
     -L, --languages [file] use a custom languages.json
     -m, --marked [file]    use custom marked options
+```
