@@ -1,3 +1,4 @@
+```
  ____
 /\  _`\
 \ \ \/\ \        ___         ___         ___         ___
@@ -5,10 +6,9 @@
   \ \ \_\ \    /\ \ \ \    /\ \__/     /\ \__/     /\ \ \ \
    \ \____/    \ \____/    \ \____\    \ \____\    \ \____/
     \/___/      \/___/      \/____/     \/____/     \/___/
+```
 
-
-**This is a fork of Jeremy Ashkenas' great [docco](http://jashkenas.github.com/docco/)
-tool, adding support for (recursive) subdirectories, CJSX, emojis and other nice-to-haves ;) **
+**This is a fork of Jeremy Ashkenas' great [docco](http://jashkenas.github.com/docco/) tool, adding support for (recursive) subdirectories, CJSX, emojis and other nice-to-haves** ;)
 
 Docco is a quick-and-dirty, hundred-line-long, literate-programming-style
 documentation generator. For more information, see:
