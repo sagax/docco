@@ -19,8 +19,12 @@ Installation:
 
 ```
   sudo npm install -g docco
+```
 
-Usage: docco [options] FILES
+Usage: 
+
+```
+  docco [options] FILES
 
   Options:
 
