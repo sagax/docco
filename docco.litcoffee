@@ -252,7 +252,7 @@ the current docs and code, then start a new section.
 
         else
           hasCode = yes
-          if config.indent != null
+          if config.indent
             oldLen = 0
             while oldLen != line.length
               oldLen = line.length
