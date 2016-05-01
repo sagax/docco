@@ -252,6 +252,11 @@ the current docs and code, then start a new section.
 
         else
           hasCode = yes
+          if config.indent != null
+            oldLen = 0
+            while oldLen != line.length
+              oldLen = line.length
+              line = line.replace(/^(\x20*)\t/, '$1' + config.indent)
           codeText += line + '\n'
 
 Reset `in_block` when we have reached the end of the comment block.
@@ -425,6 +430,8 @@ user-specified options.
           code
       }
       ignore:     false
+      tabSize:    null
+      indent:     null
 
 **Configure** this particular run of Docco. We might use a passed-in external
 template, one of the built-in **layouts**, or an external **layout**. We only attempt to process
@@ -434,6 +441,12 @@ source files for languages for which we have definitions.
       config = _.extend {}, defaults, _.pick(options, _.keys(defaults)...)
 
       config.languages = buildMatchers config.languages
+
+Determine what the indent should be if the user has supplied a custom tab-size
+on the command line.
+
+      if config.tabSize != null
+        config.indent = Array(parseInt(config.tabSize) + 1).join(' ')
 
 The user is able to override the layout file used with the `--template` parameter.
 In this case, it is also necessary to explicitly specify a stylesheet file.
@@ -559,6 +572,7 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
         .option('-x, --separator [sep]',  'the source path is included the output filename, seaparated by this separator (default: "-")', c.separator)
         .option('-m, --marked-options [file]',  'use custom Marked options', c.marked_options)
         .option('-i, --ignore [file]',    'ignore unsupported languages', c.ignore)
+        .option('-t, --tab-size [size]',  'convert leading tabs to X spaces')
         .parse(args)
         .name = "docco"
       if commander.args.length

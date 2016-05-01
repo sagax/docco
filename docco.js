@@ -82,7 +82,7 @@
   };
 
   parse = function(source, code, config) {
-    var codeText, docsText, hasCode, i, ignore_this_block, in_block, isText, j, k, lang, len, len1, line, lines, match, maybeCode, param, raw_line, save, sections, single;
+    var codeText, docsText, hasCode, i, ignore_this_block, in_block, isText, j, k, lang, len, len1, line, lines, match, maybeCode, oldLen, param, raw_line, save, sections, single;
     if (config == null) {
       config = {};
     }
@@ -152,6 +152,13 @@
         }
       } else {
         hasCode = true;
+        if (config.indent !== null) {
+          oldLen = 0;
+          while (oldLen !== line.length) {
+            oldLen = line.length;
+            line = line.replace(/^(\x20*)\t/, '$1' + config.indent);
+          }
+        }
         codeText += line + '\n';
       }
       if (in_block === -1) {
@@ -287,13 +294,18 @@
         return code;
       }
     },
-    ignore: false
+    ignore: false,
+    tabSize: null,
+    indent: null
   };
 
   configure = function(options) {
     var config, dir;
     config = _.extend({}, defaults, _.pick.apply(_, [options].concat(slice.call(_.keys(defaults)))));
     config.languages = buildMatchers(config.languages);
+    if (config.tabSize !== null) {
+      config.indent = Array(parseInt(config.tabSize) + 1).join(' ');
+    }
     if (options.template) {
       if (!options.css) {
         console.warn("docco: no stylesheet file specified");
@@ -390,7 +402,7 @@
       args = process.argv;
     }
     c = defaults;
-    commander.version(version).usage('[options] files').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear, pretty or classic) or external layout', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-c, --css [file]', 'use a custom css file', c.css).option('-t, --template [file]', 'use a custom .jst template', c.template).option('-b, --blocks', 'parse block comments where available', c.blocks).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-s, --source [path]', 'output code in a given folder', c.source).option('-x, --separator [sep]', 'the source path is included the output filename, seaparated by this separator (default: "-")', c.separator).option('-m, --marked-options [file]', 'use custom Marked options', c.marked_options).option('-i, --ignore [file]', 'ignore unsupported languages', c.ignore).parse(args).name = "docco";
+    commander.version(version).usage('[options] files').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear, pretty or classic) or external layout', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-c, --css [file]', 'use a custom css file', c.css).option('-t, --template [file]', 'use a custom .jst template', c.template).option('-b, --blocks', 'parse block comments where available', c.blocks).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-s, --source [path]', 'output code in a given folder', c.source).option('-x, --separator [sep]', 'the source path is included the output filename, seaparated by this separator (default: "-")', c.separator).option('-m, --marked-options [file]', 'use custom Marked options', c.marked_options).option('-i, --ignore [file]', 'ignore unsupported languages', c.ignore).option('-t, --tab-size [size]', 'convert leading tabs to X spaces').parse(args).name = "docco";
     if (commander.args.length) {
       return document(commander);
     } else {
