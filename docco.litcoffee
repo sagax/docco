@@ -572,7 +572,7 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
         .option('-x, --separator [sep]',  'the source path is included the output filename, seaparated by this separator (default: "-")', c.separator)
         .option('-m, --marked-options [file]',  'use custom Marked options', c.marked_options)
         .option('-i, --ignore [file]',    'ignore unsupported languages', c.ignore)
-        .option('--tab-size [size]',      'convert leading tabs to X spaces')
+        .option('-T, --tab-size [size]',      'convert leading tabs to X spaces')
         .parse(args)
         .name = "docco"
       if commander.args.length

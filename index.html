@@ -1121,7 +1121,7 @@ Parse options using <a href="https://github.com/visionmedia/commander.js">Comman
     .option(<span class="hljs-string">'-x, --separator [sep]'</span>,  <span class="hljs-string">'the source path is included the output filename, seaparated by this separator (default: "-")'</span>, c.separator)
     .option(<span class="hljs-string">'-m, --marked-options [file]'</span>,  <span class="hljs-string">'use custom Marked options'</span>, c.marked_options)
     .option(<span class="hljs-string">'-i, --ignore [file]'</span>,    <span class="hljs-string">'ignore unsupported languages'</span>, c.ignore)
-    .option(<span class="hljs-string">'--tab-size [size]'</span>,      <span class="hljs-string">'convert leading tabs to X spaces'</span>)
+    .option(<span class="hljs-string">'-T, --tab-size [size]'</span>,      <span class="hljs-string">'convert leading tabs to X spaces'</span>)
     .parse(args)
     .name = <span class="hljs-string">"docco"</span>
   <span class="hljs-keyword">if</span> commander.args.length
