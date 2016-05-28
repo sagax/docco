@@ -21,6 +21,7 @@
   ".dtx": {"name": "TeX", "symbol": "%" },
   ".dust": {"name": "dust", "symbol": "!"},
   ".erl": {"name" : "erlang", "symbol" : "%"},
+  ".es6": {"name" : "javascript", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
   ".feature": {"name" : "gherkin", "symbol" : "#"},
   ".frag": {"name": "glsl", "symbol": "//"},
   ".fs": {"name": "fsharp", "symbol": "//"},
