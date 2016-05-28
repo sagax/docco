@@ -166,7 +166,7 @@
   };
 
   format = function(source, sections, config) {
-    var code, doc, i, j, language, len, markedOptions, results, section;
+    var code, doc, err, error1, i, j, language, len, markedOptions, results, section;
     language = getLanguage(source, config);
     markedOptions = config.marked_options;
     marked.setOptions(markedOptions);
@@ -186,7 +186,15 @@
       section = sections[i];
       code = section.codeText;
       section.codeText = code = code.replace(/\s+$/, '');
-      code = highlightjs.highlight(language.name, code).value;
+      try {
+        code = highlightjs.highlight(language.name, code).value;
+      } catch (error1) {
+        err = error1;
+        if (!config.ignore) {
+          throw err;
+        }
+        code = section.codeText;
+      }
       section.codeHtml = "<div class='highlight'><pre>" + code + "</pre></div>";
       doc = section.docsText;
       section.docsText = doc = doc.replace(/\s+$/, '');
@@ -278,7 +286,8 @@
       highlight: function(code, lang) {
         return code;
       }
-    }
+    },
+    ignore: false
   };
 
   configure = function(options) {
@@ -381,7 +390,7 @@
       args = process.argv;
     }
     c = defaults;
-    commander.version(version).usage('[options] files').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear, pretty or classic) or external layout', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-c, --css [file]', 'use a custom css file', c.css).option('-t, --template [file]', 'use a custom .jst template', c.template).option('-b, --blocks', 'parse block comments where available', c.blocks).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-s, --source [path]', 'output code in a given folder', c.source).option('-x, --separator [sep]', 'the source path is included the output filename, seaparated by this separator (default: "-")', c.separator).option('-m, --marked-options [file]', 'use custom Marked options', c.marked_options).parse(args).name = "docco";
+    commander.version(version).usage('[options] files').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear, pretty or classic) or external layout', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-c, --css [file]', 'use a custom css file', c.css).option('-t, --template [file]', 'use a custom .jst template', c.template).option('-b, --blocks', 'parse block comments where available', c.blocks).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-s, --source [path]', 'output code in a given folder', c.source).option('-x, --separator [sep]', 'the source path is included the output filename, seaparated by this separator (default: "-")', c.separator).option('-m, --marked-options [file]', 'use custom Marked options', c.marked_options).option('-i, --ignore [file]', 'ignore unsupported languages', c.ignore).parse(args).name = "docco";
     if (commander.args.length) {
       return document(commander);
     } else {

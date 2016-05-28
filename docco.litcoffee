@@ -307,7 +307,12 @@ Process each chunk:
       for section, i in sections
         code = section.codeText
         section.codeText = code = code.replace(/\s+$/, '')
-        code = highlightjs.highlight(language.name, code).value
+        try
+          code = highlightjs.highlight(language.name, code).value
+        catch err
+          throw err unless config.ignore
+          code = section.codeText
+
         section.codeHtml = "<div class='highlight'><pre>#{code}</pre></div>"
         doc = section.docsText
         section.docsText = doc = doc.replace(/\s+$/, '')
@@ -419,6 +424,7 @@ user-specified options.
         highlight: (code, lang) ->
           code
       }
+      ignore:     false
 
 **Configure** this particular run of Docco. We might use a passed-in external
 template, one of the built-in **layouts**, or an external **layout**. We only attempt to process
@@ -552,6 +558,7 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
         .option('-s, --source [path]',    'output code in a given folder', c.source)
         .option('-x, --separator [sep]',  'the source path is included the output filename, seaparated by this separator (default: "-")', c.separator)
         .option('-m, --marked-options [file]',  'use custom Marked options', c.marked_options)
+        .option('-i, --ignore [file]',    'ignore unsupported languages', c.ignore)
         .parse(args)
         .name = "docco"
       if commander.args.length

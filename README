@@ -33,9 +33,10 @@ Usage: docco [options] FILES
     -c, --css [file]          use a custom css file
     -o, --output [path]       use a custom output path
     -t, --template [file]     use a custom .jst template
-    -b, --blocks           parse block comments where available
-    -m, --markdown         output markdown
-    --marked [file]        use custom marked options
+    -b, --blocks              parse block comments where available
+    -m, --markdown            output markdown
+    --marked [file]           use custom marked options
+    -i, --ignore [file]       ignore unsupported languages
     -e, --extension [ext]     use the given file extension for all inputs
     -L, --languages [file]    use a custom languages.json
 

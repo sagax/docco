@@ -612,7 +612,12 @@ if not specified.</p>
             <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">for</span> section, i <span class="hljs-keyword">in</span> sections
     code = section.codeText
     section.codeText = code = code.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>)
-    code = highlightjs.highlight(language.name, code).value
+    <span class="hljs-keyword">try</span>
+      code = highlightjs.highlight(language.name, code).value
+    <span class="hljs-keyword">catch</span> err
+      <span class="hljs-keyword">throw</span> err <span class="hljs-keyword">unless</span> config.ignore
+      code = section.codeText
+
     section.codeHtml = <span class="hljs-string">"&lt;div class='highlight'&gt;&lt;pre&gt;<span class="hljs-subst">#{code}</span>&lt;/pre&gt;&lt;/div&gt;"</span>
     doc = section.docsText
     section.docsText = doc = doc.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>)
@@ -795,7 +800,8 @@ user-specified options.</p>
     langPrefix: <span class="hljs-string">'language-'</span>,
     highlight: <span class="hljs-function"><span class="hljs-params">(code, lang)</span> -&gt;</span>
       code
-  }</pre></div></div>
+  }
+  ignore:     <span class="hljs-literal">false</span></pre></div></div>
             
         </li>
         
@@ -1090,6 +1096,7 @@ Parse options using <a href="https://github.com/visionmedia/commander.js">Comman
     .option(<span class="hljs-string">'-s, --source [path]'</span>,    <span class="hljs-string">'output code in a given folder'</span>, c.source)
     .option(<span class="hljs-string">'-x, --separator [sep]'</span>,  <span class="hljs-string">'the source path is included the output filename, seaparated by this separator (default: "-")'</span>, c.separator)
     .option(<span class="hljs-string">'-m, --marked-options [file]'</span>,  <span class="hljs-string">'use custom Marked options'</span>, c.marked_options)
+    .option(<span class="hljs-string">'-i, --ignore [file]'</span>,    <span class="hljs-string">'ignore unsupported languages'</span>, c.ignore)
     .parse(args)
     .name = <span class="hljs-string">"docco"</span>
   <span class="hljs-keyword">if</span> commander.args.length
