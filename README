@@ -68,9 +68,10 @@ you must make sure to install the commander package as well:
 For Docco Developers: Building and Testing (original, outdated info):
 ---------------------------------------------------------------------
 
+    npm install -g coffee-script
+    npm install -g commander
     npm install
-    cake build
-    cake test
+    make
 
 
 

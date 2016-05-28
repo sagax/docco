@@ -181,10 +181,10 @@ name of the source file.</p>
       title = <span class="hljs-keyword">if</span> hasTitle <span class="hljs-keyword">then</span> first.text <span class="hljs-keyword">else</span> path.basename source
 
       source_infos.push({
-        <span class="hljs-attribute">source</span>: source,
-        <span class="hljs-attribute">hasTitle</span>: hasTitle,
-        <span class="hljs-attribute">title</span>: title,
-        <span class="hljs-attribute">sections</span>: sections
+        source: source,
+        hasTitle: hasTitle,
+        title: title,
+        sections: sections
       })
 
       <span class="hljs-keyword">if</span> files.length <span class="hljs-keyword">then</span> nextFile() <span class="hljs-keyword">else</span> outputFiles()</pre></div></div>
@@ -417,7 +417,7 @@ the end token, and note that we’re no longer in the block.</p>
             
             <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> in_block <span class="hljs-keyword">and</span> line.match(lang.commentExit)
         line = line.replace(lang.commentExit, <span class="hljs-string">''</span>)
-        in_block = -<span class="hljs-number">1</span></pre></div></div>
+        in_block = <span class="hljs-number">-1</span></pre></div></div>
             
         </li>
         
@@ -474,7 +474,7 @@ the current docs and code, then start a new section.</p>
             <div class="content"><div class='highlight'><pre>      save() <span class="hljs-keyword">if</span> hasCode
 
       docsText += line + <span class="hljs-string">'\n'</span>
-      save() <span class="hljs-keyword">if</span> <span class="hljs-regexp">/^(---+|===+)$/</span>.test line <span class="hljs-keyword">or</span> in_block == -<span class="hljs-number">1</span>
+      save() <span class="hljs-keyword">if</span> <span class="hljs-regexp">/^(---+|===+)$/</span>.test line <span class="hljs-keyword">or</span> in_block == <span class="hljs-number">-1</span>
 
     <span class="hljs-keyword">else</span>
       hasCode = <span class="hljs-literal">yes</span>
@@ -493,7 +493,7 @@ the current docs and code, then start a new section.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> in_block == -<span class="hljs-number">1</span>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> in_block == <span class="hljs-number">-1</span>
       in_block = <span class="hljs-number">0</span></pre></div></div>
             
         </li>
@@ -581,7 +581,7 @@ if not specified.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  marked.setOptions {
-    <span class="hljs-attribute">highlight</span>: <span class="hljs-function"><span class="hljs-params">(code, lang)</span> -&gt;</span>
+    highlight: <span class="hljs-function"><span class="hljs-params">(code, lang)</span> -&gt;</span>
       lang <span class="hljs-keyword">or</span>= language.name
 
       <span class="hljs-keyword">if</span> highlightjs.getLanguage(lang)
@@ -648,13 +648,13 @@ and rendering it to the specified output path.</p>
   css = relative path.join(config.output, path.basename(config.css))
 
   html = config.template {
-    <span class="hljs-attribute">sources</span>: config.sources
-    <span class="hljs-attribute">titles</span>: source_infos.map (info) -&gt;
+    sources: config.sources
+    titles: source_infos.map (info) -&gt;
       info.title
     css
-    <span class="hljs-attribute">title</span>: source_infos[title_idx].title
-    <span class="hljs-attribute">hasTitle</span>: source_infos[title_idx].hasTitle
-    <span class="hljs-attribute">sections</span>: source_infos[title_idx].sections
+    title: source_infos[title_idx].title
+    hasTitle: source_infos[title_idx].hasTitle
+    sections: source_infos[title_idx].sections
     path
     destination
     relative
@@ -775,25 +775,25 @@ user-specified options.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>defaults =
-  <span class="hljs-attribute">layout</span>:     <span class="hljs-string">'parallel'</span>
-  <span class="hljs-attribute">output</span>:     <span class="hljs-string">'docs'</span>
-  <span class="hljs-attribute">template</span>:   <span class="hljs-literal">null</span>
-  <span class="hljs-attribute">css</span>:        <span class="hljs-literal">null</span>
-  <span class="hljs-attribute">extension</span>:  <span class="hljs-literal">null</span>
-  <span class="hljs-attribute">languages</span>:  {}
-  <span class="hljs-attribute">source</span>:     <span class="hljs-literal">null</span>
-  <span class="hljs-attribute">separator</span>:  <span class="hljs-string">'-'</span>
-  <span class="hljs-attribute">blocks</span>:     <span class="hljs-literal">false</span>
-  <span class="hljs-attribute">marked_options</span>: {
-    <span class="hljs-attribute">gfm</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attribute">tables</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attribute">breaks</span>: <span class="hljs-literal">false</span>,
-    <span class="hljs-attribute">pedantic</span>: <span class="hljs-literal">false</span>,
-    <span class="hljs-attribute">sanitize</span>: <span class="hljs-literal">false</span>,
-    <span class="hljs-attribute">smartLists</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attribute">smartypants</span>: <span class="hljs-literal">yes</span>,
-    <span class="hljs-attribute">langPrefix</span>: <span class="hljs-string">'language-'</span>,
-    <span class="hljs-attribute">highlight</span>: <span class="hljs-function"><span class="hljs-params">(code, lang)</span> -&gt;</span>
+  layout:     <span class="hljs-string">'parallel'</span>
+  output:     <span class="hljs-string">'docs'</span>
+  template:   <span class="hljs-literal">null</span>
+  css:        <span class="hljs-literal">null</span>
+  extension:  <span class="hljs-literal">null</span>
+  languages:  {}
+  source:     <span class="hljs-literal">null</span>
+  separator:  <span class="hljs-string">'-'</span>
+  blocks:     <span class="hljs-literal">false</span>
+  marked_options: {
+    gfm: <span class="hljs-literal">true</span>,
+    tables: <span class="hljs-literal">true</span>,
+    breaks: <span class="hljs-literal">false</span>,
+    pedantic: <span class="hljs-literal">false</span>,
+    sanitize: <span class="hljs-literal">false</span>,
+    smartLists: <span class="hljs-literal">true</span>,
+    smartypants: <span class="hljs-literal">yes</span>,
+    langPrefix: <span class="hljs-string">'language-'</span>,
+    highlight: <span class="hljs-function"><span class="hljs-params">(code, lang)</span> -&gt;</span>
       code
   }</pre></div></div>
             
@@ -1029,7 +1029,7 @@ file extension. Detect and tag “literate” <code>.ext.md</code> variants.</p>
     <span class="hljs-keyword">if</span> lang.name <span class="hljs-keyword">is</span> <span class="hljs-string">'markdown'</span>
       codeExt = path.extname(path.basename(source, ext))
       <span class="hljs-keyword">if</span> codeExt <span class="hljs-keyword">and</span> codeLang = languages[codeExt]
-        lang = _.extend {}, codeLang, {<span class="hljs-attribute">literate</span>: <span class="hljs-literal">yes</span>, <span class="hljs-attribute">source</span>: <span class="hljs-string">''</span>}
+        lang = _.extend {}, codeLang, {literate: <span class="hljs-literal">yes</span>, source: <span class="hljs-string">''</span>}
     <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> lang.source
       lang.source = ext
   lang</pre></div></div>
