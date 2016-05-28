@@ -217,9 +217,10 @@
     };
     destfile = destination(source);
     relative = function(srcfile) {
-      var from, to;
+      var dstfile, from, to;
       to = path.dirname(path.resolve(srcfile));
-      from = path.dirname(path.resolve(destfile));
+      dstfile = destination(srcfile);
+      from = path.dirname(path.resolve(dstfile));
       return path.join(path.relative(from, to), path.basename(srcfile));
     };
     css = relative(path.join(config.output, path.basename(config.css)));

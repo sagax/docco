@@ -336,7 +336,8 @@ and rendering it to the specified output path.
 
       relative = (srcfile) ->
         to = path.dirname(path.resolve(srcfile))
-        from = path.dirname(path.resolve(destfile))
+        dstfile = destination srcfile
+        from = path.dirname(path.resolve(dstfile))
         path.join(path.relative(from, to), path.basename(srcfile))
 
       css = relative path.join(config.output, path.basename(config.css))

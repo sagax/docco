@@ -652,7 +652,8 @@ and rendering it to the specified output path.</p>
 <span class="hljs-function">
   <span class="hljs-title">relative</span> = <span class="hljs-params">(srcfile)</span> -&gt;</span>
     to = path.dirname(path.resolve(srcfile))
-    from = path.dirname(path.resolve(destfile))
+    dstfile = destination srcfile
+    from = path.dirname(path.resolve(dstfile))
     path.join(path.relative(from, to), path.basename(srcfile))
 
   css = relative path.join(config.output, path.basename(config.css))
