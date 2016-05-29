@@ -29,7 +29,7 @@ TOOL_DEPS=                                      \
 
 .PHONY: all install build doc loc clean test
 
-all: build doc loc
+all: build doc loc test
 
 install: build doc loc
 	$(CAKE) install
