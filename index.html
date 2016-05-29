@@ -132,22 +132,27 @@ out in an HTML template, and writing plain code files where instructed.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">document</span> = <span class="hljs-params">(options = {}, callback)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">document</span> = <span class="hljs-params">(options = {}, user_callback)</span> -&gt;</span>
   config = configure options
   source_infos = []
 
   fs.mkdirsSync config.output
   fs.mkdirsSync config.source <span class="hljs-keyword">if</span> config.source
-
-  callback <span class="hljs-keyword">or</span>= <span class="hljs-function"><span class="hljs-params">(error)</span> -&gt;</span> <span class="hljs-keyword">throw</span> error <span class="hljs-keyword">if</span> error
-<span class="hljs-function">  <span class="hljs-title">copyAsset</span>  = <span class="hljs-params">(file, callback)</span> -&gt;</span>
+<span class="hljs-function">
+  <span class="hljs-title">callback</span> = <span class="hljs-params">(error)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> error
+      user_callback error <span class="hljs-keyword">if</span> user_callback 
+      <span class="hljs-keyword">throw</span> error
+    <span class="hljs-keyword">if</span> user_callback
+      user_callback <span class="hljs-literal">null</span>, { source_infos, config }
+<span class="hljs-function">
+  <span class="hljs-title">copyAsset</span>  = <span class="hljs-params">(file, callback)</span> -&gt;</span>
     <span class="hljs-keyword">return</span> callback() <span class="hljs-keyword">unless</span> fs.existsSync file
     fs.copy file, path.join(config.output, path.basename(file)), callback
 <span class="hljs-function">  <span class="hljs-title">complete</span>   = -&gt;</span>
     copyAsset config.css, <span class="hljs-function"><span class="hljs-params">(error)</span> -&gt;</span>
       <span class="hljs-keyword">return</span> callback error <span class="hljs-keyword">if</span> error
-      <span class="hljs-keyword">return</span> copyAsset config.public, callback <span class="hljs-keyword">if</span> fs.existsSync config.public
-      callback()
+      <span class="hljs-keyword">return</span> copyAsset config.public, callback
 
   files = config.sources.slice()
 <span class="hljs-function">
@@ -209,7 +214,7 @@ needs to produce a TOC with each file.</p>
             <div class="content"><div class='highlight'><pre><span class="hljs-function">  <span class="hljs-title">outputFiles</span> = -&gt;</span>
     <span class="hljs-keyword">for</span> info, i <span class="hljs-keyword">in</span> source_infos
       write info.source, i, source_infos, config
-      outputCode info.source, info.sections, config
+      outputCode info.source, info.sections, i, source_infos, config
     complete()</pre></div></div>
             
         </li>
@@ -225,7 +230,7 @@ needs to produce a TOC with each file.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  nextFile()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">if</span> files.length <span class="hljs-keyword">then</span> nextFile() <span class="hljs-keyword">else</span> outputFiles()</pre></div></div>
             
         </li>
         
@@ -646,7 +651,7 @@ and rendering it to the specified output path.</p>
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">write</span> = <span class="hljs-params">(source, title_idx, source_infos, config)</span> -&gt;</span>
 <span class="hljs-function">
   <span class="hljs-title">destination</span> = <span class="hljs-params">(file)</span> -&gt;</span>
-    make_destination(config.output, config.separator, file, <span class="hljs-string">'.html'</span>)
+    make_destination config.output, config.separator, file, <span class="hljs-string">'.html'</span>, config
 
   destfile = destination source
 <span class="hljs-function">
@@ -656,7 +661,7 @@ and rendering it to the specified output path.</p>
     from = path.dirname(path.resolve(dstfile))
     path.join(path.relative(from, to), path.basename(srcfile))
 
-  css = relative path.join(config.output, path.basename(config.css))
+  css = <span class="hljs-keyword">if</span> config.css <span class="hljs-keyword">then</span> relative path.join(config.output, path.basename(config.css)) <span class="hljs-keyword">else</span> <span class="hljs-literal">null</span>
 
   html = config.template {
     sources: config.sources
@@ -672,7 +677,9 @@ and rendering it to the specified output path.</p>
   }
 
   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"docco: <span class="hljs-subst">#{source}</span> -&gt; <span class="hljs-subst">#{destfile}</span>"</span>
-  fs.writeFileSync destfile, html</pre></div></div>
+  fs.mkdirsSync path.dirname(destfile)
+  fs.writeFileSync destfile, html
+  source_infos[title_idx].destDocFile = destfile</pre></div></div>
             
         </li>
         
@@ -688,17 +695,19 @@ file. No documentation will be included in the new file.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">outputCode</span> = <span class="hljs-params">(source, sections, config)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">outputCode</span> = <span class="hljs-params">(source, sections, title_idx, source_infos, config)</span> -&gt;</span>
   lang = getLanguage source, config
 
   <span class="hljs-keyword">if</span> config.source
-    destfile = make_destination config.source, config.separator, source, lang.source
+    destfile = make_destination config.source, config.separator, source, lang.source, config
   
     code = _.pluck(sections, <span class="hljs-string">'codeText'</span>).join <span class="hljs-string">'\n'</span>
     code = code.trim().replace <span class="hljs-regexp">/(\n{2,})/g</span>, <span class="hljs-string">'\n\n'</span>
 
     <span class="hljs-built_in">console</span>.log <span class="hljs-string">"docco: <span class="hljs-subst">#{source}</span> -&gt; <span class="hljs-subst">#{destfile}</span>"</span>
-    fs.writeFileSync destfile, code</pre></div></div>
+    fs.mkdirsSync path.dirname(destfile)
+    fs.writeFileSync destfile, code
+    source_infos[title_idx].destCodeFile = destfile</pre></div></div>
             
         </li>
         
@@ -747,16 +756,17 @@ dash) is used to flatten the directory tree when we process a directory tree all
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">qualifiedName</span> = <span class="hljs-params">(file, separator, extension)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">qualifiedName</span> = <span class="hljs-params">(file, separator, extension, config)</span> -&gt;</span>
+  cwd = <span class="hljs-keyword">if</span> config <span class="hljs-keyword">and</span> config.cwd <span class="hljs-keyword">then</span> config.cwd <span class="hljs-keyword">else</span> process.cwd() 
   file = normalize(file)
-  nameParts = path.dirname(file).replace(normalize(process.cwd()), <span class="hljs-string">''</span>).split(<span class="hljs-string">'/'</span>)
+  nameParts = path.dirname(file).replace(normalize(cwd), <span class="hljs-string">''</span>).split(<span class="hljs-string">'/'</span>)
   nameParts.shift() <span class="hljs-keyword">while</span> nameParts[<span class="hljs-number">0</span>] <span class="hljs-keyword">is</span> <span class="hljs-string">''</span> <span class="hljs-keyword">or</span> nameParts[<span class="hljs-number">0</span>] <span class="hljs-keyword">is</span> <span class="hljs-string">'.'</span> <span class="hljs-keyword">or</span> nameParts[<span class="hljs-number">0</span>] <span class="hljs-keyword">is</span> <span class="hljs-string">'..'</span>
   nameParts.push(path.basename(file, path.extname(file)))
 
   nameParts.join(separator) + extension
 <span class="hljs-function">
-<span class="hljs-title">make_destination</span> = <span class="hljs-params">(basepath, separator, file, extension)</span> -&gt;</span>
-  path.join basepath, qualifiedName(file, separator, extension)</pre></div></div>
+<span class="hljs-title">make_destination</span> = <span class="hljs-params">(basepath, separator, file, extension, config)</span> -&gt;</span>
+  path.join basepath, qualifiedName(file, separator, extension, config)</pre></div></div>
             
         </li>
         
@@ -786,6 +796,7 @@ user-specified options.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>defaults =
+  sources:    []
   layout:     <span class="hljs-string">'parallel'</span>
   output:     <span class="hljs-string">'docs'</span>
   template:   <span class="hljs-literal">null</span>
@@ -793,6 +804,7 @@ user-specified options.</p>
   extension:  <span class="hljs-literal">null</span>
   languages:  {}
   source:     <span class="hljs-literal">null</span>
+  cwd:        process.cwd()
   separator:  <span class="hljs-string">'-'</span>
   blocks:     <span class="hljs-literal">false</span>
   marked_options: {
@@ -893,11 +905,12 @@ not been explicitly overridden by the user.</p>
             <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">if</span> options.marked_options
     config.marked_options = _.extend config.marked_options, JSON.parse fs.readFileSync(options.marked_options)
 
-  config.sources = options.args.filter(<span class="hljs-function"><span class="hljs-params">(source)</span> -&gt;</span>
-    lang = getLanguage source, config
-    <span class="hljs-built_in">console</span>.warn <span class="hljs-string">"docco: skipped unknown type (<span class="hljs-subst">#{path.basename source}</span>)"</span> <span class="hljs-keyword">unless</span> lang
-    lang
-  ).sort()
+  <span class="hljs-keyword">if</span> options.args
+    config.sources = options.args.filter(<span class="hljs-function"><span class="hljs-params">(source)</span> -&gt;</span>
+      lang = getLanguage source, config
+      <span class="hljs-built_in">console</span>.warn <span class="hljs-string">"docco: skipped unknown type (<span class="hljs-subst">#{path.basename source}</span>)"</span> <span class="hljs-keyword">unless</span> lang
+      lang
+    ).sort()
 
   config</pre></div></div>
             
@@ -1119,7 +1132,8 @@ Parse options using <a href="https://github.com/visionmedia/commander.js">Comman
     .option(<span class="hljs-string">'-b, --blocks'</span>,           <span class="hljs-string">'parse block comments where available'</span>, c.blocks)
     .option(<span class="hljs-string">'-e, --extension [ext]'</span>,  <span class="hljs-string">'assume a file extension for all inputs'</span>, c.extension)
     .option(<span class="hljs-string">'-s, --source [path]'</span>,    <span class="hljs-string">'output code in a given folder'</span>, c.source)
-    .option(<span class="hljs-string">'-x, --separator [sep]'</span>,  <span class="hljs-string">'the source path is included the output filename, seaparated by this separator (default: "-")'</span>, c.separator)
+    .option(<span class="hljs-string">'--cwd [path]'</span>,           <span class="hljs-string">'specify the Current Working Directory path for the purpose of generating qualified output filenames'</span>, c.cwd)
+    .option(<span class="hljs-string">'-x, --separator [sep]'</span>,  <span class="hljs-string">'the source path is included in the output filename, separated by this separator (default: "-")'</span>, c.separator)
     .option(<span class="hljs-string">'-m, --marked-options [file]'</span>,  <span class="hljs-string">'use custom Marked options'</span>, c.marked_options)
     .option(<span class="hljs-string">'-i, --ignore [file]'</span>,    <span class="hljs-string">'ignore unsupported languages'</span>, c.ignore)
     .option(<span class="hljs-string">'-T, --tab-size [size]'</span>,      <span class="hljs-string">'convert leading tabs to X spaces'</span>)

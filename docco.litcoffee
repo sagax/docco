@@ -81,22 +81,27 @@ assets, reading all the source files in, splitting them up into prose+code
 sections, highlighting each file in the appropriate language, printing them
 out in an HTML template, and writing plain code files where instructed.
 
-    document = (options = {}, callback) ->
+    document = (options = {}, user_callback) ->
       config = configure options
       source_infos = []
 
       fs.mkdirsSync config.output
       fs.mkdirsSync config.source if config.source
 
-      callback or= (error) -> throw error if error
+      callback = (error) ->
+        if error
+          user_callback error if user_callback 
+          throw error
+        if user_callback
+          user_callback null, { source_infos, config }
+
       copyAsset  = (file, callback) ->
         return callback() unless fs.existsSync file
         fs.copy file, path.join(config.output, path.basename(file)), callback
       complete   = ->
         copyAsset config.css, (error) ->
           return callback error if error
-          return copyAsset config.public, callback if fs.existsSync config.public
-          callback()
+          return copyAsset config.public, callback
 
       files = config.sources.slice()
 
@@ -137,12 +142,12 @@ needs to produce a TOC with each file.
       outputFiles = ->
         for info, i in source_infos
           write info.source, i, source_infos, config
-          outputCode info.source, info.sections, config
+          outputCode info.source, info.sections, i, source_infos, config
         complete()
 
 Start processing all sources and producing the corresponding files for each:
 
-      nextFile()
+      if files.length then nextFile() else outputFiles()
 
 Given a string of source code, **parse** out each block of prose and the code that
 follows it — by detecting which is which, line by line — and then create an
@@ -330,7 +335,7 @@ and rendering it to the specified output path.
     write = (source, title_idx, source_infos, config) ->
 
       destination = (file) ->
-        make_destination(config.output, config.separator, file, '.html')
+        make_destination config.output, config.separator, file, '.html', config
 
       destfile = destination source
 
@@ -340,7 +345,7 @@ and rendering it to the specified output path.
         from = path.dirname(path.resolve(dstfile))
         path.join(path.relative(from, to), path.basename(srcfile))
 
-      css = relative path.join(config.output, path.basename(config.css))
+      css = if config.css then relative path.join(config.output, path.basename(config.css)) else null
 
       html = config.template {
         sources: config.sources
@@ -356,22 +361,26 @@ and rendering it to the specified output path.
       }
 
       console.log "docco: #{source} -> #{destfile}"
+      fs.mkdirsSync path.dirname(destfile)
       fs.writeFileSync destfile, html
+      source_infos[title_idx].destDocFile = destfile
 
 Print out the consolidated code sections parsed from the source file in to another
 file. No documentation will be included in the new file.
 
-    outputCode = (source, sections, config) ->
+    outputCode = (source, sections, title_idx, source_infos, config) ->
       lang = getLanguage source, config
 
       if config.source
-        destfile = make_destination config.source, config.separator, source, lang.source
+        destfile = make_destination config.source, config.separator, source, lang.source, config
       
         code = _.pluck(sections, 'codeText').join '\n'
         code = code.trim().replace /(\n{2,})/g, '\n\n'
 
         console.log "docco: #{source} -> #{destfile}"
+        fs.mkdirsSync path.dirname(destfile)
         fs.writeFileSync destfile, code
+        source_infos[title_idx].destCodeFile = destfile
 
 
 Helper Functions
@@ -390,16 +399,17 @@ We construct a suitable filename/path for each document by prepending it with th
 relative path while using the separator specified on the command line. (The default separator ('-'
 dash) is used to flatten the directory tree when we process a directory tree all at once.)
 
-    qualifiedName = (file, separator, extension) ->
+    qualifiedName = (file, separator, extension, config) ->
+      cwd = if config and config.cwd then config.cwd else process.cwd() 
       file = normalize(file)
-      nameParts = path.dirname(file).replace(normalize(process.cwd()), '').split('/')
+      nameParts = path.dirname(file).replace(normalize(cwd), '').split('/')
       nameParts.shift() while nameParts[0] is '' or nameParts[0] is '.' or nameParts[0] is '..'
       nameParts.push(path.basename(file, path.extname(file)))
 
       nameParts.join(separator) + extension
 
-    make_destination = (basepath, separator, file, extension) ->
-      path.join basepath, qualifiedName(file, separator, extension)
+    make_destination = (basepath, separator, file, extension, config) ->
+      path.join basepath, qualifiedName(file, separator, extension, config)
 
 
 Configuration
@@ -409,6 +419,7 @@ Default configuration **options**. All of these may be extended by
 user-specified options.
 
     defaults =
+      sources:    []
       layout:     'parallel'
       output:     'docs'
       template:   null
@@ -416,6 +427,7 @@ user-specified options.
       extension:  null
       languages:  {}
       source:     null
+      cwd:        process.cwd()
       separator:  '-'
       blocks:     false
       marked_options: {
@@ -472,11 +484,12 @@ not been explicitly overridden by the user.
       if options.marked_options
         config.marked_options = _.extend config.marked_options, JSON.parse fs.readFileSync(options.marked_options)
 
-      config.sources = options.args.filter((source) ->
-        lang = getLanguage source, config
-        console.warn "docco: skipped unknown type (#{path.basename source})" unless lang
-        lang
-      ).sort()
+      if options.args
+        config.sources = options.args.filter((source) ->
+          lang = getLanguage source, config
+          console.warn "docco: skipped unknown type (#{path.basename source})" unless lang
+          lang
+        ).sort()
 
       config
 
@@ -570,7 +583,8 @@ Parse options using [Commander](https://github.com/visionmedia/commander.js).
         .option('-b, --blocks',           'parse block comments where available', c.blocks)
         .option('-e, --extension [ext]',  'assume a file extension for all inputs', c.extension)
         .option('-s, --source [path]',    'output code in a given folder', c.source)
-        .option('-x, --separator [sep]',  'the source path is included the output filename, seaparated by this separator (default: "-")', c.separator)
+        .option('--cwd [path]',           'specify the Current Working Directory path for the purpose of generating qualified output filenames', c.cwd)
+        .option('-x, --separator [sep]',  'the source path is included in the output filename, separated by this separator (default: "-")', c.separator)
         .option('-m, --marked-options [file]',  'use custom Marked options', c.marked_options)
         .option('-i, --ignore [file]',    'ignore unsupported languages', c.ignore)
         .option('-T, --tab-size [size]',      'convert leading tabs to X spaces')

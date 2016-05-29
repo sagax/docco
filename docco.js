@@ -3,8 +3,8 @@
   var Docco, _, buildMatchers, commander, configure, defaults, document, format, fs, getLanguage, highlightjs, languages, make_destination, marked, normalize, outputCode, parse, path, qualifiedName, run, version, write,
     slice = [].slice;
 
-  document = function(options, callback) {
-    var complete, config, copyAsset, files, nextFile, outputFiles, source_infos;
+  document = function(options, user_callback) {
+    var callback, complete, config, copyAsset, files, nextFile, outputFiles, source_infos;
     if (options == null) {
       options = {};
     }
@@ -14,11 +14,20 @@
     if (config.source) {
       fs.mkdirsSync(config.source);
     }
-    callback || (callback = function(error) {
+    callback = function(error) {
       if (error) {
+        if (user_callback) {
+          user_callback(error);
+        }
         throw error;
       }
-    });
+      if (user_callback) {
+        return user_callback(null, {
+          source_infos: source_infos,
+          config: config
+        });
+      }
+    };
     copyAsset = function(file, callback) {
       if (!fs.existsSync(file)) {
         return callback();
@@ -30,10 +39,7 @@
         if (error) {
           return callback(error);
         }
-        if (fs.existsSync(config["public"])) {
-          return copyAsset(config["public"], callback);
-        }
-        return callback();
+        return copyAsset(config["public"], callback);
       });
     };
     files = config.sources.slice();
@@ -74,11 +80,15 @@
       for (i = j = 0, len = source_infos.length; j < len; i = ++j) {
         info = source_infos[i];
         write(info.source, i, source_infos, config);
-        outputCode(info.source, info.sections, config);
+        outputCode(info.source, info.sections, i, source_infos, config);
       }
       return complete();
     };
-    return nextFile();
+    if (files.length) {
+      return nextFile();
+    } else {
+      return outputFiles();
+    }
   };
 
   parse = function(source, code, config) {
@@ -213,7 +223,7 @@
   write = function(source, title_idx, source_infos, config) {
     var css, destfile, destination, html, relative;
     destination = function(file) {
-      return make_destination(config.output, config.separator, file, '.html');
+      return make_destination(config.output, config.separator, file, '.html', config);
     };
     destfile = destination(source);
     relative = function(srcfile) {
@@ -223,7 +233,7 @@
       from = path.dirname(path.resolve(dstfile));
       return path.join(path.relative(from, to), path.basename(srcfile));
     };
-    css = relative(path.join(config.output, path.basename(config.css)));
+    css = config.css ? relative(path.join(config.output, path.basename(config.css))) : null;
     html = config.template({
       sources: config.sources,
       titles: source_infos.map(function(info) {
@@ -238,18 +248,22 @@
       relative: relative
     });
     console.log("docco: " + source + " -> " + destfile);
-    return fs.writeFileSync(destfile, html);
+    fs.mkdirsSync(path.dirname(destfile));
+    fs.writeFileSync(destfile, html);
+    return source_infos[title_idx].destDocFile = destfile;
   };
 
-  outputCode = function(source, sections, config) {
+  outputCode = function(source, sections, title_idx, source_infos, config) {
     var code, destfile, lang;
     lang = getLanguage(source, config);
     if (config.source) {
-      destfile = make_destination(config.source, config.separator, source, lang.source);
+      destfile = make_destination(config.source, config.separator, source, lang.source, config);
       code = _.pluck(sections, 'codeText').join('\n');
       code = code.trim().replace(/(\n{2,})/g, '\n\n');
       console.log("docco: " + source + " -> " + destfile);
-      return fs.writeFileSync(destfile, code);
+      fs.mkdirsSync(path.dirname(destfile));
+      fs.writeFileSync(destfile, code);
+      return source_infos[title_idx].destCodeFile = destfile;
     }
   };
 
@@ -257,10 +271,11 @@
     return path.replace(/[\\\/]/g, '/');
   };
 
-  qualifiedName = function(file, separator, extension) {
-    var nameParts;
+  qualifiedName = function(file, separator, extension, config) {
+    var cwd, nameParts;
+    cwd = config && config.cwd ? config.cwd : process.cwd();
     file = normalize(file);
-    nameParts = path.dirname(file).replace(normalize(process.cwd()), '').split('/');
+    nameParts = path.dirname(file).replace(normalize(cwd), '').split('/');
     while (nameParts[0] === '' || nameParts[0] === '.' || nameParts[0] === '..') {
       nameParts.shift();
     }
@@ -268,11 +283,12 @@
     return nameParts.join(separator) + extension;
   };
 
-  make_destination = function(basepath, separator, file, extension) {
-    return path.join(basepath, qualifiedName(file, separator, extension));
+  make_destination = function(basepath, separator, file, extension, config) {
+    return path.join(basepath, qualifiedName(file, separator, extension, config));
   };
 
   defaults = {
+    sources: [],
     layout: 'parallel',
     output: 'docs',
     template: null,
@@ -280,6 +296,7 @@
     extension: null,
     languages: {},
     source: null,
+    cwd: process.cwd(),
     separator: '-',
     blocks: false,
     marked_options: {
@@ -324,14 +341,16 @@
     if (options.marked_options) {
       config.marked_options = _.extend(config.marked_options, JSON.parse(fs.readFileSync(options.marked_options)));
     }
-    config.sources = options.args.filter(function(source) {
-      var lang;
-      lang = getLanguage(source, config);
-      if (!lang) {
-        console.warn("docco: skipped unknown type (" + (path.basename(source)) + ")");
-      }
-      return lang;
-    }).sort();
+    if (options.args) {
+      config.sources = options.args.filter(function(source) {
+        var lang;
+        lang = getLanguage(source, config);
+        if (!lang) {
+          console.warn("docco: skipped unknown type (" + (path.basename(source)) + ")");
+        }
+        return lang;
+      }).sort();
+    }
     return config;
   };
 
@@ -403,7 +422,7 @@
       args = process.argv;
     }
     c = defaults;
-    commander.version(version).usage('[options] files').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear, pretty or classic) or external layout', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-c, --css [file]', 'use a custom css file', c.css).option('-t, --template [file]', 'use a custom .jst template', c.template).option('-b, --blocks', 'parse block comments where available', c.blocks).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-s, --source [path]', 'output code in a given folder', c.source).option('-x, --separator [sep]', 'the source path is included the output filename, seaparated by this separator (default: "-")', c.separator).option('-m, --marked-options [file]', 'use custom Marked options', c.marked_options).option('-i, --ignore [file]', 'ignore unsupported languages', c.ignore).option('-T, --tab-size [size]', 'convert leading tabs to X spaces').parse(args).name = "docco";
+    commander.version(version).usage('[options] files').option('-L, --languages [file]', 'use a custom languages.json', _.compose(JSON.parse, fs.readFileSync)).option('-l, --layout [name]', 'choose a layout (parallel, linear, pretty or classic) or external layout', c.layout).option('-o, --output [path]', 'output to a given folder', c.output).option('-c, --css [file]', 'use a custom css file', c.css).option('-t, --template [file]', 'use a custom .jst template', c.template).option('-b, --blocks', 'parse block comments where available', c.blocks).option('-e, --extension [ext]', 'assume a file extension for all inputs', c.extension).option('-s, --source [path]', 'output code in a given folder', c.source).option('--cwd [path]', 'specify the Current Working Directory path for the purpose of generating qualified output filenames', c.cwd).option('-x, --separator [sep]', 'the source path is included in the output filename, separated by this separator (default: "-")', c.separator).option('-m, --marked-options [file]', 'use custom Marked options', c.marked_options).option('-i, --ignore [file]', 'ignore unsupported languages', c.ignore).option('-T, --tab-size [size]', 'convert leading tabs to X spaces').parse(args).name = "docco";
     if (commander.args.length) {
       return document(commander);
     } else {
