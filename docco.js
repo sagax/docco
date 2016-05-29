@@ -407,13 +407,13 @@
   languages = buildMatchers(languages);
 
   getLanguage = function(source, config) {
-    var codeExt, codeLang, ext, lang, ref;
+    var codeExt, codeLang, ext, lang, ref, ref1;
     ext = config.extension || path.extname(source) || path.basename(source);
     lang = ((ref = config.languages) != null ? ref[ext] : void 0) || languages[ext] || languages['text'];
     if (lang) {
       if (lang.name === 'markdown') {
         codeExt = path.extname(path.basename(source, ext));
-        if (codeExt && (codeLang = languages[codeExt])) {
+        if (codeExt && (codeLang = ((ref1 = config.languages) != null ? ref1[codeExt] : void 0) || languages[codeExt] || languages['text'])) {
           lang = _.extend({}, codeLang, {
             literate: true,
             source: ''

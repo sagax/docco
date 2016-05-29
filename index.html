@@ -1120,7 +1120,7 @@ file extension. Detect and tag “literate” <code>.ext.md</code> variants.</p>
   <span class="hljs-keyword">if</span> lang
     <span class="hljs-keyword">if</span> lang.name <span class="hljs-keyword">is</span> <span class="hljs-string">'markdown'</span>
       codeExt = path.extname(path.basename(source, ext))
-      <span class="hljs-keyword">if</span> codeExt <span class="hljs-keyword">and</span> codeLang = languages[codeExt]
+      <span class="hljs-keyword">if</span> codeExt <span class="hljs-keyword">and</span> codeLang = config.languages?[codeExt] <span class="hljs-keyword">or</span> languages[codeExt] <span class="hljs-keyword">or</span> languages[<span class="hljs-string">'text'</span>]
         lang = _.extend {}, codeLang, {literate: <span class="hljs-literal">yes</span>, source: <span class="hljs-string">''</span>}
     <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> lang.source
       lang.source = ext
