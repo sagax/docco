@@ -34,15 +34,15 @@ all: build doc loc
 install: build doc loc
 	$(CAKE) install
 
-build: docco.js tests/tests.js
+build: docco.js test/tests.js
 
 doc: index.html
 
 loc: $(SRC_DEPS) $(TOOL_DEPS)
 	$(CAKE) loc
 
-test: tests/tests.js
-	node tests/tests.js 
+test: test/tests.js
+	node test/tests.js 
 
 clean:
 	-rm index.html
@@ -65,9 +65,8 @@ index.html: $(SRC_DEPS) $(TOOL_DEPS)
 	rm -rf docs
 	#$(CAKE) doc
 
-tests/tests.js: $(SRC_DEPS) $(TOOL_DEPS) tests/tests.coffee docco.js
-	$(COFFEE) -c tests/tests.coffee
-	#$(CAKE) build
+test/tests.js: $(SRC_DEPS) $(TOOL_DEPS) test/tests.coffee docco.js
+	$(COFFEE) -c test/tests.coffee
 
 # did 'npm install' run before?
 $(TOOL_DEPS):
