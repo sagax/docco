@@ -27,19 +27,22 @@ TOOL_DEPS=                                      \
 
 # ** MAIN BUILD TARGETS **
 
-.PHONY: all install build doc loc clean
+.PHONY: all install build doc loc clean test
 
 all: build doc loc
 
 install: build doc loc
 	$(CAKE) install
 
-build: docco.js
+build: docco.js tests/tests.js
 
 doc: index.html
 
 loc: $(SRC_DEPS) $(TOOL_DEPS)
 	$(CAKE) loc
+
+test: tests/tests.js
+	node tests/tests.js 
 
 clean:
 	-rm index.html
@@ -61,6 +64,10 @@ index.html: $(SRC_DEPS) $(TOOL_DEPS)
 	sed -e 's/docco.css/resources\/$(TEMPLATE)\/docco.css/g' < docs/docco.html > index.html
 	rm -rf docs
 	#$(CAKE) doc
+
+tests/tests.js: $(SRC_DEPS) $(TOOL_DEPS) tests/tests.coffee docco.js
+	$(COFFEE) -c tests/tests.coffee
+	#$(CAKE) build
 
 # did 'npm install' run before?
 $(TOOL_DEPS):
