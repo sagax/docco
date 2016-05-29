@@ -183,7 +183,7 @@
   };
 
   format = function(source, sections, config) {
-    var code, doc, err, error1, i, j, language, len, markedOptions, results, section;
+    var code, doc, err, error1, i, j, k, language, len, len1, markedOptions, results, section;
     language = getLanguage(source, config);
     markedOptions = config.marked_options;
     marked.setOptions(markedOptions);
@@ -198,7 +198,10 @@
         }
       }
     });
-    results = [];
+    marked.setOptions({
+      linksCollector: {},
+      execPrepPhaseOnly: true
+    });
     for (i = j = 0, len = sections.length; j < len; i = ++j) {
       section = sections[i];
       code = section.codeText;
@@ -215,6 +218,15 @@
       section.codeHtml = "<div class='highlight'><pre>" + code + "</pre></div>";
       doc = section.docsText;
       section.docsText = doc = doc.replace(/\s+$/, '');
+      marked(doc);
+    }
+    marked.setOptions({
+      execPrepPhaseOnly: false
+    });
+    results = [];
+    for (i = k = 0, len1 = sections.length; k < len1; i = ++k) {
+      section = sections[i];
+      doc = section.docsText;
       results.push(section.docsHtml = marked(doc));
     }
     return results;

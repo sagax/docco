@@ -26,10 +26,9 @@
   }
 
   equal = function (a, b, msg) {
-    console.log("equal: ", {
-      a: a,
-      b: b
-    }, msg);
+    if (a !== b) {
+      throw new Error("TEST FAILED: " + msg + " (" + a + " !== " + b + ")");
+    }
     return a === b;
   }
 
@@ -37,7 +36,6 @@
 
   Docco.ensureDirectory = function (dir, f) {
     xfs.mkdirsSync(dir);
-    console.log("ensureDirectory: ", dir);
     return f();
   };
 
@@ -60,11 +58,10 @@
       }
       opts = options || {};
       opts.args = sources;
-      console.log("going to run docco with options: ", opts);
+      //console.log("going to run docco with options: ", opts);
       return Docco.document(opts, function(error, info) {
         var expected, files, found, src, _i, _len;
         files = [];
-        console.log("invoked docco.document and invoked user callback: ", error, info);
         for (_i = 0, _len = sources.length; _i < _len; _i++) {
           src = sources[_i];
           console.log("check output for file: ", {
@@ -73,7 +70,19 @@
           });
           files = files.concat(info.source_infos[_i].destDocFile);
         }
-        expected = files.length + ((options != null ? options.markdown : void 0) ? 2 : 1);
+        var extra_files = 0;
+        if (options != null) {
+          if (options.markdown) {
+            extra_files = 2;
+          } else if (options.template) {
+            extra_files = 0;
+          } else if (options.css) {
+            extra_files = 2;
+          } else {
+            extra_files = 2;
+          }
+        }
+        expected = files.length + extra_files;
         found = fs.readdirSync(destPath).length;
         equal(found, expected, "find expected output (" + expected + " files) - (" + found + ")");
         if (callback != null) {
@@ -83,31 +92,31 @@
     });
   };
 
-  xtest("markdown from docco", function() {
+  test("markdown from docco", function() {
     return testDoccoRun("markdown_output", ["" + testPath + "/tests.coffee"], {
       markdown: true
     });
   });
 
-  xtest("custom JST template file", function() {
+  test("custom JST template file", function() {
     return testDoccoRun("custom_jst", ["" + testPath + "/tests.coffee"], {
       template: "" + resourcesPath + "/pagelet/docco.jst"
     });
   });
 
-  xtest("custom CSS file", function() {
+  test("custom CSS file", function() {
     return testDoccoRun("custom_css", ["" + testPath + "/tests.coffee"], {
       css: "" + resourcesPath + "/pagelet/docco.css"
     });
   });
 
-  xtest("specify an extension", function() {
+  test("specify an extension", function() {
     return testDoccoRun("specify_extension", ["" + testPath + "/comments/noextension"], {
       extension: ".coffee"
     });
   });
 
-  xtest("single line and block comment parsing", function() {
+  test("single line and block comment parsing", function() {
     var commentsPath, ext, l, languageKeys, options, testNextLanguage;
     commentsPath = path.join(testPath, "comments");
     options = {
@@ -187,7 +196,7 @@
           var contents, count;
           contents = fs.readFileSync(outFile).toString();
           count = contents.match(/<a\shref="http:\/\/www.google.com">Google<\/a>/g);
-          return equal(count.length, 2, "find expected (2) resolved url references");
+          return equal(count && count.length, 2, "find expected (2) resolved url references");
         });
       });
     });
@@ -210,13 +219,13 @@
           var contents, count;
           contents = fs.readFileSync(outFile).toString();
           count = contents.match(/<a\shref="http:\/\/www.google.com">Google<\/a>/g);
-          return equal(count.length, 2, "find expected (2) resolved url references");
+          return equal(count && count.length, 2, "find expected (2) resolved url references");
         });
       });
     });
   });
 
-  xtest("create complex paths that do not exist", function() {
+  test("create complex paths that do not exist", function() {
     var exist, outputPath;
     exist = fs.existsSync || path.existsSync;
     outputPath = path.join(dataPath, 'complex/path/that/doesnt/exist');

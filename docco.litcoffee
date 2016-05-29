@@ -309,10 +309,24 @@ if not specified.
             code
       }
 
-Process each chunk:
+Also instruct Marked to run a preliminary scan of all the chunks first, where we want to
+collect all link references. Only in the second run will we then require Marked to produce
+the final HTML rendered output.
+
+We have to execute this 2-phase process to ensure that any input which includes MarkDown
+link references is processed properly: without the initial scan any link reference defined
+later (near the end of the input document) will be unknown to document chunks near the top
+of the input document.
+
+      marked.setOptions {
+        linksCollector: {}
+        execPrepPhaseOnly: true
+      }
+
+Process each chunk (phase 1):
 - both the code and text blocks are stripped of trailing empty lines
 - the code block is marked up by highlighted to show a nice HTML rendition of the code
-- the text block is fed to Marked to turn it into HTML
+- the text block is fed to Marked for an initial scan
 
       for section, i in sections
         code = section.codeText
@@ -326,6 +340,17 @@ Process each chunk:
         section.codeHtml = "<div class='highlight'><pre>#{code}</pre></div>"
         doc = section.docsText
         section.docsText = doc = doc.replace(/\s+$/, '')
+        marked(doc)
+
+Process each chunk (phase 2):
+- the text block is fed to Marked to turn it into HTML
+
+      marked.setOptions {
+        execPrepPhaseOnly: false
+      }
+
+      for section, i in sections
+        doc = section.docsText
         section.docsHtml = marked(doc)
 
 Once all of the code has finished highlighting, we can **write** the resulting
