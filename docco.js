@@ -144,7 +144,7 @@ write = function(source, sections, config) {
   title = hasTitle ? first.text : path.basename(source);
   html = config.template({
     sources: config.sources,
-    css: path.basename(config.css),
+    css: config.css ? path.basename(config.css) : null,
     title: title,
     hasTitle: hasTitle,
     sections: sections,
