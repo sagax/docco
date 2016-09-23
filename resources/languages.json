@@ -30,6 +30,7 @@
   ".go": {"name": "go", "symbol": "//"},
   ".groovy": {"name": "groovy", "symbol": "//" },
   ".h": {"name" : "c", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
+  ".hpp": {"name" : "cpp", "symbol" : "//", "enter": "^\\s*\\/\\*+(\\s+|$)", "exit": "\\s*\\*+\\/\\s*$", "next": "^\\s*\\*+\\s?", "param": "@([a-zA-Z]+)" },
   ".hrl": {"name" : "erlang", "symbol" : "%"},
   ".hs": {"name" : "haskell", "symbol" : "--"},
   ".htm": {"name": "html", "symbol": "", "enter": "^\\s*<!--(\\s+|$)", "exit": "\\s*-->\\s*$", "next": "" },
