@@ -273,10 +273,11 @@ individual <strong>section</strong> for it. Each section is an object with <code
               <p>Our quick-and-dirty implementation of the literate programming style. Simply
 invert the prose and code relationship on a per-line basis, and then continue as
 normal below.</p>
+<p>Note: “Literate markdown” is an exception here as it’s basically the reverse.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">if</span> lang.literate
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">if</span> lang.literate <span class="hljs-keyword">and</span> lang.name != <span class="hljs-string">'markdown'</span>
     isText = maybeCode = <span class="hljs-literal">yes</span>
     <span class="hljs-keyword">for</span> line, i <span class="hljs-keyword">in</span> lines
       lines[i] = <span class="hljs-keyword">if</span> maybeCode <span class="hljs-keyword">and</span> match = <span class="hljs-regexp">/^([ ]{4}|[ ]{0,3}\t)/</span>.exec line
@@ -644,18 +645,34 @@ of the input document.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">for</span> section, i <span class="hljs-keyword">in</span> sections
-    code = section.codeText
-    section.codeText = code = code.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>)
-    <span class="hljs-keyword">try</span>
-      code = highlightjs.highlight(language.name, code).value
-    <span class="hljs-keyword">catch</span> err
-      <span class="hljs-keyword">throw</span> err <span class="hljs-keyword">unless</span> config.ignore
-      code = section.codeText
+    <span class="hljs-keyword">if</span> language.name == <span class="hljs-string">'markdown'</span>
+      <span class="hljs-keyword">if</span> language.literate
+        code = section.codeText
+        section.codeText = code = code.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>)
+        section.codeHtml = marked(code)
 
-    section.codeHtml = <span class="hljs-string">"&lt;div class='highlight'&gt;&lt;pre&gt;<span class="hljs-subst">#{code}</span>&lt;/pre&gt;&lt;/div&gt;"</span>
-    doc = section.docsText
-    section.docsText = doc = doc.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>)
-    marked(doc)</pre></div></div>
+        doc = section.docsText
+        section.docsText = doc = doc.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>)
+        marked(doc)
+      <span class="hljs-keyword">else</span>
+        section.codeHtml = <span class="hljs-string">''</span>
+
+        code = section.codeText
+        section.codeText = code = code.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>)
+        marked(code)
+    <span class="hljs-keyword">else</span>
+      code = section.codeText
+      section.codeText = code = code.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>)
+      <span class="hljs-keyword">try</span>
+        code = highlightjs.highlight(language.name, code).value
+      <span class="hljs-keyword">catch</span> err
+        <span class="hljs-keyword">throw</span> err <span class="hljs-keyword">unless</span> config.ignore
+        code = section.codeText
+
+      section.codeHtml = <span class="hljs-string">"&lt;div class='highlight'&gt;&lt;pre&gt;<span class="hljs-subst">#{code}</span>&lt;/pre&gt;&lt;/div&gt;"</span>
+      doc = section.docsText
+      section.docsText = doc = doc.replace(<span class="hljs-regexp">/\s+$/</span>, <span class="hljs-string">''</span>)
+      marked(doc)</pre></div></div>
             
         </li>
         
@@ -678,8 +695,16 @@ of the input document.</p>
   }
 
   <span class="hljs-keyword">for</span> section, i <span class="hljs-keyword">in</span> sections
-    doc = section.docsText
-    section.docsHtml = marked(doc)</pre></div></div>
+    <span class="hljs-keyword">if</span> language.name == <span class="hljs-string">'markdown'</span>
+      <span class="hljs-keyword">if</span> language.literate
+        doc = section.docsText
+        section.docsHtml = marked(doc)
+      <span class="hljs-keyword">else</span>
+        code = section.codeText
+        section.docsHtml = marked(code)
+    <span class="hljs-keyword">else</span>
+      doc = section.docsText
+      section.docsHtml = marked(doc)</pre></div></div>
             
         </li>
         

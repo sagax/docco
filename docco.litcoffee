@@ -171,7 +171,9 @@ Our quick-and-dirty implementation of the literate programming style. Simply
 invert the prose and code relationship on a per-line basis, and then continue as
 normal below.
 
-      if lang.literate
+Note: "Literate markdown" is an exception here as it's basically the reverse.
+
+      if lang.literate and lang.name != 'markdown'
         isText = maybeCode = yes
         for line, i in lines
           lines[i] = if maybeCode and match = /^([ ]{4}|[ ]{0,3}\t)/.exec line
@@ -329,18 +331,34 @@ Process each chunk (phase 1):
 - the text block is fed to Marked for an initial scan
 
       for section, i in sections
-        code = section.codeText
-        section.codeText = code = code.replace(/\s+$/, '')
-        try
-          code = highlightjs.highlight(language.name, code).value
-        catch err
-          throw err unless config.ignore
-          code = section.codeText
+        if language.name == 'markdown'
+          if language.literate
+            code = section.codeText
+            section.codeText = code = code.replace(/\s+$/, '')
+            section.codeHtml = marked(code)
 
-        section.codeHtml = "<div class='highlight'><pre>#{code}</pre></div>"
-        doc = section.docsText
-        section.docsText = doc = doc.replace(/\s+$/, '')
-        marked(doc)
+            doc = section.docsText
+            section.docsText = doc = doc.replace(/\s+$/, '')
+            marked(doc)
+          else
+            section.codeHtml = ''
+
+            code = section.codeText
+            section.codeText = code = code.replace(/\s+$/, '')
+            marked(code)
+        else
+          code = section.codeText
+          section.codeText = code = code.replace(/\s+$/, '')
+          try
+            code = highlightjs.highlight(language.name, code).value
+          catch err
+            throw err unless config.ignore
+            code = section.codeText
+
+          section.codeHtml = "<div class='highlight'><pre>#{code}</pre></div>"
+          doc = section.docsText
+          section.docsText = doc = doc.replace(/\s+$/, '')
+          marked(doc)
 
 Process each chunk (phase 2):
 - the text block is fed to Marked to turn it into HTML
@@ -350,8 +368,16 @@ Process each chunk (phase 2):
       }
 
       for section, i in sections
-        doc = section.docsText
-        section.docsHtml = marked(doc)
+        if language.name == 'markdown'
+          if language.literate
+            doc = section.docsText
+            section.docsHtml = marked(doc)
+          else
+            code = section.codeText
+            section.docsHtml = marked(code)
+        else
+          doc = section.docsText
+          section.docsHtml = marked(doc)
 
 Once all of the code has finished highlighting, we can **write** the resulting
 documentation file by passing the completed HTML sections into the template,

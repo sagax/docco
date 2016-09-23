@@ -110,7 +110,7 @@
       });
       return hasCode = docsText = codeText = '';
     };
-    if (lang.literate) {
+    if (lang.literate && lang.name !== 'markdown') {
       isText = maybeCode = true;
       for (i = j = 0, len = lines.length; j < len; i = ++j) {
         line = lines[i];
@@ -204,21 +204,37 @@
     });
     for (i = j = 0, len = sections.length; j < len; i = ++j) {
       section = sections[i];
-      code = section.codeText;
-      section.codeText = code = code.replace(/\s+$/, '');
-      try {
-        code = highlightjs.highlight(language.name, code).value;
-      } catch (error1) {
-        err = error1;
-        if (!config.ignore) {
-          throw err;
+      if (language.name === 'markdown') {
+        if (language.literate) {
+          code = section.codeText;
+          section.codeText = code = code.replace(/\s+$/, '');
+          section.codeHtml = marked(code);
+          doc = section.docsText;
+          section.docsText = doc = doc.replace(/\s+$/, '');
+          marked(doc);
+        } else {
+          section.codeHtml = '';
+          code = section.codeText;
+          section.codeText = code = code.replace(/\s+$/, '');
+          marked(code);
         }
+      } else {
         code = section.codeText;
+        section.codeText = code = code.replace(/\s+$/, '');
+        try {
+          code = highlightjs.highlight(language.name, code).value;
+        } catch (error1) {
+          err = error1;
+          if (!config.ignore) {
+            throw err;
+          }
+          code = section.codeText;
+        }
+        section.codeHtml = "<div class='highlight'><pre>" + code + "</pre></div>";
+        doc = section.docsText;
+        section.docsText = doc = doc.replace(/\s+$/, '');
+        marked(doc);
       }
-      section.codeHtml = "<div class='highlight'><pre>" + code + "</pre></div>";
-      doc = section.docsText;
-      section.docsText = doc = doc.replace(/\s+$/, '');
-      marked(doc);
     }
     marked.setOptions({
       execPrepPhaseOnly: false
@@ -226,8 +242,18 @@
     results = [];
     for (i = k = 0, len1 = sections.length; k < len1; i = ++k) {
       section = sections[i];
-      doc = section.docsText;
-      results.push(section.docsHtml = marked(doc));
+      if (language.name === 'markdown') {
+        if (language.literate) {
+          doc = section.docsText;
+          results.push(section.docsHtml = marked(doc));
+        } else {
+          code = section.codeText;
+          results.push(section.docsHtml = marked(code));
+        }
+      } else {
+        doc = section.docsText;
+        results.push(section.docsHtml = marked(doc));
+      }
     }
     return results;
   };
