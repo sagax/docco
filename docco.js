@@ -257,7 +257,8 @@
       sections: source_infos[title_idx].sections,
       path: path,
       destination: destination,
-      relative: relative
+      relative: relative,
+      language: getLanguage(source, config)
     });
     console.log("docco: " + source + " -> " + destfile);
     fs.mkdirsSync(path.dirname(destfile));
