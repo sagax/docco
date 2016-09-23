@@ -524,12 +524,17 @@ Helpers & Initial Setup
 
 Require our external dependencies.
 
-    _           = require 'underscore'
-    fs          = require 'fs-extra'
-    path        = require 'path'
-    marked      = require 'marked'
-    commander   = require 'commander'
-    highlightjs = require 'highlight.js'
+    _                = require 'underscore'
+    fs               = require 'fs-extra'
+    path             = require 'path'
+    marked           = require 'marked'
+    commander        = require 'commander'
+    highlightjs      = require 'highlight.js'
+    coffeeSyntax     = require 'hljs-classy-site/coffeescript'
+    javascriptSyntax = require 'hljs-classy-site/javascript'
+
+    highlightjs.registerLanguage('coffeescript', coffeeSyntax)
+    highlightjs.registerLanguage('javascript', javascriptSyntax)
 
 Languages are stored in JSON in the file `resources/languages.json`.
 Each item maps the file extension to the name of the language and the
