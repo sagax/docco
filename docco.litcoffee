@@ -39,11 +39,11 @@ Partners in Crime:
 * If **Node.js** doesn't run on your platform, or you'd prefer a more
 convenient package, get [Ryan Tomayko](http://github.com/rtomayko)'s
 [Rocco](http://rtomayko.github.io/rocco/rocco.html), the **Ruby** port that's
-available as a gem.
+available as a gem. (**WARNING**: project seems currently broken and apparently abandoned.)
 
 * If you're writing shell scripts, try
 [Shocco](http://rtomayko.github.io/shocco/), a port for the **POSIX shell**,
-also by Mr. Tomayko.
+also by Mr. Tomayko. (**WARNING**: project seems currently broken and apparently abandoned.)
 
 * If **Python** is more your speed, take a look at
 [Nick Fitzgerald](http://github.com/fitzgen)'s [Pycco](https://pycco-docs.github.io/pycco/).
