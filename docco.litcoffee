@@ -383,6 +383,7 @@ and rendering it to the specified output path.
         path
         destination
         relative
+	// language: getLanguage(source, config)
       }
 
       console.log "docco: #{source} -> #{destfile}"
