@@ -240,7 +240,7 @@ a single '*', for example).
           if in_block > 1 and lang.commentNext
             line = line.replace(lang.commentNext, '');
 
-If we happen upon a JavaDoc @param parameter, then process that item.
+If we happen upon a JavaDoc `@param` parameter, then process that item.
 
           if lang.commentParam
             param = line.match(lang.commentParam);
