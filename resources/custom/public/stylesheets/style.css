@@ -138,3 +138,9 @@ article {
   padding: 0 10px;
   }
 } /* @iPhone */
+
+.doc-tag b {
+  text-shadow: 0 0 1px #555;
+  padding-left: 20px;
+  color: #505050;
+}
