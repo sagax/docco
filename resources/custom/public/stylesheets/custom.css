@@ -68,3 +68,13 @@
 #jump_page .source:first-child {
 }
 
+.doc-tag b {
+  text-shadow: 0 0 1px #555;
+  padding-left: 20px;
+  color: #505050;
+}
+
+.doc-tag b.red {
+  text-shadow: 0 0 1px #b50000;
+  color: #B50000;
+}
