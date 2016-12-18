@@ -10,7 +10,7 @@ body {
   font: 1.3em "Vollkorn", Palatino, Times;
   color: #333;
   line-height: 1.4;
-  text-align: justify;
+  text-align: left;
   }
 header, nav, article, footer {
   width: 700px;
