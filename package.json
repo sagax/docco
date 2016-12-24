@@ -28,8 +28,7 @@
     "commander": ">=2.9.0",
     "marked": "GerHobbelt/marked#master",
     "fs-extra": ">=0.30.0",
-    "underscore": ">= 1.8.3",
-    "highlight.js": ">=9.4.0"
+    "underscore": ">= 1.8.3"
   },
   "devDependencies": {
     "coffee": ">=3.2.1",
