@@ -1,5 +1,5 @@
 {
-  "name": "@GerHobbelt/docco",
+  "name": "docco",
   "description": "The Quick and Dirty Literate Programming Documentation Generator",
   "keywords": [
     "documentation",
@@ -19,7 +19,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jashkenas/docco.git"
+    "url": "https://github.com/sagax/docco"
   },
   "engines": {
     "node": ">=0.2.0"
