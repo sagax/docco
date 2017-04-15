@@ -77,3 +77,27 @@
   text-shadow: 0 0 1px #b50000;
   color: #B50000;
 }
+
+.to_top_div {
+  text-align: left;
+  position: relative;
+}
+
+.to_top_div > a {
+  position: absolute;
+  left: 100%;
+  width: 30px;
+  height: 30px;
+  background-color: #2484C1;
+  top: -30px;
+}
+
+.nav {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-right: 1px dashed #2484C1;
+  padding-right: 10px;
+  width: 200px;
+}
