@@ -48,6 +48,7 @@
         <%= section.docsHtml %>
         <% if (!(/^\s*$/).test(section.codeText)) { %>
           <%= section.codeHtml %>
+        <% } else { %>
         <% } %>
       <% } else { %>
         <h1> <%= title %> </h1>
@@ -84,7 +85,7 @@
     </script>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
-        var headers = [].slice.call( document.querySelectorAll('h1') ).slice(1).forEach(
+        var headers = [].slice.call( document.querySelectorAll('h1') ).forEach(
           function(head) {
             var name = transliterate(head.textContent).replace(/\s/g, '_');
 
@@ -92,6 +93,7 @@
             tag_a.name = name;
             tag_a.href = '#' + name;
             tag_a.textContent = name;
+            tag_a.className = "anchor_link"
             head.parentNode.insertBefore(tag_a, head);
 
             var div_top = document.createElement('div');

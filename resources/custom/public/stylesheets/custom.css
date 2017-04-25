@@ -89,7 +89,7 @@
   width: 30px;
   height: 30px;
   background-color: #2484C1;
-  top: -30px;
+  top: -70px;
 }
 
 .nav {
@@ -100,4 +100,13 @@
   border-right: 1px dashed #2484C1;
   padding-right: 10px;
   width: 200px;
+}
+
+.anchor_link {
+  position: relative;
+  font-size: 0.7em;
+}
+
+.anchor_link:before {
+  content: " > "
 }
