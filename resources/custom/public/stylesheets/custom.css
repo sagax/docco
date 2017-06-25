@@ -8,6 +8,7 @@
   cursor: pointer;
   text-align: right;
   list-style: none;
+  z-index: 1000;
 }
 
 #jump_to a {
@@ -52,6 +53,7 @@
   max-height: 100%;
   max-height: 100vh;        /* 100% is fallback for browsers which do not support the 'vh' unit */
   overflow: auto;
+  min-width: 200px;
 }
 
 #jump_page .source {
@@ -99,7 +101,8 @@
   bottom: 0;
   border-right: 1px dashed #2484C1;
   padding-right: 10px;
-  width: 20%;
+  width: 250px;
+  box-sizing: border-box;
 }
 
 .anchor_link {
@@ -109,4 +112,27 @@
 
 .anchor_link:before {
   content: " > "
+}
+
+table {
+  border: 0px solid #f0f0f0;
+  font-family: monospace;
+  border-spacing: 0px;
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+table th {
+  padding: 0 10px;
+  border-bottom: 1px solid #a0a0a0;
+}
+table tr td:first-child {
+}
+table tr td {
+  padding: 5px 10px;
+  border-bottom: 1px solid #a0a0a0;
+}
+.content {
+  margin-left: 250px;
 }
