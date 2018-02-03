@@ -15,8 +15,8 @@
     <% if (sources.length > 1) { %>
       <ul id="jump_to">
         <li>
-          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
-          <a class="small" href="javascript:void(0);">+</a>
+          <a class="large" href="#!">Jump To &hellip;</a>
+          <a class="small" href="#!">+</a>
           <div id="jump_wrapper">
             <div id="jump_page_wrapper">
               <div id="jump_page">
@@ -34,28 +34,37 @@
       </ul>
     <% } %>
 
-    <ul class="nav"></ul>
-
-    <div class="container">
-      <% if (hasTitle) { %>
-        <% var section = sections.shift(); %>
-        <%= section.docsHtml %>
-        <% if (!(/^\s*$/).test(section.codeText)) { %>
-          <%= section.codeHtml %>
-        <% } else { %>
-        <% } %>
-      <% } else { %>
-        <h1> <%= title %> </h1>
-      <% } %>
-
-      <% for (var i = 0, l = sections.length; i < l; i++) { %>
-        <% var section = sections[i]; %>
-        <%= section.docsHtml %>
-        <% if (!(/^\s*$/).test(section.codeText)) { %>
-          <%= section.codeHtml %>
-        <% } %>
-      <% } %>
+    <div class="left_area__wrap">
+      <div class="left_area">
+        <ul class="nav"></ul>
+      </div>
+      <a href="#" class="backlink"></a>
     </div>
+
+    <div class="container__wrap">
+      <div class="container">
+        <% if (hasTitle) { %>
+          <% var section = sections.shift(); %>
+          <%= section.docsHtml %>
+          <% if (!(/^\s*$/).test(section.codeText)) { %>
+            <%= section.codeHtml %>
+          <% } else { %>
+          <% } %>
+        <% } else { %>
+          <h1> <%= title %> </h1>
+        <% } %>
+
+        <% for (var i = 0, l = sections.length; i < l; i++) { %>
+          <% var section = sections[i]; %>
+          <%= section.docsHtml %>
+          <% if (!(/^\s*$/).test(section.codeText)) { %>
+            <%= section.codeHtml %>
+          <% } %>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="clear_both"></div>
 
     <script src="public/js/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
