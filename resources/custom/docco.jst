@@ -42,7 +42,8 @@
     </div>
 
     <div class="container__wrap">
-      <div class="container">
+      <div class="container hide" id="mirror"></div>
+      <div class="container" id="base">
         <% if (hasTitle) { %>
           <% var section = sections.shift(); %>
           <%= section.docsHtml %>
@@ -65,6 +66,84 @@
     </div>
 
     <div class="clear_both"></div>
+<script>
+function draw_to_block(el_arr, container, parent, div) {
+  el_arr.forEach(function(item){
+    div.append(item);
+  });
+  container.append(div);
+}
+
+function wrap_to_block(el, direction) {
+  var parent = el.parentNode;
+  var container = document.querySelector('#mirror');
+  var el_arr = [];
+
+  if (direction === "up") {
+    var div = document.createElement('div');
+    div.className = "container_part";
+
+    while (el.previousSibling) {
+      el_arr.push(el.previousSibling);
+      parent.removeChild(el.previousSibling)
+    };
+
+    el_arr.reverse();
+    draw_to_block(el_arr, container, parent, div);
+    parent.removeChild(el);
+  } else if (direction === "down") {
+    var div = document.createElement('div');
+    div.className = "container_part";
+
+    while (el.previousSibling) {
+      el_arr.push(el.previousSibling);
+      parent.removeChild(el.previousSibling)
+    };
+    el_arr.reverse();
+    draw_to_block(el_arr, container, parent, div);
+    var el_arr = [];
+
+    var div = document.createElement('div');
+    div.className = "container_part";
+
+    while (el.nextSibling) {
+      el_arr.push(el.nextSibling);
+      parent.removeChild(el.nextSibling)
+    };
+
+    draw_to_block(el_arr, container, parent, div);
+    parent.removeChild(el);
+  }
+};
+
+function find_divider(xpath_result, count) {
+  //var item = xpath_result.iterateNext();
+  elements = [];
+
+  while(count > 0) {
+    item = xpath_result.iterateNext();
+    elements.push(item);
+    count -= 1;
+  };
+
+  if (elements.length === 0) {
+    var base = document.querySelector('#base');
+    base.style.backgroundColor = "white";
+    base.style.boxShadow = "0 0 15px #505050";
+    return;
+  }
+  elements.forEach(function(el, index, arr) {
+    var _index = index + 1;
+    if (_index < arr.length) {
+      wrap_to_block(el, "up");
+    } else {
+      wrap_to_block(el, "down");
+    }
+  });
+  var container = document.querySelector('#mirror');
+  container.classList.remove('hide');
+};
+</script>
 
     <script src="public/js/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
@@ -114,6 +193,9 @@
             document.querySelector('ul.nav').append(li);
           }
         );
+        var divides = document.evaluate("//p[contains(.,'~')]", document, null, XPathResult.ANY_TYPE, null);
+        var divides_count = document.evaluate("count(//p[contains(.,'~')])", document, null, XPathResult.NUMBER_TYPE, null).numberValue;
+        find_divider(divides, divides_count);
       });
     </script>
   </body>
